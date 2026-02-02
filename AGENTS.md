@@ -593,3 +593,53 @@ const handleEventTypeClick = (eventType) => {
 }
 ```
 Close menu first, then notify parent. Console.log serves as placeholder for future modal integration.
+
+### Story 9: Mobile FAB - Team Member Switcher (2026-02-02)
+**Sorting Current User to Bottom of List:** To keep the current user at the bottom (matching the FAB button position), use array sorting with conditional ID comparison:
+```javascript
+const sortedMembers = [...allMembers].sort((a, b) => {
+  if (a.id === selectedMember.id) return 1  // Move selected to end
+  if (b.id === selectedMember.id) return -1
+  return 0  // Keep others in original order
+})
+```
+This creates a new sorted array where the selected member always appears last, while other members maintain their original order.
+
+**Multiple Visual Indicators for Selection:** Combine two visual cues for better UX:
+1. Orange ring around the entire button: `ring-2 ring-accent`
+2. Small orange dot indicator next to the name: `<div className="w-2 h-2 rounded-full bg-accent" />`
+
+This dual indication makes it immediately clear which team member is currently selected, even when scanning the list quickly.
+
+**Dynamic FAB Button Styling:** Use inline styles to set the FAB button's background color to match the selected member's color:
+```jsx
+<button
+  style={{ backgroundColor: selectedMember.color }}
+  className="w-12 h-12 rounded-full..."
+>
+  <span>{selectedMember.avatar}</span>
+</button>
+```
+This provides instant visual feedback about whose schedule is being viewed without needing to open the menu.
+
+**Reusing FAB Pattern:** The TeamMemberSwitcher follows the same structure as FloatingActionButton:
+- Backdrop overlay: `fixed inset-0 bg-black/50 z-40`
+- FAB container: `fixed bottom-6 left-6 z-50` (left instead of right)
+- Action buttons: `absolute bottom-16` positioned above FAB
+- Mobile-only: `md:hidden` on both backdrop and container
+
+This pattern consistency makes the codebase easier to understand and maintain.
+
+**Controlled Component for Team Member Selection:** The parent (SchedulePage) owns the selectedMember state and passes it down with an onMemberSelect callback. The switcher displays the current selection but doesn't manage its own state:
+```jsx
+// Parent
+const [selectedMember, setSelectedMember] = useState(allMembers[0])
+<TeamMemberSwitcher selectedMember={selectedMember} onMemberSelect={setSelectedMember} />
+
+// Child
+const handleMemberClick = (member) => {
+  setIsOpen(false)
+  onMemberSelect(member)  // Notify parent
+}
+```
+This allows multiple components (TimeGrid, TeamMemberSwitcher) to react to the same state changes.

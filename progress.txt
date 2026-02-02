@@ -482,3 +482,78 @@ COMPLETED: Render Events on Mobile Calendar at Mon Feb  2 13:42:32 CST 2026
 ### Next Steps:
 - Story 9: Mobile FAB - Team Member Switcher (bottom-left button to switch viewed schedule)
 
+MONITOR: Story story-8 marked complete, signaling Claude to stop at Mon Feb  2 13:48:16 CST 2026
+COMPLETED: Mobile FAB - Create Event Actions at Mon Feb  2 13:48:17 CST 2026
+
+---
+## 2026-02-02 13:48:19 | Story: story-9 | Status: Complete
+
+### Implemented:
+- TeamMemberSwitcher component with circular FAB (48px) in bottom-left corner
+- Vertical list of team members displayed above button when opened
+- Avatar/initials with colored background for each team member
+- Current user always positioned at bottom of list
+- Schedule switching functionality - selecting a member updates displayed events
+- Orange accent highlighting for currently selected member (ring + dot indicator)
+- Backdrop overlay with click-to-close functionality
+- Smooth fadeIn animation for member list
+- Mobile-only visibility (md:hidden)
+- Integration with SchedulePage state management
+
+### Files Created:
+- src/components/schedule/TeamMemberSwitcher.jsx (team member switcher FAB component)
+
+### Files Modified:
+- src/pages/SchedulePage.jsx (added TeamMemberSwitcher integration, removed eslint-disable for setSelectedMember, added handleMemberSelect callback)
+
+### Tests:
+- [x] Circular button (48px) renders in bottom-left with current user's initials and color
+- [x] Pressing button shows vertical list of all team members above button
+- [x] Each team member option shows colored avatar/initials and name
+- [x] Current user always appears at bottom of list
+- [x] Selecting a team member switches calendar to show that person's schedule
+- [x] Currently selected member highlighted with orange ring (ring-2 ring-accent)
+- [x] Orange dot indicator appears next to selected member's name
+- [x] Background dimmed with backdrop overlay when menu open
+- [x] Backdrop click closes the member list
+- [x] Component is mobile-only (hidden at md/768px+ breakpoint)
+- [x] npm run lint passes
+- [x] npm run build succeeds (dist/ 221.41 KB)
+- [x] Browser verification at mobile width (375px) using dev-browser
+
+### Quality Checks:
+- ESLint: ✅ No errors
+- Build: ✅ Success (dist/ 221.41 KB)
+- Mobile (375px): ✅ All features working correctly
+- Design System: ✅ Correct fonts, colors, pill-shaped buttons, orange accent highlighting
+- State Management: ✅ Schedule updates correctly when switching members
+- Animations: ✅ Smooth fadeIn animation for member list
+
+### Browser Testing Details:
+- Initial view: Blue "MT" button (Mike Torres) in bottom-left corner
+- Menu opened: All 6 team members listed vertically with colored avatars
+- Mike Torres initially at bottom with orange ring + dot indicator
+- Clicked Sarah Chen: Schedule switched to show her events
+- Button updated to teal "SC" (Sarah Chen)
+- Opened menu again: Sarah Chen now at bottom with orange highlighting
+- Tuesday Feb 3 view: Sarah's events displayed correctly (4 events)
+- Background overlay dims content behind menu
+- Current user always sorted to bottom of list
+
+### Issues:
+- None encountered
+
+### Learnings:
+- **Sorting Current User to Bottom:** Used array sorting with conditional logic to always place the selected member at the end of the list. The sort compares each member's ID against selectedMember.id and returns 1 (move down) or -1 (move up) accordingly.
+- **Multiple Visual Indicators for Selection:** Combined two visual cues for the selected member: an orange ring (`ring-2 ring-accent`) around the entire button and a small orange dot next to the name. This dual indication makes it very clear which member is active.
+- **Reusing FAB Pattern:** The component follows the same structure as FloatingActionButton from Story 8 - backdrop overlay at z-40, FAB container at z-50, buttons with hover brightness effects. This consistency makes the codebase easier to maintain.
+- **Dynamic Button Color:** The main FAB button uses inline styles to set backgroundColor from the selected member's color property. This provides immediate visual feedback about whose schedule is being viewed.
+- **State Management Pattern:** The parent component (SchedulePage) manages the selectedMember state and passes it down as a prop along with the onMemberSelect callback. This keeps the switcher as a controlled component and allows the state to be shared with other components like TimeGrid.
+- **PropTypes Shape Validation:** Used `PropTypes.shape()` to validate the complex selectedMember object structure with all required fields (id, name, role, avatar, color). This provides clear documentation and runtime validation.
+
+### Next Steps:
+- Story 10: Create Event Modal - Mobile (bottom-sheet modal with form fields for creating new events)
+
+MONITOR: Story story-9 marked complete, signaling Claude to stop at 2026-02-02 13:51:33
+COMPLETED: Mobile FAB - Team Member Switcher at 2026-02-02 13:51:33
+

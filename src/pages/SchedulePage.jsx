@@ -2,6 +2,7 @@ import { useState } from 'react'
 import WeekStrip from '../components/schedule/WeekStrip'
 import TimeGrid from '../components/schedule/TimeGrid'
 import FloatingActionButton from '../components/schedule/FloatingActionButton'
+import TeamMemberSwitcher from '../components/schedule/TeamMemberSwitcher'
 import { getAllMembers } from '../utils/dataAccess'
 
 export default function SchedulePage() {
@@ -9,7 +10,6 @@ export default function SchedulePage() {
 
   // Default to first team member (current user)
   const allMembers = getAllMembers()
-  // eslint-disable-next-line no-unused-vars
   const [selectedMember, setSelectedMember] = useState(allMembers[0])
 
   const handleDateSelect = (date) => {
@@ -21,6 +21,10 @@ export default function SchedulePage() {
     console.log('Selected event type:', eventType)
   }
 
+  const handleMemberSelect = (member) => {
+    setSelectedMember(member)
+  }
+
   return (
     <div className="flex flex-col h-full">
       {/* Week Strip - Mobile Only */}
@@ -29,7 +33,10 @@ export default function SchedulePage() {
       {/* Time Grid - Mobile Day Agenda View */}
       <TimeGrid selectedDate={selectedDate} selectedMember={selectedMember} />
 
-      {/* Floating Action Button - Mobile Only */}
+      {/* Team Member Switcher - Mobile Only - Bottom Left */}
+      <TeamMemberSwitcher selectedMember={selectedMember} onMemberSelect={handleMemberSelect} />
+
+      {/* Floating Action Button - Mobile Only - Bottom Right */}
       <FloatingActionButton onEventTypeSelect={handleEventTypeSelect} />
     </div>
   )
