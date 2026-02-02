@@ -263,3 +263,39 @@ export default MyComponent
 ```
 
 **date-fns for Date Display:** Use `format(date, 'MMMM yyyy')` for clean month/year display. Lighter and more flexible than moment.js.
+
+### Story 4: Mobile Week Strip Navigation (2026-02-02)
+**date-fns Week Calculations:** Use `startOfWeek(date, { weekStartsOn: 1 })` to start weeks on Monday (required for this project). The `addWeeks(date, n)` and `addDays(date, n)` functions make week navigation and day generation straightforward:
+```jsx
+const [currentWeekStart, setCurrentWeekStart] = useState(
+  startOfWeek(selectedDate, { weekStartsOn: 1 })
+)
+const weekDays = Array.from({ length: 7 }, (_, i) => addDays(currentWeekStart, i))
+```
+
+**isSameDay for Date Comparison:** Always use `isSameDay(date1, date2)` from date-fns instead of comparing date strings or using equality operators. Handles time portions and timezone issues correctly:
+```jsx
+const isSelected = isSameDay(day, selectedDate)
+const isToday = isSameDay(day, new Date())
+```
+
+**Multiple Visual States in Components:** The WeekStrip shows three distinct states: selected (orange bg), today but not selected (orange ring), and default (gray text). Use nested ternary operators with clear logic:
+```jsx
+className={`... ${
+  isSelected
+    ? 'bg-accent text-white'
+    : isToday
+    ? 'bg-secondary text-text-light ring-1 ring-accent'
+    : 'text-text-light hover:bg-secondary'
+}`}
+```
+
+**Controlled Week Navigation Pattern:** Store week navigation state (`currentWeekStart`) separately from the selected date prop. This allows users to navigate weeks independently while maintaining their selected day across week changes. The component manages its own week state but delegates date selection to parent via callback.
+
+**PropTypes for Date Objects:** Use `PropTypes.instanceOf(Date)` for date props, not `PropTypes.object`:
+```jsx
+WeekStrip.propTypes = {
+  selectedDate: PropTypes.instanceOf(Date).isRequired,
+  onDateSelect: PropTypes.func.isRequired,
+}
+```

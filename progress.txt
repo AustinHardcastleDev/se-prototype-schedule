@@ -170,3 +170,57 @@ COMPLETED: Mock Data Files and Data Access Layer at Mon Feb  2 13:17:02 CST 2026
 ### Next Steps:
 - Story 4: Mobile Week Strip Navigation (7-day week selector with arrows)
 
+MONITOR: Story story-3 marked complete, signaling Claude to stop at Mon Feb  2 13:22:30 CST 2026
+COMPLETED: App Layout Shell and Routing at Mon Feb  2 13:22:31 CST 2026
+
+---
+## 2026-02-02 13:22:33 | Story: story-4 | Status: Complete
+
+### Implemented:
+- WeekStrip component with 7 day squares showing abbreviated day names and dates
+- Left/right arrow navigation to cycle between weeks
+- Day selection with orange background highlighting for selected day
+- Orange ring indicator for current day when not selected
+- Week starts on Monday using date-fns startOfWeek with weekStartsOn: 1
+- Mobile-only visibility (hidden at md/768px+ breakpoint)
+- Integrated into SchedulePage with state management for selectedDate
+
+### Files Created:
+- src/components/schedule/WeekStrip.jsx (week navigation component)
+
+### Files Modified:
+- src/pages/SchedulePage.jsx (added WeekStrip integration with state)
+
+### Tests Passed:
+- [x] Seven day squares render with abbreviated day names (Mon, Tue, Wed, etc.)
+- [x] Numeric dates display correctly on bottom of each square
+- [x] Left/right arrows navigate to previous/next week
+- [x] Current day selected by default with orange background
+- [x] Clicking a day changes selection and deselects previous day
+- [x] Selected date passed to parent via onDateSelect callback
+- [x] Component hidden on desktop (md:hidden class working at 1280px)
+- [x] Week starts on Monday as specified
+- [x] npm run lint passes
+- [x] npm run build succeeds (dist/ 209.32 KB)
+- [x] Browser verification at mobile width (375px) - all interactions working
+- [x] Browser verification at desktop width (1280px) - component hidden
+
+### Quality Checks:
+- ESLint: ✅ No errors
+- Build: ✅ Success (dist/ 209.32 KB)
+- Mobile (375px): ✅ Week strip visible, navigation arrows work, day selection works
+- Desktop (1280px): ✅ Week strip hidden (mobile-only)
+- Design System: ✅ Correct fonts (uppercase day names), orange accent for selection, dark background
+- Interactions: ✅ Arrow navigation changes week, day clicks update selection, orange ring shows today
+
+### Learnings:
+- **date-fns Week Calculations:** Use `startOfWeek(date, { weekStartsOn: 1 })` to start weeks on Monday. The `addWeeks()` and `addDays()` functions make week navigation and day generation simple.
+- **isSameDay for Date Comparison:** `isSameDay(day, selectedDate)` is more reliable than comparing date strings, as it handles time portions correctly.
+- **Multiple Visual States:** Component shows three states: selected (orange bg), today (orange ring), and default (gray text). Using conditional classes with ternary operators keeps the logic clean.
+- **Controlled Week Navigation:** Store `currentWeekStart` in component state separately from `selectedDate` prop. This allows independent week navigation while maintaining selected day across week changes.
+- **Mobile-Only Components:** `md:hidden` class effectively hides components at 768px+ breakpoint without needing separate component instances or conditional rendering.
+- **PropTypes for Date Objects:** Use `PropTypes.instanceOf(Date)` for date props, not `PropTypes.object`.
+
+### Next Steps:
+- Story 5: Mobile Day Agenda Calendar Grid (6 AM - 8 PM time slots with 15-min increments)
+
