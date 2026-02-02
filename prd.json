@@ -137,7 +137,7 @@
         "FAB has subtle scale animation on open/close"
       ],
       "priority": "high",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     },
     {
@@ -154,7 +154,7 @@
         "Pressing backdrop closes the member list"
       ],
       "priority": "high",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     },
     {

@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { format } from 'date-fns'
 import EventCard from './EventCard'
-import { getEventsForMember } from '../../utils/dataAccess'
 
 const SLOT_HEIGHT = 16 // pixels per 15-minute slot
 const SLOTS_PER_HOUR = 4
@@ -11,7 +10,7 @@ const END_HOUR = 20 // 8 PM
 const TOTAL_HOURS = END_HOUR - START_HOUR
 const TOTAL_SLOTS = TOTAL_HOURS * SLOTS_PER_HOUR
 
-export default function TimeGrid({ selectedDate, selectedMember }) {
+export default function TimeGrid({ selectedDate, selectedMember, events: allEvents }) {
   const [currentTime, setCurrentTime] = useState(new Date())
 
   // Update current time every minute
@@ -51,11 +50,13 @@ export default function TimeGrid({ selectedDate, selectedMember }) {
 
   const currentTimeOffset = getCurrentTimeOffset()
 
-  // Format selected date as YYYY-MM-DD for data access
+  // Format selected date as YYYY-MM-DD for filtering
   const formattedDate = format(selectedDate, 'yyyy-MM-dd')
 
-  // Get events for selected member and date
-  const events = getEventsForMember(selectedMember.id, formattedDate)
+  // Filter events for selected member and date
+  const events = allEvents.filter(
+    (event) => event.assigneeId === selectedMember.id && event.date === formattedDate
+  )
 
   // Helper: Calculate top offset for an event
   const calculateEventOffset = (startTime) => {
@@ -154,4 +155,16 @@ TimeGrid.propTypes = {
     avatar: PropTypes.string.isRequired,
     color: PropTypes.string.isRequired,
   }).isRequired,
+  events: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      title: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+      assigneeId: PropTypes.string.isRequired,
+      date: PropTypes.string.isRequired,
+      startTime: PropTypes.string.isRequired,
+      endTime: PropTypes.string.isRequired,
+      status: PropTypes.string.isRequired,
+    })
+  ).isRequired,
 }

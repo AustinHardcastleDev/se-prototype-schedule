@@ -557,3 +557,82 @@ COMPLETED: Mobile FAB - Create Event Actions at Mon Feb  2 13:48:17 CST 2026
 MONITOR: Story story-9 marked complete, signaling Claude to stop at 2026-02-02 13:51:33
 COMPLETED: Mobile FAB - Team Member Switcher at 2026-02-02 13:51:33
 
+MONITOR: Story story-9 marked complete, signaling Claude to stop at Mon Feb  2 13:52:50 CST 2026
+COMPLETED: Mobile FAB - Team Member Switcher at Mon Feb  2 13:52:50 CST 2026
+
+---
+## 2026-02-02 13:52:53 | Story: story-10 | Status: Complete
+
+### Implemented:
+- CreateEventModal component with bottom-sheet slide-up animation
+- Form fields: Event Type dropdown with colored indicators, Person dropdown, Date picker, Start/End Time pickers (15-min increments), Title text input
+- Inline validation: end time must be after start time with error message display
+- Save button (orange pill) and Cancel button (dark pill) with design system styling
+- Integration with SchedulePage for state management and event creation
+- Drag handle at top of modal for visual affordance
+- Mobile-only visibility (md:hidden)
+- Backdrop overlay with click-to-close functionality
+
+### Files Created:
+- src/components/schedule/CreateEventModal.jsx (modal component with all form fields and validation)
+
+### Files Modified:
+- src/pages/SchedulePage.jsx (added modal state, event state management, handlers for FAB integration)
+- src/components/schedule/TimeGrid.jsx (updated to accept events as prop instead of fetching from dataAccess)
+
+### Tests Passed:
+- [x] Modal slides up from bottom on mobile when event type selected from FAB
+- [x] Drag handle visible at top of modal
+- [x] Event Type dropdown shows all 6 types with colored indicators
+- [x] Person dropdown defaults to viewed person (Mike Torres)
+- [x] Date picker defaults to selected date (Feb 2, 2026)
+- [x] Start Time picker shows 15-min increments from 6:00 AM to 8:00 PM
+- [x] End Time picker shows 15-min increments from 6:00 AM to 8:00 PM
+- [x] Title text input accepts text with placeholder "Enter event title"
+- [x] Validation: setting end time before start time shows error "End time must be after start time"
+- [x] Validation error appears in light pink/rose background box
+- [x] Save button creates new event and adds it to calendar view
+- [x] Cancel button closes modal without saving
+- [x] Backdrop overlay dims background when modal open
+- [x] Event appears on calendar with correct time position, height, colored border, and all details
+- [x] npm run lint passes
+- [x] npm run build succeeds (dist/ 227.60 KB)
+- [x] Browser verification at mobile width (375px) using dev-browser
+
+### Quality Checks:
+- ESLint: ✅ No errors
+- Build: ✅ Success (dist/ 227.60 KB)
+- Mobile (375px): ✅ All features working correctly
+- Design System: ✅ Correct fonts (Bebas Neue heading, Open Sans body), pill-shaped buttons, orange accent (#F47A20), dark secondary (#2A2A2A)
+- Validation: ✅ Inline validation working, prevents invalid submissions
+- State Management: ✅ Events state managed at SchedulePage level, passed down to TimeGrid
+
+### Browser Testing Details:
+- Initial load: Empty state message for Mike Torres on Feb 2, 2026
+- FAB click: Menu opens showing all 6 event types with colored dots
+- "Job (Occupied)" click: Modal slides up with blue color indicator, all fields pre-populated
+- Validation test: Changed end time to 8:00 AM (before start 9:00 AM), clicked Save → error message appeared
+- Valid submission: Changed end time to 11:00 AM, filled title "Test Event", clicked Save → event created and appeared at 9:00 AM slot on calendar
+- Event display: White card with blue left border, shows "Test Event", "9:00 AM - 11:00 AM", "Job (Occupied)"
+- Cancel test: Opened modal for "Meeting" event type (gray indicator), clicked Cancel → modal closed without creating event
+
+### Issues:
+- None encountered
+
+### Learnings:
+- **Bottom Sheet Modal Pattern:** Use `transform translate-y-full` for off-screen positioning and `translate-y-0` with transition for slide-up animation from bottom. The `rounded-t-2xl` creates the characteristic bottom-sheet appearance.
+- **Drag Handle Visual Affordance:** A small gray bar (`w-12 h-1 bg-muted rounded-full`) at the top of the modal provides visual feedback that the sheet can be dragged/dismissed, following mobile design conventions.
+- **Time Picker Options Generation:** Loop through hours (6-20) and minutes (0, 15, 30, 45) to generate all 15-minute increment options. Format as 12-hour time with AM/PM for display, store as 24-hour HH:MM for data consistency.
+- **Colored Dropdown Indicators:** Position colored dots (`w-3 h-3 rounded-full`) absolutely at `left-4` with inline styles for backgroundColor. This visually reinforces the event type selection without cluttering the UI.
+- **Inline Validation Pattern:** Use local component state for `validationError`, display conditionally in a styled div with `bg-rose-100 text-time-off`. Clear error when user modifies relevant fields (start/end time) to provide immediate feedback.
+- **Form Pre-population with Defaults:** Accept a `defaults` prop with optional fields (eventType, assigneeId, date, startTime, endTime). Use `useEffect` to reset form fields when modal opens with new defaults, ensuring clean state for each modal invocation.
+- **Event State Management:** Manage events array at SchedulePage level, not within TimeGrid. This allows multiple components (TimeGrid, future EditModal, future DesktopGrid) to share the same event data and updates. TimeGrid becomes a controlled component that filters the events it receives.
+- **PropTypes Shape Validation:** For complex event objects, define the full shape with all required fields (id, title, type, assigneeId, date, startTime, endTime, status) to ensure type safety and clear documentation.
+- **Mobile-Only Modals:** Use `md:hidden` class on both backdrop and modal container to ensure they only appear on mobile. Desktop will use centered modals (Story 19-20) instead of bottom sheets.
+- **Backdrop Click Handler:** Use `e.target === e.currentTarget` check in backdrop onClick to only close when clicking the backdrop itself, not when clicks bubble up from child elements.
+- **Date Formatting for Data:** Always format Date objects to 'yyyy-MM-dd' string format when creating events to match the JSON schema and ensure consistent data structure.
+- **Generate Unique IDs:** Use timestamp-based IDs (`evt-${Date.now()}`) for new events. In production, this would come from the backend, but for local state it provides reasonable uniqueness.
+
+### Next Steps:
+- Story 11: Edit Event Modal - Mobile (tap event card to open pre-populated modal with delete option)
+

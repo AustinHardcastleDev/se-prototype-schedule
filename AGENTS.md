@@ -643,3 +643,158 @@ const handleMemberClick = (member) => {
 }
 ```
 This allows multiple components (TimeGrid, TeamMemberSwitcher) to react to the same state changes.
+
+### Story 10: Create Event Modal - Mobile (2026-02-02)
+**Bottom Sheet Modal Pattern:** Use `transform translate-y-full` for off-screen initial positioning and `translate-y-0` with transition for slide-up animation from bottom. The `rounded-t-2xl` on the modal container creates the characteristic bottom-sheet appearance with rounded top corners:
+```jsx
+<div className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-50 md:hidden transform transition-transform duration-300 ${
+  isOpen ? 'translate-y-0' : 'translate-y-full'
+}`}>
+```
+Combine with a backdrop overlay (`fixed inset-0 bg-black/50 z-40`) to dim the background.
+
+**Drag Handle Visual Affordance:** A small gray bar at the top of bottom-sheet modals provides visual feedback that the sheet can be dragged/dismissed, following mobile design conventions:
+```jsx
+<div className="flex justify-center py-3">
+  <div className="w-12 h-1 bg-muted rounded-full" />
+</div>
+```
+This is a visual-only element in Story 10 (no drag functionality yet), but prepares for future enhancements.
+
+**Time Picker Options Generation:** For 15-minute increment time pickers, loop through hours (6-20) and minutes (0, 15, 30, 45) to generate all valid options:
+```javascript
+const generateTimeOptions = () => {
+  const options = []
+  for (let hour = 6; hour <= 20; hour++) {
+    for (let minute = 0; minute < 60; minute += 15) {
+      if (hour === 20 && minute > 0) break // Stop after 8:00 PM
+      const timeStr = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
+      const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour
+      const period = hour >= 12 ? 'PM' : 'AM'
+      const displayStr = `${displayHour}:${minute.toString().padStart(2, '0')} ${period}`
+      options.push({ value: timeStr, label: displayStr })
+    }
+  }
+  return options
+}
+```
+Store values in 24-hour HH:MM format for data consistency, display in 12-hour format with AM/PM for UX.
+
+**Colored Dropdown Indicators:** For event type dropdowns, position colored indicator dots absolutely at the left side of the select element:
+```jsx
+<div className="relative">
+  <select value={eventType} onChange={...} className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg appearance-none">
+    {eventTypes.map(et => <option key={et.key} value={et.key}>{et.label}</option>)}
+  </select>
+  <div
+    className="absolute left-4 top-1/2 transform -translate-y-1/2 w-3 h-3 rounded-full pointer-events-none"
+    style={{ backgroundColor: selectedEventType?.borderColor }}
+  />
+</div>
+```
+The `pointer-events-none` ensures the dot doesn't interfere with dropdown clicks. Use `borderColor` (darker shade) for better visibility.
+
+**Inline Validation Pattern:** Use local component state for validation errors and display them conditionally in a styled container:
+```jsx
+const [validationError, setValidationError] = useState('')
+
+// In validate function
+if (!validateTimes(startTime, endTime)) {
+  setValidationError('End time must be after start time')
+  return
+}
+
+// In render
+{validationError && (
+  <div className="mb-4 px-4 py-2 bg-rose-100 text-time-off rounded-lg text-sm font-body">
+    {validationError}
+  </div>
+)}
+```
+Clear the error when user modifies relevant fields (onChange handlers) to provide immediate feedback and prevent persistent error states.
+
+**Form Pre-population with Defaults:** Accept a `defaults` prop to pre-populate form fields. Use `useEffect` to reset fields when modal opens with new defaults:
+```jsx
+const [eventType, setEventType] = useState(defaults.eventType || eventTypes[0].key)
+// ... other fields
+
+useEffect(() => {
+  if (isOpen) {
+    setEventType(defaults.eventType || eventTypes[0].key)
+    setAssigneeId(defaults.assigneeId || allMembers[0].id)
+    setDate(defaults.date || format(new Date(), 'yyyy-MM-dd'))
+    setStartTime(defaults.startTime || '09:00')
+    setEndTime(defaults.endTime || '10:00')
+    setTitle('')
+    setValidationError('')
+  }
+}, [isOpen, defaults, eventTypes, allMembers])
+```
+This ensures clean state for each modal invocation and handles cases where defaults change between openings.
+
+**Event State Management Pattern:** Manage the events array at the page level (SchedulePage), not within individual components:
+```jsx
+// SchedulePage.jsx
+const initialEvents = getEventsForDate(format(new Date(), 'yyyy-MM-dd'))
+const [events, setEvents] = useState(initialEvents)
+
+const handleCreateEvent = (newEvent) => {
+  setEvents([...events, newEvent])
+}
+
+<TimeGrid events={events} selectedDate={selectedDate} selectedMember={selectedMember} />
+<CreateEventModal onSave={handleCreateEvent} />
+```
+TimeGrid filters the events it receives based on selected member and date. This centralized state management allows future components (EditModal, DesktopGrid) to share the same event data and updates.
+
+**Lifting State for Shared Data:** When multiple components need to interact with the same data (events, selected member, selected date), lift the state to the nearest common ancestor. The parent manages state and passes down both data and updater functions:
+```jsx
+// Parent manages state
+const [events, setEvents] = useState(initialEvents)
+const [selectedMember, setSelectedMember] = useState(allMembers[0])
+
+// Children receive controlled props
+<TimeGrid events={events} selectedMember={selectedMember} />
+<TeamMemberSwitcher selectedMember={selectedMember} onMemberSelect={setSelectedMember} />
+<CreateEventModal onSave={handleCreateEvent} />
+```
+
+**Date Formatting for Data Consistency:** Always format JavaScript Date objects to 'yyyy-MM-dd' string format when creating events or filtering data:
+```javascript
+import { format } from 'date-fns'
+
+const newEvent = {
+  id: `evt-${Date.now()}`,
+  date: format(selectedDate, 'yyyy-MM-dd'), // Not selectedDate.toISOString()
+  // ... other fields
+}
+```
+This matches the JSON schema format and ensures consistent string-based date comparisons throughout the app.
+
+**Generating Unique IDs for Local State:** For client-side-only event creation, use timestamp-based IDs:
+```javascript
+const newEvent = {
+  id: `evt-${Date.now()}`,
+  // ... other fields
+}
+```
+This provides reasonable uniqueness for local development. In production, IDs would come from the backend.
+
+**Backdrop Click Handler Safety:** When handling backdrop clicks to close modals, check that the click target is the backdrop itself, not a bubbled event from children:
+```jsx
+const handleBackdropClick = (e) => {
+  if (e.target === e.currentTarget) {
+    onClose()
+  }
+}
+
+<div className="fixed inset-0 bg-black/50 z-40" onClick={handleBackdropClick} />
+```
+Without this check, clicking anywhere inside the modal (including form fields) would close it.
+
+**Mobile-Only Modal Pattern:** Use `md:hidden` on both backdrop and modal container to restrict to mobile views:
+```jsx
+<div className="fixed inset-0 bg-black/50 z-40 md:hidden" />
+<div className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-50 md:hidden">
+```
+Desktop views will use centered modals (Stories 19-20) instead of bottom sheets.
