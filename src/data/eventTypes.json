@@ -1,0 +1,38 @@
+[
+  {
+    "key": "job-occupied",
+    "label": "Job (Occupied)",
+    "color": "#3B82F6",
+    "borderColor": "#2563EB"
+  },
+  {
+    "key": "job-vacant",
+    "label": "Job (Vacant)",
+    "color": "#14B8A6",
+    "borderColor": "#0D9488"
+  },
+  {
+    "key": "callback-job",
+    "label": "Callback Job",
+    "color": "#F59E0B",
+    "borderColor": "#D97706"
+  },
+  {
+    "key": "sales-stop",
+    "label": "Sales Stop",
+    "color": "#8B5CF6",
+    "borderColor": "#7C3AED"
+  },
+  {
+    "key": "meeting",
+    "label": "Meeting",
+    "color": "#64748B",
+    "borderColor": "#475569"
+  },
+  {
+    "key": "time-off",
+    "label": "Time Off",
+    "color": "#F43F5E",
+    "borderColor": "#E11D48"
+  }
+]

@@ -193,3 +193,19 @@ fontFamily: {
 ```
 
 **Custom Colors in Tailwind:** All project colors (including event types and status indicators) are defined in tailwind.config.js for consistency. Use kebab-case for multi-word color names (e.g., `job-occupied`, `text-light`).
+
+### Story 2: Mock Data and Data Access Layer (2026-02-02)
+**JSON Import in Vite:** Vite supports native JSON imports using ES6 import syntax. JSON files are automatically parsed and can be imported directly: `import data from './data.json'`. No additional configuration needed.
+
+**Centralized Data Access Pattern:** Create a single `dataAccess.js` utility that imports all JSON data files and exports typed accessor functions. This provides a single source of truth and prevents components from directly importing JSON files, making it easier to swap data sources later.
+
+**Event Status Field:** The `status` field on events only applies to job-type events (job-occupied, job-vacant, callback-job). Values are: `open` (no indicator), `closed-no-invoice` (yellow dot), `closed-invoiced` (purple dot). Non-job events always use status "open".
+
+**Realistic Mock Data Patterns:**
+- Job titles use format: "{Property Name} - Unit {Unit Number}"
+- Callback jobs prefix with "Callback: "
+- Sales stops use company names
+- Events span multiple days with realistic time distributions
+- Status distribution: ~60% open, ~25% closed-no-invoice, ~15% closed-invoiced
+
+**Testing Data Access in Development:** Using `useEffect` hook in App.jsx with console.log statements is an effective way to verify data access functions during development. Display stats in the UI (team member count, event counts) provides visual confirmation without needing to open console.

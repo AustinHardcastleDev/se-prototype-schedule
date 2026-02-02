@@ -1,0 +1,44 @@
+[
+  {
+    "id": "tm-1",
+    "name": "Mike Torres",
+    "role": "tech",
+    "avatar": "MT",
+    "color": "#3B82F6"
+  },
+  {
+    "id": "tm-2",
+    "name": "Sarah Chen",
+    "role": "tech",
+    "avatar": "SC",
+    "color": "#14B8A6"
+  },
+  {
+    "id": "tm-3",
+    "name": "James Rodriguez",
+    "role": "tech",
+    "avatar": "JR",
+    "color": "#F59E0B"
+  },
+  {
+    "id": "tm-4",
+    "name": "Rachel Kim",
+    "role": "sales",
+    "avatar": "RK",
+    "color": "#8B5CF6"
+  },
+  {
+    "id": "tm-5",
+    "name": "David Martinez",
+    "role": "sales",
+    "avatar": "DM",
+    "color": "#F43F5E"
+  },
+  {
+    "id": "tm-6",
+    "name": "Jennifer Park",
+    "role": "ops",
+    "avatar": "JP",
+    "color": "#64748B"
+  }
+]
