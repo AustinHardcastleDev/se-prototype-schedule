@@ -121,7 +121,7 @@
         "Empty state: helpful message when no events exist for selected day/person"
       ],
       "priority": "high",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     },
     {

@@ -512,3 +512,84 @@ This keeps the setter in place for future use while passing current linting chec
 4. No manual re-fetching needed — React's reactivity handles it
 
 This is why TimeGrid doesn't need useEffect to watch for prop changes — the component function re-runs whenever props change.
+
+### Story 8: Mobile FAB - Create Event Actions (2026-02-02)
+**Tailwind Custom Animations:** To add custom animations, define keyframes in `theme.extend.keyframes` and reference them in `theme.extend.animation`:
+```javascript
+// tailwind.config.js
+export default {
+  theme: {
+    extend: {
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+      },
+      animation: {
+        fadeIn: 'fadeIn 0.2s ease-out',
+      },
+    },
+  },
+}
+```
+Then use in components: `className="animate-fadeIn"`
+
+**FAB Menu Pattern (Google Calendar Style):** Floating Action Button with expanding menu:
+- FAB container: `fixed bottom-6 right-6 z-50` for bottom-right positioning
+- Action buttons: absolutely positioned above FAB (`absolute bottom-16 right-0`)
+- Backdrop overlay: `fixed inset-0 bg-black/50 z-40` for dimmed background
+- z-index layering: backdrop (z-40) → FAB container (z-50)
+- Backdrop click handler closes menu
+
+**Transform Animations with Tailwind:** Combine rotation and scale for smooth FAB icon transitions:
+```jsx
+className={`... ${
+  isOpen ? 'rotate-45 scale-110' : 'rotate-0 scale-100'
+}`}
+```
+The `transition-all` class smoothly animates between states. 45-degree rotation turns the plus icon into an X.
+
+**Mobile-Only Fixed Positioning:** Use `md:hidden` on both FAB and backdrop to ensure they only appear on mobile:
+```jsx
+<div className="fixed inset-0 bg-black/50 z-40 md:hidden" />
+<div className="fixed bottom-6 right-6 z-50 md:hidden">
+```
+This prevents FAB from appearing on desktop where different UI patterns are used.
+
+**Dynamic Event Type Buttons:** Use `getEventTypes()` to generate action buttons dynamically:
+```jsx
+const eventTypes = getEventTypes()
+{eventTypes.map((eventType) => (
+  <button key={eventType.key} style={{ backgroundColor: eventType.color }}>
+    {eventType.label}
+  </button>
+))}
+```
+Maintains single source of truth — event types defined once in JSON, used everywhere.
+
+**Pill-Shaped Action Buttons:** White buttons with colored indicators and pill shape:
+```jsx
+<button className="flex items-center gap-3 bg-white rounded-full px-4 py-3 shadow-lg">
+  <div className="w-4 h-4 rounded-full" style={{ backgroundColor: eventType.color }} />
+  <span className="text-sm font-body text-text-dark font-semibold">{eventType.label}</span>
+</button>
+```
+`rounded-full` creates pill shape, colored dot shows event type, shadow provides depth.
+
+**Callback Props for Event Handlers:** Pass callbacks to child components for user interactions:
+```jsx
+// Parent (SchedulePage)
+const handleEventTypeSelect = (eventType) => {
+  // TODO: Open create event modal (Story 10)
+  console.log('Selected event type:', eventType)
+}
+<FloatingActionButton onEventTypeSelect={handleEventTypeSelect} />
+
+// Child (FloatingActionButton)
+const handleEventTypeClick = (eventType) => {
+  setIsOpen(false)
+  onEventTypeSelect(eventType)
+}
+```
+Close menu first, then notify parent. Console.log serves as placeholder for future modal integration.

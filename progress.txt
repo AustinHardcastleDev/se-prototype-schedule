@@ -417,3 +417,68 @@ COMPLETED: Event Card Component at Mon Feb  2 13:36:22 CST 2026
 ### Next Steps:
 - Story 8: Mobile FAB - Create Event Actions (floating action button with event type options)
 
+MONITOR: Story story-7 marked complete, signaling Claude to stop at Mon Feb  2 13:42:32 CST 2026
+COMPLETED: Render Events on Mobile Calendar at Mon Feb  2 13:42:32 CST 2026
+
+---
+## 2026-02-02 13:42:34 | Story: story-8 | Status: Complete
+
+### Implemented:
+- FloatingActionButton component with orange circular FAB (56px)
+- FAB expand/collapse logic with dimmed background overlay
+- Action buttons for all 6 event types with colored indicators
+- Smooth fade-in animation for action buttons
+- Rotate animation on FAB button (plus → X icon)
+- Mobile-only visibility (md:hidden)
+- Integration into SchedulePage with callback handler
+
+### Files Created:
+- src/components/schedule/FloatingActionButton.jsx (FAB component)
+
+### Files Modified:
+- src/pages/SchedulePage.jsx (integrated FAB with onEventTypeSelect handler)
+- tailwind.config.js (added fadeIn keyframes and animation)
+
+### Tests:
+- [x] Orange circular FAB (56px) renders in bottom-right corner
+- [x] Pressing FAB fades/dims background and reveals action options
+- [x] All 6 event types show as action buttons with correct colored indicators
+- [x] Each action button displays event type label (Job Occupied, Job Vacant, etc.)
+- [x] Pressing backdrop closes the FAB menu
+- [x] FAB has scale and rotate animation on open/close
+- [x] Component is mobile-only (hidden at md/768px+ breakpoint)
+- [x] npm run lint passes
+- [x] npm run build succeeds (dist/ 219.68 KB)
+- [x] Browser verification at mobile width (375px) using dev-browser
+
+### Quality Checks:
+- ESLint: ✅ No errors
+- Build: ✅ Success (dist/ 219.68 KB)
+- Mobile (375px): ✅ FAB renders, expands, shows all event types with colors, closes on backdrop click
+- Design System: ✅ Orange accent (#F47A20), white action buttons, pill shape, correct event type colors
+- Animations: ✅ Smooth fadeIn animation for action buttons, rotate animation for FAB icon
+
+### Browser Testing Details:
+- FAB visible in bottom-right corner with plus icon
+- Clicking FAB: background dims to black/50, action buttons appear above FAB with fadeIn animation
+- Action buttons: white pill-shaped buttons with colored dots (blue, teal, amber, purple, gray, rose)
+- FAB icon rotates 45 degrees to show X when open
+- Clicking backdrop or empty area closes menu and removes overlay
+- All 6 event types present: Job (Occupied), Job (Vacant), Callback Job, Sales Stop, Meeting, Time Off
+
+### Issues:
+- None encountered
+
+### Learnings:
+- **Tailwind Custom Animations:** Added custom keyframes and animation in tailwind.config.js for fadeIn effect. Define keyframes in `theme.extend.keyframes` and reference in `theme.extend.animation`.
+- **FAB Menu Pattern:** Google Calendar-style FAB uses fixed positioning in bottom-right, with action buttons absolutely positioned above. z-index layering: backdrop (z-40), FAB container (z-50).
+- **Backdrop Overlay:** Use `fixed inset-0 bg-black/50` for dimmed background. Click handler on backdrop closes menu.
+- **Icon Rotation Animation:** Using Tailwind's `rotate-45` and `scale-110` with transitions creates smooth transform animation when toggling FAB open/close state.
+- **Mobile-Only Components:** Add `md:hidden` class to FAB and backdrop to ensure they only appear on mobile views.
+- **Event Type Data Access:** Used `getEventTypes()` from dataAccess.js to dynamically generate action buttons, maintaining single source of truth pattern.
+- **PropTypes for Callbacks:** Callback props use `PropTypes.func.isRequired` for runtime validation.
+- **TODO Handler for Future Stories:** Added console.log in SchedulePage's handleEventTypeSelect for Story 10 (Create Event Modal) integration.
+
+### Next Steps:
+- Story 9: Mobile FAB - Team Member Switcher (bottom-left button to switch viewed schedule)
+
