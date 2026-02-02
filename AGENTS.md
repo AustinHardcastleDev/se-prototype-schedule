@@ -444,3 +444,71 @@ Example: "08:00" → "8:00 AM", "14:30" → "2:30 PM"
 className="... hover:brightness-95 transition-all cursor-pointer"
 ```
 Prepares for click handlers in edit/detail modals (Stories 11, 20).
+
+### Story 7: Render Events on Mobile Calendar (2026-02-02)
+**Date Formatting for Data Filtering:** When filtering events by date, convert the JavaScript Date object to match the JSON string format:
+```javascript
+import { format } from 'date-fns'
+
+const selectedDate = new Date() // Date object from state
+const formattedDate = format(selectedDate, 'yyyy-MM-dd') // "2026-02-03"
+const events = getEventsForMember(memberId, formattedDate)
+```
+The events.json uses "YYYY-MM-DD" format, so always format the Date object before filtering.
+
+**Controlled Component Pattern for Data Display:** TimeGrid is now a controlled component that receives both `selectedDate` and `selectedMember` as props rather than managing its own data. This makes it reusable and allows the parent (SchedulePage) to control what data is displayed:
+```jsx
+// Parent manages state
+const [selectedDate, setSelectedDate] = useState(new Date())
+const [selectedMember, setSelectedMember] = useState(allMembers[0])
+
+// Child receives state and displays filtered data
+<TimeGrid selectedDate={selectedDate} selectedMember={selectedMember} />
+```
+This pattern separates concerns: parent handles state, child handles display.
+
+**Empty State Positioning in Absolute Layout:** When the event rendering area uses absolute positioning, the empty state message needs careful positioning:
+```jsx
+<div className="absolute left-16 right-0 top-0 bottom-0 px-1">
+  {events.length === 0 ? (
+    <div className="flex items-center justify-center h-full">
+      <p className="text-muted font-body text-sm">
+        No events scheduled for {selectedMember.name} on {format(selectedDate, 'MMM d, yyyy')}
+      </p>
+    </div>
+  ) : (
+    // Render events
+  )}
+</div>
+```
+The wrapper div fills the available space (left-16 to right-0, top-0 to bottom-0), and the empty state uses flex centering to appear in the middle.
+
+**PropTypes for Complex Objects:** When passing complex objects as props, define the shape explicitly:
+```jsx
+TimeGrid.propTypes = {
+  selectedDate: PropTypes.instanceOf(Date).isRequired,
+  selectedMember: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    role: PropTypes.string.isRequired,
+    avatar: PropTypes.string.isRequired,
+    color: PropTypes.string.isRequired,
+  }).isRequired,
+}
+```
+This provides clear documentation and runtime validation of the expected prop structure.
+
+**Handling Unused State Setters:** When adding state that will be used in future stories (like `setSelectedMember` for Story 9), use eslint-disable to suppress warnings:
+```jsx
+// eslint-disable-next-line no-unused-vars
+const [selectedMember, setSelectedMember] = useState(allMembers[0])
+```
+This keeps the setter in place for future use while passing current linting checks.
+
+**Reactive Data Updates:** When the parent component's state changes (selectedDate from WeekStrip), the child component automatically re-renders with filtered data because:
+1. Parent state change triggers parent re-render
+2. Parent passes new props to child
+3. Child re-renders and re-filters data based on new props
+4. No manual re-fetching needed — React's reactivity handles it
+
+This is why TimeGrid doesn't need useEffect to watch for prop changes — the component function re-runs whenever props change.

@@ -353,3 +353,67 @@ COMPLETED: Mobile Day Agenda Calendar Grid at Mon Feb  2 13:32:14 CST 2026
 ### Next Steps:
 - Story 7: Render Events on Mobile Calendar (integrate real data from dataAccess.js, filter by date/person, replace test events)
 
+MONITOR: Story story-6 marked complete, signaling Claude to stop at Mon Feb  2 13:36:22 CST 2026
+COMPLETED: Event Card Component at Mon Feb  2 13:36:22 CST 2026
+
+---
+## 2026-02-02 13:36:25 | Story: story-7 | Status: Complete
+
+### Implemented:
+- Real event data integration via dataAccess.getEventsForMember()
+- SchedulePage state management for selectedMember (defaults to first team member - Mike Torres)
+- TimeGrid component receives selectedDate and selectedMember as props
+- Date-based event filtering using format(selectedDate, 'yyyy-MM-dd')
+- Event cards render at correct vertical positions based on startTime
+- Event cards span correct height based on duration
+- Empty state message displays when no events exist for selected day/person
+- Date selection from WeekStrip updates displayed events
+- PropTypes validation for TimeGrid component
+
+### Files:
+- src/pages/SchedulePage.jsx (modified) - added selectedMember state, imported dataAccess
+- src/components/schedule/TimeGrid.jsx (modified) - replaced test events with real data, added props, empty state
+- src/data/events.json (modified) - updated dates from 2025 to 2026 for testing
+
+### Tests:
+- [x] Events render at correct vertical position (8:00 AM at 8 AM line, 10:00 AM at 10 AM line, etc.)
+- [x] Events span correct height (90-minute event taller than 15-minute event)
+- [x] Events positioned to the right of time labels
+- [x] Changing selected date from week strip updates displayed events (tested Mon vs Tue)
+- [x] Default view shows Mike Torres's events (first team member)
+- [x] Empty state message appears when no events for selected day/person
+- [x] Current time indicator visible at correct position
+- [x] Event cards show correct data: title, time range, event type, colored borders, status indicators
+- [x] npm run lint passes
+- [x] npm run build succeeds (dist/ 218.24 KB)
+- [x] Browser verification at mobile width (375px) using dev-browser
+
+### Quality Checks:
+- ESLint: ✅ No errors
+- Build: ✅ Success (dist/ 218.24 KB)
+- Mobile (375px): ✅ All features working correctly
+- Design System: ✅ Correct fonts, colors, event type borders, status indicator dots
+- Data Integration: ✅ dataAccess.js used correctly, no direct JSON imports in components
+
+### Browser Testing Details:
+- Monday Feb 2, 2026: Empty state message "No events scheduled for Mike Torres on Feb 2, 2026"
+- Tuesday Feb 3, 2026: Three events rendered correctly:
+  - Oakwood Apartments - Unit 12B (8:00-9:30 AM, blue border, job-occupied)
+  - Riverside Condos - Unit 405 (10:00-11:15 AM, teal border, job-vacant, yellow status dot for closed-no-invoice)
+  - Weekly Team Meeting (2:00-3:00 PM, gray border, meeting)
+- Date switching: Clicking different days in week strip updates events immediately
+- Current time indicator: Orange line with dot visible at ~1 PM
+
+### Issues:
+- None encountered
+
+### Learnings:
+- **date-fns for Date Formatting in Data Access:** When filtering events by date, the selectedDate (Date object) must be formatted to match the JSON string format (YYYY-MM-DD). Use `format(selectedDate, 'yyyy-MM-dd')` to convert.
+- **Prop Dependency Updates:** When adding new props to a component (selectedDate, selectedMember), the parent must manage that state and pass it down. SchedulePage manages both selectedDate (for WeekStrip) and selectedMember (for future stories).
+- **Empty State Positioning:** The empty state message is positioned within the event rendering area (absolute left-16 right-0), using flex centering to appear in the middle of the scrollable time grid.
+- **Data Year Mismatch:** Mock data used 2025 dates, but current date is 2026. Updated all events to 2026 for proper testing. In production, this would be handled by the backend providing current data.
+- **Component Reusability:** TimeGrid is now a controlled component receiving external state (selectedDate, selectedMember) instead of managing its own data, making it reusable for different views.
+
+### Next Steps:
+- Story 8: Mobile FAB - Create Event Actions (floating action button with event type options)
+

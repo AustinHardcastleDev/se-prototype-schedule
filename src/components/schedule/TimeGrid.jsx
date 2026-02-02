@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react'
+import PropTypes from 'prop-types'
 import { format } from 'date-fns'
 import EventCard from './EventCard'
+import { getEventsForMember } from '../../utils/dataAccess'
 
 const SLOT_HEIGHT = 16 // pixels per 15-minute slot
 const SLOTS_PER_HOUR = 4
@@ -9,7 +11,7 @@ const END_HOUR = 20 // 8 PM
 const TOTAL_HOURS = END_HOUR - START_HOUR
 const TOTAL_SLOTS = TOTAL_HOURS * SLOTS_PER_HOUR
 
-export default function TimeGrid() {
+export default function TimeGrid({ selectedDate, selectedMember }) {
   const [currentTime, setCurrentTime] = useState(new Date())
 
   // Update current time every minute
@@ -49,59 +51,11 @@ export default function TimeGrid() {
 
   const currentTimeOffset = getCurrentTimeOffset()
 
-  // Test events for Story 6 verification (will be replaced in Story 7)
-  const testEvents = [
-    {
-      id: 'test-1',
-      title: 'Oakwood Apartments - Unit 12B',
-      type: 'job-occupied',
-      assigneeId: 'tm-1',
-      date: '2025-02-03',
-      startTime: '08:00',
-      endTime: '09:30', // 90 min - full layout
-      status: 'open',
-    },
-    {
-      id: 'test-2',
-      title: 'Riverside Condos - Unit 405',
-      type: 'job-vacant',
-      assigneeId: 'tm-1',
-      date: '2025-02-03',
-      startTime: '10:00',
-      endTime: '10:15', // 15 min - condensed layout
-      status: 'closed-no-invoice', // Yellow dot
-    },
-    {
-      id: 'test-3',
-      title: 'Callback: Hillside Manor - Unit 8',
-      type: 'callback-job',
-      assigneeId: 'tm-1',
-      date: '2025-02-03',
-      startTime: '11:30',
-      endTime: '12:00', // 30 min - condensed layout
-      status: 'closed-invoiced', // Purple dot
-    },
-    {
-      id: 'test-4',
-      title: 'TechCorp Industries',
-      type: 'sales-stop',
-      assigneeId: 'tm-4',
-      date: '2025-02-03',
-      startTime: '13:00',
-      endTime: '14:00', // 60 min - full layout
-      status: 'open',
-    },
-    {
-      id: 'test-5',
-      title: 'Weekly Team Meeting',
-      type: 'meeting',
-      assigneeId: 'tm-1',
-      date: '2025-02-03',
-      startTime: '16:00',
-      endTime: '17:30', // 90 min - full layout
-      status: 'open',
-    },
-  ]
+  // Format selected date as YYYY-MM-DD for data access
+  const formattedDate = format(selectedDate, 'yyyy-MM-dd')
+
+  // Get events for selected member and date
+  const events = getEventsForMember(selectedMember.id, formattedDate)
 
   // Helper: Calculate top offset for an event
   const calculateEventOffset = (startTime) => {
@@ -161,19 +115,43 @@ export default function TimeGrid() {
           </div>
         )}
 
-        {/* Event rendering area with test events for Story 6 verification */}
+        {/* Event rendering area */}
         <div className="absolute left-16 right-0 top-0 bottom-0 px-1">
-          {testEvents.map((event) => (
-            <div
-              key={event.id}
-              className="absolute left-0 right-0"
-              style={{ top: `${calculateEventOffset(event.startTime)}px` }}
-            >
-              <EventCard event={event} onClick={() => console.log('Event clicked:', event)} />
+          {events.length === 0 ? (
+            // Empty state
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center px-4">
+                <p className="text-muted font-body text-sm">
+                  No events scheduled for {selectedMember.name} on{' '}
+                  {format(selectedDate, 'MMM d, yyyy')}
+                </p>
+              </div>
             </div>
-          ))}
+          ) : (
+            // Render events
+            events.map((event) => (
+              <div
+                key={event.id}
+                className="absolute left-0 right-0"
+                style={{ top: `${calculateEventOffset(event.startTime)}px` }}
+              >
+                <EventCard event={event} onClick={() => console.log('Event clicked:', event)} />
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>
   )
+}
+
+TimeGrid.propTypes = {
+  selectedDate: PropTypes.instanceOf(Date).isRequired,
+  selectedMember: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    role: PropTypes.string.isRequired,
+    avatar: PropTypes.string.isRequired,
+    color: PropTypes.string.isRequired,
+  }).isRequired,
 }

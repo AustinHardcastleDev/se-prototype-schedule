@@ -88,7 +88,7 @@
         "Grid cell height is consistent and proportional (each 15-min slot = same height)"
       ],
       "priority": "high",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     },
     {
@@ -105,7 +105,7 @@
         "Cards for events shorter than 30 minutes show condensed layout (title only)"
       ],
       "priority": "high",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     },
     {
