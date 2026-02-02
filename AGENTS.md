@@ -209,3 +209,57 @@ fontFamily: {
 - Status distribution: ~60% open, ~25% closed-no-invoice, ~15% closed-invoiced
 
 **Testing Data Access in Development:** Using `useEffect` hook in App.jsx with console.log statements is an effective way to verify data access functions during development. Display stats in the UI (team member count, event counts) provides visual confirmation without needing to open console.
+
+### Story 3: App Layout Shell and Routing (2026-02-02)
+**React Router v6 Nested Routes:** Use `<Outlet />` in layout component to render child routes. Wrap routes with layout component using nested Route structure. The layout persists across all child routes.
+
+```jsx
+<BrowserRouter>
+  <Routes>
+    <Route path="/" element={<AppLayout />}>
+      <Route index element={<SchedulePage />} />
+      <Route path="team" element={<TeamPage />} />
+    </Route>
+  </Routes>
+</BrowserRouter>
+```
+
+**Responsive Layout Pattern:** Use Tailwind responsive classes for clean mobile/desktop switching:
+- Sidebar: `hidden md:flex` (hidden on mobile, flex on desktop)
+- Top bar: `md:hidden` (visible on mobile, hidden on desktop)
+- Main content: `md:ml-64` to account for fixed sidebar width on desktop
+
+**Slide-out Drawer Animation:** Controlled with state and Tailwind transitions:
+```jsx
+className={`fixed right-0 top-0 transform transition-transform duration-300 ${
+  isOpen ? 'translate-x-0' : 'translate-x-full'
+}`}
+```
+
+**Fixed Mobile Top Bar:** Use `fixed top-0 left-0 right-0 z-50` to keep header visible during scroll. Add `pt-14` to main content area to prevent content from hiding behind the fixed header.
+
+**NavLink Active States:** React Router's `NavLink` provides `isActive` boolean in className function for conditional styling:
+```jsx
+<NavLink
+  to="/"
+  className={({ isActive }) =>
+    `block px-4 py-3 rounded-lg ${isActive ? 'bg-accent text-white' : 'text-text-light hover:bg-secondary'}`
+  }
+>
+```
+
+**PropTypes Validation:** ESLint with React rules requires PropTypes for all component props. Import from 'prop-types' package and define at component bottom:
+```jsx
+import PropTypes from 'prop-types'
+
+function MyComponent({ prop1, prop2 }) { ... }
+
+MyComponent.propTypes = {
+  prop1: PropTypes.string.isRequired,
+  prop2: PropTypes.func.isRequired
+}
+
+export default MyComponent
+```
+
+**date-fns for Date Display:** Use `format(date, 'MMMM yyyy')` for clean month/year display. Lighter and more flexible than moment.js.

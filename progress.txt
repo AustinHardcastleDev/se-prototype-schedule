@@ -111,3 +111,62 @@ COMPLETED: Project Scaffolding and Configuration at Mon Feb  2 13:11:02 CST 2026
 ### Next Steps:
 - Story 3: App Layout Shell and Routing with responsive sidebar and mobile top bar
 
+MONITOR: Story story-2 marked complete, signaling Claude to stop at Mon Feb  2 13:17:01 CST 2026
+COMPLETED: Mock Data Files and Data Access Layer at Mon Feb  2 13:17:02 CST 2026
+
+---
+## 2026-02-02 13:20:15 | Story: story-3 | Status: Complete
+
+### Implemented:
+- React Router configured with BrowserRouter and Routes
+- Desktop sidebar with logo, nav links, search bar, and user profile at bottom
+- Mobile top bar with logo, month/year display, and hamburger icon
+- Hamburger drawer with slide-out animation and same navigation as sidebar
+- Responsive breakpoint at md (768px) switching between mobile and desktop layouts
+- Active nav link highlighting with orange accent color
+- All typography following design system (Bebas Neue headings, Open Sans body)
+
+### Files Created:
+- src/layouts/AppLayout.jsx (main layout shell with state management)
+- src/layouts/Sidebar.jsx (desktop fixed left sidebar)
+- src/layouts/MobileTopBar.jsx (mobile header with hamburger button)
+- src/layouts/HamburgerDrawer.jsx (slide-out mobile navigation drawer)
+- src/pages/SchedulePage.jsx (placeholder schedule page)
+
+### Files Modified:
+- src/App.jsx (replaced placeholder with React Router setup)
+- package.json (added react-router-dom and date-fns dependencies)
+
+### Tests Passed:
+- [x] React Router / route configured
+- [x] Desktop sidebar shows at md (768px+), mobile top bar shows below md
+- [x] Sidebar contains: logo placeholder, nav links, search bar, user avatar/name
+- [x] Mobile top bar contains: logo, current month/year, hamburger icon
+- [x] Hamburger menu opens slide-out drawer with same nav as sidebar
+- [x] Active nav item highlighted with orange accent (#F47A20)
+- [x] Responsive breakpoint works correctly at 375px (mobile) and 1280px (desktop)
+- [x] Fonts correct: Bebas Neue for headings, Open Sans for body/labels
+- [x] npm run lint passes
+- [x] npm run build succeeds (dist/ 217.3 KB)
+- [x] Browser verification at mobile (375px) and desktop (1280px) widths
+
+### Quality Checks:
+- ESLint: ✅ No errors
+- Build: ✅ Success (dist/ 217.3 KB)
+- Mobile (375px): ✅ Top bar visible, sidebar hidden, hamburger menu opens drawer
+- Desktop (1280px): ✅ Sidebar visible, top bar hidden, navigation works
+- Design System: ✅ Correct fonts, colors, orange accent on active states
+- Navigation: ✅ NavLink active states work, clicking nav changes routes
+
+### Learnings:
+- **React Router v6 Nested Routes:** Use `<Outlet />` in layout component to render child routes. The layout component wraps all routes and provides persistent UI (sidebar, top bar).
+- **Responsive Sidebar Pattern:** Use Tailwind `hidden md:flex` on sidebar and `md:hidden` on mobile top bar for clean responsive switching at breakpoint.
+- **Slide-out Drawer Animation:** Use `transform translate-x-full` for off-screen positioning and `translate-x-0` with transition for smooth slide-in animation.
+- **PropTypes in React 18:** ESLint requires PropTypes validation for all component props. Import from 'prop-types' package.
+- **date-fns for Date Formatting:** `format(date, 'MMMM yyyy')` provides clean month/year display in mobile top bar.
+- **NavLink Active States:** React Router's `NavLink` component provides `isActive` in render prop for conditional styling. Use orange bg for active, hover state for inactive.
+- **Fixed Positioning for Mobile Top Bar:** Mobile top bar uses `fixed top-0 left-0 right-0` with `z-50` to stay at top during scroll. Main content needs `pt-14` to account for fixed header height.
+
+### Next Steps:
+- Story 4: Mobile Week Strip Navigation (7-day week selector with arrows)
+
