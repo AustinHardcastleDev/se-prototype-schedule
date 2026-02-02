@@ -1,0 +1,385 @@
+{
+  "branchName": "ralph/se-schedule",
+  "overview": "A schedule management prototype for Surface Experts. Mobile-first day view for techs/sales, desktop multi-column view for ops. Mock JSON data, drag-and-drop, conflict detection, dark chrome industrial design.",
+  "turnsPerStory": 50,
+  "maxRetries": 3,
+  "userStories": [
+    {
+      "id": "story-1",
+      "title": "Project Scaffolding and Configuration",
+      "description": "Initialize React + Vite project with Tailwind CSS, Google Fonts (Bebas Neue, Open Sans), ESLint, and folder structure. Configure base styles matching the dark chrome design system.",
+      "acceptanceCriteria": [
+        "Vite project created with React template",
+        "Tailwind CSS installed and configured with custom colors (charcoal: #1A1A1A, accent: #F47A20, etc.)",
+        "Google Fonts loaded: Bebas Neue for headings, Open Sans for body",
+        "ESLint configured with React rules",
+        "Folder structure: src/components/, src/data/, src/utils/, src/hooks/, src/layouts/",
+        "index.css sets dark background (#1A1A1A) and default font (Open Sans)",
+        "App.jsx renders a placeholder with correct fonts and colors visible",
+        "npm run dev starts without errors",
+        "npm run lint passes"
+      ],
+      "priority": "high",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-2",
+      "title": "Mock Data Files and Data Access Layer",
+      "description": "Create all JSON mock data files (team members, events, event types) and a centralized data access utility. All components will import from this single access layer.",
+      "acceptanceCriteria": [
+        "src/data/teamMembers.json with 5-6 team members (3 techs, 2 sales, 1 ops)",
+        "src/data/events.json with 25-30 events across the current week following role-based distribution",
+        "src/data/eventTypes.json with all 6 event types and their colors",
+        "src/utils/dataAccess.js exports: getAllMembers(), getMemberById(id), getEventsForMember(memberId, date), getEventsForDate(date), getEventTypes(), getEventTypeByKey(key)",
+        "Events use realistic titles (apartment names, unit numbers for jobs; company names for sales stops)",
+        "Mix of job statuses: ~60% open, ~25% closed-no-invoice, ~15% closed-invoiced",
+        "src/data/README.md documenting all schemas"
+      ],
+      "priority": "high",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-3",
+      "title": "App Layout Shell and Routing",
+      "description": "Create the responsive app shell with mobile top bar and desktop sidebar. Set up React Router with a main schedule route.",
+      "acceptanceCriteria": [
+        "React Router configured with / route for schedule view",
+        "Desktop sidebar: fixed left, dark background (#1A1A1A), logo placeholder at top, nav links in middle, user avatar/name at bottom, search bar with dark fill and rounded shape",
+        "Mobile top bar: dark background, hamburger icon on right, logo on left, current month/year in center",
+        "Hamburger menu opens a slide-out drawer with same nav as desktop sidebar",
+        "Responsive breakpoint: sidebar shows at md (768px+), top bar shows below md",
+        "Active nav item highlighted with orange accent",
+        "Sidebar and top bar use Bebas Neue for headings, Open Sans for labels"
+      ],
+      "priority": "high",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-4",
+      "title": "Mobile Week Strip Navigation",
+      "description": "Build the week strip component that shows 7 day squares for the current week with navigation arrows to cycle between weeks. Current day selected by default.",
+      "acceptanceCriteria": [
+        "Seven squares in a row, each showing abbreviated day name on top and numeric date on bottom",
+        "Left and right arrows on either side to navigate to previous/next week",
+        "Current day selected by default with orange background and white text",
+        "Tapping a day selects it and deselects the previous one",
+        "Selected date is passed up to parent via callback",
+        "Component is mobile-only (hidden on desktop)",
+        "Uses date-fns for date calculations, week starts on Monday"
+      ],
+      "priority": "high",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-5",
+      "title": "Mobile Day Agenda Calendar Grid",
+      "description": "Build the day agenda view for mobile that displays time slots from 6 AM to 8 PM with 15-minute increments. Empty grid only, no events rendered yet.",
+      "acceptanceCriteria": [
+        "Vertical time grid from 6:00 AM to 8:00 PM",
+        "Hour labels on the left side (6 AM, 7 AM, ... 8 PM)",
+        "15-minute grid lines (lighter for quarter hours, heavier for full hours)",
+        "Grid takes up remaining screen height below the week strip",
+        "Grid is scrollable vertically",
+        "Current time indicator: horizontal orange line at current time position",
+        "Grid cell height is consistent and proportional (each 15-min slot = same height)"
+      ],
+      "priority": "high",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-6",
+      "title": "Event Card Component",
+      "description": "Create the event card component that displays within time grid slots. Cards are colored by event type and show status indicators for jobs.",
+      "acceptanceCriteria": [
+        "Card renders with white background, colored left border (4px, color from event type)",
+        "Card height is proportional to event duration (15 min = 1 slot height)",
+        "Card shows: event title, start-end time, event type label",
+        "Job-type events show status indicator dot in top-right corner",
+        "Status indicators: no dot for open, yellow dot (#EAB308) for closed-no-invoice, purple dot (#8B5CF6) for closed-invoiced",
+        "Card text truncates with ellipsis if card is too small",
+        "Cards for events shorter than 30 minutes show condensed layout (title only)"
+      ],
+      "priority": "high",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-7",
+      "title": "Render Events on Mobile Calendar",
+      "description": "Integrate event cards into the mobile day agenda grid. Events for the selected person and selected date render as positioned blocks on the time grid.",
+      "acceptanceCriteria": [
+        "Events render at correct vertical position based on start time",
+        "Events span correct height based on duration",
+        "Events positioned in the right column area (to the right of time labels)",
+        "Changing the selected date from week strip updates displayed events",
+        "Default view shows current user's events for today",
+        "Empty state: helpful message when no events exist for selected day/person"
+      ],
+      "priority": "high",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-8",
+      "title": "Mobile FAB - Create Event Actions",
+      "description": "Build the floating action button (bottom-right) that expands to show event creation options, following the Google Calendar FAB pattern.",
+      "acceptanceCriteria": [
+        "Orange circular FAB (56px) in bottom-right corner with plus icon",
+        "Pressing FAB: fades/dims background, reveals action options above the FAB",
+        "Action options: one button per event type with colored indicators",
+        "Pressing an action opens the create event modal with that type pre-selected",
+        "Pressing dimmed background or X button closes the FAB menu",
+        "FAB has subtle scale animation on open/close"
+      ],
+      "priority": "high",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-9",
+      "title": "Mobile FAB - Team Member Switcher",
+      "description": "Build the bottom-left floating action button that shows a list of team members to switch whose schedule is displayed.",
+      "acceptanceCriteria": [
+        "Circular button (48px) in bottom-left showing current user's initials",
+        "Pressing button shows vertical list of team members above the button",
+        "Each option shows avatar/initials and name",
+        "Current user always appears at the bottom of the list",
+        "Selecting a team member switches the calendar to that person's schedule",
+        "Currently selected member highlighted with orange accent",
+        "Pressing backdrop closes the member list"
+      ],
+      "priority": "high",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-10",
+      "title": "Create Event Modal - Mobile",
+      "description": "Build the bottom-sheet modal for creating new events on mobile. Slides up from the bottom of the screen.",
+      "acceptanceCriteria": [
+        "Modal slides up from bottom with drag handle at top",
+        "Fields: Event Type dropdown, Person dropdown (defaults to viewed person), Date picker (defaults to selected date), Start Time (15-min increments), End Time (15-min increments), Title text input",
+        "Event Type dropdown shows colored indicators next to each option",
+        "Time pickers only allow 15-minute increments from 6:00 AM to 8:00 PM",
+        "End time must be after start time - inline validation error if not",
+        "Save button (orange pill) and Cancel button (dark pill)",
+        "Saving adds event to local state and closes modal"
+      ],
+      "priority": "high",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-11",
+      "title": "Edit Event Modal - Mobile",
+      "description": "Build the bottom-sheet modal for editing existing events. Same layout as create modal but pre-populated and includes delete option.",
+      "acceptanceCriteria": [
+        "Opens when tapping an existing event card",
+        "Same slide-up bottom sheet as create modal",
+        "All fields pre-populated with event's current values",
+        "Same validation rules as create modal",
+        "Save button updates the event in local state",
+        "Delete button (red text) with confirmation prompt removes the event",
+        "Cancel closes without changes"
+      ],
+      "priority": "high",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-12",
+      "title": "Long-Press to Create Event on Mobile",
+      "description": "Implement long-press on an empty time slot to auto-create an event at that time and open the create modal.",
+      "acceptanceCriteria": [
+        "Long-pressing (500ms hold) on empty time slot opens create event modal",
+        "Start time set to the slot that was pressed",
+        "End time defaults to start time + 1 hour",
+        "Person defaults to currently viewed team member",
+        "Visual feedback during long press (subtle highlight on slot)",
+        "Long-pressing event card opens edit modal instead"
+      ],
+      "priority": "medium",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-13",
+      "title": "Mobile Drag-and-Drop - Move Events",
+      "description": "Implement drag-and-drop to move events to different time slots on the mobile day view.",
+      "acceptanceCriteria": [
+        "Touch-drag an event card to move it to a different time slot",
+        "Event snaps to nearest 15-minute increment on drop",
+        "Visual ghost/preview shows where event will land while dragging",
+        "Invalid drop targets (conflicting times) visually indicated",
+        "Dropping on conflicting slot shows toast error and reverts",
+        "Event data updates in state on successful drop"
+      ],
+      "priority": "medium",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-14",
+      "title": "Mobile Drag-to-Resize Events",
+      "description": "Allow dragging the bottom edge of an event card to extend or shorten its duration.",
+      "acceptanceCriteria": [
+        "Resize handle visible at bottom of each event card",
+        "Dragging handle down extends event's end time",
+        "Dragging handle up shortens event's end time",
+        "Minimum duration is 15 minutes",
+        "End time snaps to 15-minute increments",
+        "Resizing into a conflicting event is blocked with visual feedback and toast"
+      ],
+      "priority": "medium",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-15",
+      "title": "Desktop Date Picker Bar",
+      "description": "Build the top date picker bar for desktop that shows the current date and allows day-by-day navigation.",
+      "acceptanceCriteria": [
+        "Horizontal bar at top of main content area (right of sidebar)",
+        "Shows current selected date prominently in Bebas Neue",
+        "Left/right arrows for previous/next day navigation",
+        "Today button to jump back to current date",
+        "Accepts external date updates (for scroll-sync)",
+        "Desktop only (hidden on mobile)"
+      ],
+      "priority": "high",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-16",
+      "title": "Desktop Multi-Column Time Grid",
+      "description": "Build the desktop calendar grid that shows one day at a time with each team member as a column.",
+      "acceptanceCriteria": [
+        "Column header row showing each team member's name and avatar/initials",
+        "One column per team member",
+        "Time labels (6 AM - 8 PM) on far left shared across all columns",
+        "15-minute grid lines within each column",
+        "Grid is vertically scrollable",
+        "Columns evenly distributed across available width",
+        "Current time indicator line spans across all columns"
+      ],
+      "priority": "high",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-17",
+      "title": "Render Events on Desktop Grid",
+      "description": "Render event cards within the desktop multi-column grid, positioned correctly in each team member's column.",
+      "acceptanceCriteria": [
+        "Events render in the correct team member's column",
+        "Events positioned at correct vertical time offset",
+        "Event cards use same EventCard component as mobile",
+        "All team member events for selected date visible simultaneously",
+        "Changing date updates all columns"
+      ],
+      "priority": "high",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-18",
+      "title": "Desktop Continuous Day Scroll with Sticky Headers",
+      "description": "Enable scrolling past end of one day into the next on desktop. Sticky day header between days and date picker auto-updates on scroll.",
+      "acceptanceCriteria": [
+        "After 8 PM of current day, grid continues with day separator header for next day",
+        "Day separator shows date in Bebas Neue and is sticky at top of viewport while scrolling",
+        "Scrolling into a new day updates the DesktopDatePicker",
+        "Navigating via date picker scrolls grid to that day's section",
+        "At least 5 days rendered below selected day for smooth scrolling"
+      ],
+      "priority": "high",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-19",
+      "title": "Desktop Click-to-Create Event",
+      "description": "Clicking an empty time slot in any team member's column opens the create event modal with that time and person pre-selected.",
+      "acceptanceCriteria": [
+        "Clicking empty slot opens centered modal for creating event",
+        "Clicked time pre-set as start time, end time defaults to +1 hour",
+        "Team member whose column was clicked pre-set as person",
+        "Modal uses same form fields as mobile create modal",
+        "Modal appears centered on screen with backdrop overlay",
+        "Save adds event, Cancel closes modal"
+      ],
+      "priority": "high",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-20",
+      "title": "Desktop Edit Event Modal",
+      "description": "Clicking an existing event on desktop opens a centered edit modal with pre-populated data and delete option.",
+      "acceptanceCriteria": [
+        "Clicking event card on desktop opens centered edit modal",
+        "All fields pre-populated with event data",
+        "Same validation as mobile edit modal",
+        "Save updates event, Delete removes with confirmation",
+        "Cancel closes without changes"
+      ],
+      "priority": "high",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-21",
+      "title": "Desktop Drag-and-Drop Within Column",
+      "description": "Enable drag-and-drop of events within the same team member's column to change event time.",
+      "acceptanceCriteria": [
+        "Drag event card up/down within column to change time",
+        "Event snaps to nearest 15-minute increment on drop",
+        "Ghost/preview shows target position while dragging",
+        "Conflict detection: invalid targets highlighted, drop blocked with toast",
+        "Event time updates in state on successful drop"
+      ],
+      "priority": "medium",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-22",
+      "title": "Desktop Drag-and-Drop Between Columns",
+      "description": "Enable dragging events between team member columns on desktop to reassign events.",
+      "acceptanceCriteria": [
+        "Drag event from one column to another to reassign it",
+        "Dropping in different column changes event's assigneeId",
+        "Time can change simultaneously with reassignment",
+        "Conflict detection against target person's existing events",
+        "Invalid targets shown with visual feedback, drop blocked with toast on conflict",
+        "Event data (assignee and time) updates in state on successful drop"
+      ],
+      "priority": "medium",
+      "passes": false,
+      "failedAttempts": 0
+    },
+    {
+      "id": "story-23",
+      "title": "Polish and Responsive Transitions",
+      "description": "Final polish pass - smooth transitions between mobile and desktop, consistent styling, loading states, and overall visual quality.",
+      "acceptanceCriteria": [
+        "Resizing browser between mobile and desktop transitions cleanly",
+        "All text uses correct fonts (Bebas Neue headings, Open Sans body)",
+        "All buttons match pill style from design system",
+        "Orange accent consistent across active states, borders, primary buttons",
+        "No visible UI bugs at 375px, 768px, and 1280px viewports",
+        "Toast notifications styled to match design system",
+        "All interactive elements have hover/active brightness shift states"
+      ],
+      "priority": "medium",
+      "passes": false,
+      "failedAttempts": 0
+    }
+  ]
+}
