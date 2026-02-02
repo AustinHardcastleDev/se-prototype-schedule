@@ -287,3 +287,69 @@ COMPLETED: Mobile Week Strip Navigation at Mon Feb  2 13:27:55 CST 2026
 ### Next Steps:
 - Story 6: Event Card Component (colored borders, status indicators, proportional height)
 
+MONITOR: Story story-5 marked complete, signaling Claude to stop at Mon Feb  2 13:32:13 CST 2026
+COMPLETED: Mobile Day Agenda Calendar Grid at Mon Feb  2 13:32:14 CST 2026
+
+---
+## 2026-02-02 13:32:16 | Story: story-6 | Status: Complete
+
+### Implemented:
+- EventCard component with white background and colored left border (4px)
+- Proportional height calculation based on event duration (15-min slots)
+- Full layout for events >= 30 minutes: title, time range, event type label
+- Condensed layout for events < 30 minutes: title only
+- Status indicator dots for job-type events (job-occupied, job-vacant, callback-job)
+- Status colors: yellow (#EAB308) for closed-no-invoice, purple (#8B5CF6) for closed-invoiced, no dot for open
+- Text truncation with ellipsis for long titles
+- Hover brightness effect for interactivity
+- Test events integrated into TimeGrid for visual verification
+
+### Files Created:
+- src/components/schedule/EventCard.jsx (event card component with all acceptance criteria)
+
+### Files Modified:
+- src/components/schedule/TimeGrid.jsx (added test events and EventCard rendering for Story 6 verification)
+
+### Tests Passed:
+- [x] Card renders with white background and colored left border based on event type
+- [x] Border colors correct: blue (job-occupied), teal (job-vacant), amber (callback-job), purple (sales-stop), gray (meeting), rose (time-off)
+- [x] Card height scales proportionally with event duration (16px per 15-min slot)
+- [x] Full layout shown for events >= 30 minutes with title, time, and type label
+- [x] Condensed layout shown for events < 30 minutes with title only
+- [x] Status indicator dots display correctly: no dot (open), yellow dot (closed-no-invoice), purple dot (closed-invoiced)
+- [x] Dots only appear on job-type events (job-occupied, job-vacant, callback-job)
+- [x] Text truncates with ellipsis when card is too small
+- [x] Card has rounded corners (6px border-radius)
+- [x] npm run lint passes
+- [x] npm run build succeeds (dist/ 213.79 KB)
+- [x] Browser verification at mobile width (375px) - all features working correctly
+
+### Quality Checks:
+- ESLint: ✅ No errors
+- Build: ✅ Success (dist/ 213.79 KB)
+- Mobile (375px): ✅ All event cards render correctly with proper colors, heights, status dots, and text truncation
+- Design System: ✅ White background, colored borders, correct fonts, rounded corners
+- Status Indicators: ✅ Yellow and purple dots visible in correct positions for closed jobs
+
+### Technical Details:
+- SLOT_HEIGHT constant: 16px (matches TimeGrid.jsx)
+- Height calculation: `(durationMinutes / 15) * SLOT_HEIGHT`
+- Time formatting: HH:MM → h:MM AM/PM format
+- Condensed threshold: events < 30 minutes
+- Job types with status indicators: job-occupied, job-vacant, callback-job
+- Border width: 4px solid left border using event type's borderColor
+- Card padding: 1.5 (6px) for compact display
+- Status dot: 2x2 (8px) rounded circle, absolute positioned top-right
+
+### Learnings:
+- **Proportional Sizing Pattern:** Using slot-based math for height calculation ensures pixel-perfect alignment with the time grid. Formula: `slots = durationMinutes / 15`, then `height = slots * SLOT_HEIGHT`.
+- **Conditional Layout Based on Duration:** The 30-minute threshold for condensed vs full layout provides good UX - very short events show just the title to avoid clutter, while longer events have room for full details.
+- **Status Indicator Logic:** Only job-type events show status dots. Non-job events (meetings, time-off, sales-stops) don't have status fields, so the conditional check prevents rendering dots where they don't belong.
+- **Border Color vs Fill Color:** Event types define both `color` (fill) and `borderColor` (darker shade). Using borderColor for the left border provides better contrast against the white card background.
+- **Text Truncation with Padding:** The `pr-3` (padding-right) on title ensures text doesn't overlap with status indicator dots. The `truncate` class handles ellipsis automatically.
+- **Hover State for Cards:** Using `hover:brightness-95` provides subtle feedback that cards are interactive, preparing for click handlers in future stories.
+- **Test Data in TimeGrid:** Adding test events directly in TimeGrid.jsx for Story 6 verification is a good pattern - it will be replaced with real data access in Story 7.
+
+### Next Steps:
+- Story 7: Render Events on Mobile Calendar (integrate real data from dataAccess.js, filter by date/person, replace test events)
+

@@ -360,3 +360,87 @@ Apply uppercase styling via CSS classes.
 </div>
 ```
 The `left-16` offset (4rem/64px) accounts for time label width.
+
+### Story 6: Event Card Component (2026-02-02)
+**Proportional Event Card Sizing:** Calculate card height using the same slot-based math as time grid positioning:
+```javascript
+const SLOT_HEIGHT = 16 // Must match TimeGrid constant
+const durationMinutes = endTime - startTime
+const slots = durationMinutes / 15
+const cardHeight = slots * SLOT_HEIGHT
+```
+This ensures pixel-perfect alignment with the time grid.
+
+**Conditional Layout Based on Duration:** Use a 30-minute threshold to switch between condensed (title only) and full (title + time + type) layouts:
+```jsx
+const isShortEvent = durationMinutes < 30
+
+{isShortEvent ? (
+  <div className="text-xs font-body text-text-dark font-semibold truncate pr-3">
+    {event.title}
+  </div>
+) : (
+  <div className="flex flex-col gap-0.5 h-full">
+    <div className="text-xs font-body text-text-dark font-semibold truncate pr-3">
+      {event.title}
+    </div>
+    <div className="text-xs font-body text-muted truncate">
+      {formatTime(event.startTime)} – {formatTime(event.endTime)}
+    </div>
+    <div className="text-xs font-body text-muted truncate">
+      {eventType.label}
+    </div>
+  </div>
+)}
+```
+Short events need condensed layouts to avoid visual clutter in small spaces.
+
+**Status Indicator Dots Logic:** Only job-type events have status fields and should show status dots:
+```javascript
+const JOB_TYPES = ['job-occupied', 'job-vacant', 'callback-job']
+const isJobType = JOB_TYPES.includes(event.type)
+const statusColor = isJobType ? STATUS_COLORS[event.status] : null
+
+// In render:
+{statusColor && (
+  <div
+    className="absolute top-1 right-1 w-2 h-2 rounded-full"
+    style={{ backgroundColor: statusColor }}
+  />
+)}
+```
+Status colors: `open` = no dot, `closed-no-invoice` = yellow (#EAB308), `closed-invoiced` = purple (#8B5CF6).
+
+**Border Color vs Fill Color:** Event types define both `color` (background fill) and `borderColor` (darker variant). Use `borderColor` for the 4px left border on white card backgrounds:
+```jsx
+style={{
+  height: `${cardHeight}px`,
+  borderLeft: `4px solid ${eventType.borderColor}`,
+}}
+```
+The darker border provides better contrast than using the lighter fill color.
+
+**Text Truncation with Status Dots:** Apply `pr-3` (padding-right: 0.75rem) to titles to prevent text overlap with status indicator dots in top-right:
+```jsx
+<div className="text-xs font-body text-text-dark font-semibold truncate pr-3">
+  {event.title}
+</div>
+```
+The `truncate` class handles ellipsis automatically when text overflows.
+
+**Time Formatting for Display:** Convert 24-hour HH:MM format to 12-hour h:MM AM/PM:
+```javascript
+const formatTime = (timeStr) => {
+  const [hour, minute] = timeStr.split(':').map(Number)
+  const period = hour >= 12 ? 'PM' : 'AM'
+  const displayHour = hour % 12 || 12
+  return `${displayHour}:${minute.toString().padStart(2, '0')} ${period}`
+}
+```
+Example: "08:00" → "8:00 AM", "14:30" → "2:30 PM"
+
+**Interactive Card Styling:** Add hover brightness for click affordance:
+```jsx
+className="... hover:brightness-95 transition-all cursor-pointer"
+```
+Prepares for click handlers in edit/detail modals (Stories 11, 20).
