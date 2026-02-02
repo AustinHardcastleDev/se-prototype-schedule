@@ -10,7 +10,7 @@ const END_HOUR = 20 // 8 PM
 const TOTAL_HOURS = END_HOUR - START_HOUR
 const TOTAL_SLOTS = TOTAL_HOURS * SLOTS_PER_HOUR
 
-export default function TimeGrid({ selectedDate, selectedMember, events: allEvents }) {
+export default function TimeGrid({ selectedDate, selectedMember, events: allEvents, onEventClick }) {
   const [currentTime, setCurrentTime] = useState(new Date())
 
   // Update current time every minute
@@ -136,7 +136,7 @@ export default function TimeGrid({ selectedDate, selectedMember, events: allEven
                 className="absolute left-0 right-0"
                 style={{ top: `${calculateEventOffset(event.startTime)}px` }}
               >
-                <EventCard event={event} onClick={() => console.log('Event clicked:', event)} />
+                <EventCard event={event} onClick={() => onEventClick(event)} />
               </div>
             ))
           )}
@@ -167,4 +167,5 @@ TimeGrid.propTypes = {
       status: PropTypes.string.isRequired,
     })
   ).isRequired,
+  onEventClick: PropTypes.func.isRequired,
 }

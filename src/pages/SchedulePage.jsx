@@ -5,7 +5,8 @@ import TimeGrid from '../components/schedule/TimeGrid'
 import FloatingActionButton from '../components/schedule/FloatingActionButton'
 import TeamMemberSwitcher from '../components/schedule/TeamMemberSwitcher'
 import CreateEventModal from '../components/schedule/CreateEventModal'
-import { getAllMembers, getEventsForDate } from '../utils/dataAccess'
+import EditEventModal from '../components/schedule/EditEventModal'
+import { getAllMembers, getAllEvents } from '../utils/dataAccess'
 
 export default function SchedulePage() {
   const [selectedDate, setSelectedDate] = useState(new Date())
@@ -14,13 +15,15 @@ export default function SchedulePage() {
   const allMembers = getAllMembers()
   const [selectedMember, setSelectedMember] = useState(allMembers[0])
 
-  // Load initial events from data
-  const initialEvents = getEventsForDate(format(new Date(), 'yyyy-MM-dd'))
-  const [events, setEvents] = useState(initialEvents)
+  // Load all events from data (TimeGrid will filter by date and member)
+  const allEvents = getAllEvents()
+  const [events, setEvents] = useState(allEvents)
 
   // Modal state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [createModalDefaults, setCreateModalDefaults] = useState({})
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false)
+  const [selectedEvent, setSelectedEvent] = useState(null)
 
   const handleDateSelect = (date) => {
     setSelectedDate(date)
@@ -51,13 +54,33 @@ export default function SchedulePage() {
     setIsCreateModalOpen(false)
   }
 
+  const handleEventClick = (event) => {
+    setSelectedEvent(event)
+    setIsEditModalOpen(true)
+  }
+
+  const handleUpdateEvent = (updatedEvent) => {
+    // Update event in state
+    setEvents(events.map((evt) => (evt.id === updatedEvent.id ? updatedEvent : evt)))
+  }
+
+  const handleDeleteEvent = (eventId) => {
+    // Remove event from state
+    setEvents(events.filter((evt) => evt.id !== eventId))
+  }
+
+  const handleCloseEditModal = () => {
+    setIsEditModalOpen(false)
+    setSelectedEvent(null)
+  }
+
   return (
     <div className="flex flex-col h-full">
       {/* Week Strip - Mobile Only */}
       <WeekStrip selectedDate={selectedDate} onDateSelect={handleDateSelect} />
 
       {/* Time Grid - Mobile Day Agenda View */}
-      <TimeGrid selectedDate={selectedDate} selectedMember={selectedMember} events={events} />
+      <TimeGrid selectedDate={selectedDate} selectedMember={selectedMember} events={events} onEventClick={handleEventClick} />
 
       {/* Team Member Switcher - Mobile Only - Bottom Left */}
       <TeamMemberSwitcher selectedMember={selectedMember} onMemberSelect={handleMemberSelect} />
@@ -71,6 +94,15 @@ export default function SchedulePage() {
         onClose={handleCloseModal}
         onSave={handleCreateEvent}
         defaults={createModalDefaults}
+      />
+
+      {/* Edit Event Modal - Mobile Only */}
+      <EditEventModal
+        isOpen={isEditModalOpen}
+        onClose={handleCloseEditModal}
+        onSave={handleUpdateEvent}
+        onDelete={handleDeleteEvent}
+        event={selectedEvent}
       />
     </div>
   )

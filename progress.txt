@@ -636,3 +636,120 @@ COMPLETED: Mobile FAB - Team Member Switcher at Mon Feb  2 13:52:50 CST 2026
 ### Next Steps:
 - Story 11: Edit Event Modal - Mobile (tap event card to open pre-populated modal with delete option)
 
+MONITOR: Story story-10 marked complete, signaling Claude to stop at Mon Feb  2 14:00:04 CST 2026
+COMPLETED: Create Event Modal - Mobile at Mon Feb  2 14:00:06 CST 2026
+
+---
+## 2026-02-02 14:03:09 | Story: story-11 | Attempt: 1/3
+Target: Edit Event Modal - Mobile
+
+HANDOFF: Max turns reached at Mon Feb  2 14:08:31 CST 2026
+
+---
+## 2026-02-02 14:08:36 | Story: story-11 | Status: Complete
+
+### Implemented:
+- EditEventModal component with bottom-sheet slide-up animation
+- Pre-populated form fields with event data (type, person, date, start/end time, title)
+- Inline validation: end time must be after start time with error message display
+- Save button updates event in state and closes modal
+- Delete button with two-stage confirmation (delete prompt → confirm/cancel)
+- Cancel button closes modal without changes
+- Integration with SchedulePage and TimeGrid for event click handling
+- Mobile-only visibility (md:hidden)
+
+### Files Created:
+- src/components/schedule/EditEventModal.jsx (complete edit modal with all acceptance criteria)
+
+### Files Modified:
+- src/pages/SchedulePage.jsx (added edit modal state, handleEventClick, handleUpdateEvent, handleDeleteEvent)
+- src/components/schedule/TimeGrid.jsx (added onEventClick prop, passed to EventCard)
+- src/components/schedule/EventCard.jsx (added onClick prop for click handling)
+
+### Tests Passed:
+- [x] Tapping event card opens edit modal
+- [x] All fields pre-populated with correct event data (title, type, person, date, start/end times)
+- [x] Save button updates event and closes modal
+- [x] Updated event appears on calendar with new data
+- [x] Validation prevents end time before start time with inline error message
+- [x] Validation error displayed in rose background with red text
+- [x] Modal remains open on validation error
+- [x] Delete button shows confirmation prompt
+- [x] Confirmation prompt displays "Are you sure you want to delete this event?"
+- [x] Cancel in confirmation returns to edit form
+- [x] Delete in confirmation removes event from calendar and closes modal
+- [x] Cancel button closes modal without saving changes
+- [x] npm run lint passes
+- [x] npm run build succeeds (dist/ 234.54 KB)
+- [x] Browser verification at mobile width (375px) using dev-browser
+
+### Quality Checks:
+- ESLint: ✅ No errors
+- Build: ✅ Success (dist/ 234.54 KB)
+- Mobile (375px): ✅ All features working correctly
+- Design System: ✅ Correct fonts (Bebas Neue heading, Open Sans body), pill-shaped buttons, orange accent, dark secondary, rose error color
+- Validation: ✅ Inline validation working, prevents invalid submissions
+- State Management: ✅ Events state managed at SchedulePage level, updates reflected on calendar
+
+### Browser Testing Details:
+**Test 1: Open and Pre-populate**
+- Clicked on "Oakwood Apartments - Unit 12B" event on Tuesday Feb 3
+- Edit modal slid up from bottom with drag handle
+- All fields pre-populated: title "Oakwood Apartments - Unit 12B", type "job-occupied", start "08:00", end "09:30"
+
+**Test 2: Update and Save**
+- Changed title to "Updated Event Title"
+- Clicked Save button
+- Modal closed smoothly
+- Updated event appeared on calendar with new title
+
+**Test 3: Validation**
+- Reopened edit modal on updated event
+- Changed end time to 07:00 (before start 08:00)
+- Clicked Save
+- Inline error message appeared: "End time must be after start time"
+- Error displayed in rose-100 background with rose text
+- Modal remained open (did not close on validation error)
+
+**Test 4: Delete with Confirmation**
+- Opened edit modal on second event "Riverside Condos - Unit 405"
+- Clicked "Delete Event" button (red text)
+- Confirmation prompt appeared: "Are you sure you want to delete this event?"
+- Two buttons: Cancel (dark) and Delete (red)
+- Clicked Delete
+- Modal closed
+- Event removed from calendar (3 events → 2 events)
+
+**Test 5: Cancel Delete**
+- Opened edit modal on an event
+- Clicked "Delete Event" button
+- Confirmation prompt appeared
+- Clicked Cancel button
+- Returned to edit form (not closed)
+- Event still present on calendar
+
+### Issues:
+- None encountered
+
+### Learnings:
+- **Reusing Form Components:** EditEventModal shares almost identical structure with CreateEventModal. Both use the same form fields, time picker generation, validation logic, and bottom-sheet pattern. Future refactoring could extract a shared EventForm component to reduce duplication.
+- **Two-Stage Delete Pattern:** The delete confirmation is handled within the same modal using conditional rendering (`showDeleteConfirm` state). This is cleaner than spawning a separate confirmation dialog and maintains consistent styling.
+- **Pre-population with useEffect:** Using `useEffect` with dependencies `[isOpen, event]` ensures form fields reset to event data each time the modal opens, even if the same event is edited multiple times. This prevents stale form data.
+- **Event Object Spread for Updates:** When saving, spread the original event object (`...event`) and override specific fields. This preserves fields like `id` and `status` that aren't in the form, preventing data loss.
+- **Delete Confirmation UX:** The confirmation shows two buttons side-by-side (Cancel and Delete) with clear visual distinction (dark vs rose background). The confirmation text is centered and easy to read.
+- **Validation Error Clearing:** Clear validation errors in onChange handlers for start/end time fields. This provides immediate feedback when user corrects the invalid input.
+- **PropTypes for Optional Event:** The `event` prop uses `PropTypes.shape()` without `.isRequired` since the modal can be closed (event = null). The component guards against null with `if (!isOpen || !event) return null`.
+
+### Next Steps:
+- Story 12: Long-Press to Create Event on Mobile (500ms hold on empty slot)
+
+MONITOR: Story story-11 marked complete, signaling Claude to stop at Mon Feb  2 14:25:00 CST 2026
+COMPLETED: Edit Event Modal - Mobile at Mon Feb  2 14:25:00 CST 2026
+
+MONITOR: Story story-11 marked complete, signaling Claude to stop at Mon Feb  2 14:12:42 CST 2026
+COMPLETED: Edit Event Modal - Mobile at Mon Feb  2 14:12:42 CST 2026
+
+---
+## 2026-02-02 14:12:45 | Story: story-12 | Attempt: 1/3
+Target: Long-Press to Create Event on Mobile
+

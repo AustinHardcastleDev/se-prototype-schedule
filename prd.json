@@ -171,7 +171,7 @@
         "Saving adds event to local state and closes modal"
       ],
       "priority": "high",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     },
     {
@@ -188,7 +188,7 @@
         "Cancel closes without changes"
       ],
       "priority": "high",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     },
     {

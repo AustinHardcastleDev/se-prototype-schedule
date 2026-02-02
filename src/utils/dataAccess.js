@@ -25,6 +25,12 @@ export const getEventsForMember = (memberId, date) =>
   events.filter(e => e.assigneeId === memberId && e.date === date)
 
 /**
+ * Get all events
+ * @returns {Array} Array of all event objects
+ */
+export const getAllEvents = () => events
+
+/**
  * Get all events for a specific date (across all team members)
  * @param {string} date - Date in YYYY-MM-DD format
  * @returns {Array} Array of event objects
