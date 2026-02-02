@@ -224,3 +224,66 @@ COMPLETED: App Layout Shell and Routing at Mon Feb  2 13:22:31 CST 2026
 ### Next Steps:
 - Story 5: Mobile Day Agenda Calendar Grid (6 AM - 8 PM time slots with 15-min increments)
 
+MONITOR: Story story-4 marked complete, signaling Claude to stop at Mon Feb  2 13:27:54 CST 2026
+COMPLETED: Mobile Week Strip Navigation at Mon Feb  2 13:27:55 CST 2026
+
+---
+## 2026-02-02 13:27:57 | Story: story-5 | Status: Complete
+
+### Implemented:
+- TimeGrid component with vertical time grid from 6 AM to 8 PM
+- Hour labels positioned on the left side with uppercase formatting
+- 15-minute grid lines (lighter opacity for quarter hours, heavier for full hours)
+- Current time indicator with orange horizontal line and dot marker
+- Auto-updating time indicator (refreshes every minute)
+- Scrollable grid container taking up remaining screen height
+- Mobile-only display (integrated into SchedulePage)
+
+### Files Created:
+- src/components/schedule/TimeGrid.jsx (mobile day agenda time grid component)
+
+### Files Modified:
+- src/pages/SchedulePage.jsx (integrated TimeGrid, removed placeholder content)
+
+### Tests Passed:
+- [x] Time grid renders from 6 AM to 8 PM
+- [x] All 15 hour labels display correctly (6 AM through 8 PM)
+- [x] Hour labels positioned on left with proper formatting
+- [x] 15-minute grid lines visible (4 per hour)
+- [x] Lighter lines for quarter hours, heavier lines for full hours
+- [x] Grid is scrollable vertically
+- [x] Current time indicator renders at correct position
+- [x] Grid takes up remaining screen height below week strip
+- [x] Grid height: 896px (56 slots × 16px per slot = 14 hours)
+- [x] npm run lint passes
+- [x] npm run build succeeds (dist/ 210.59 KB)
+- [x] Browser verification at mobile width (375px)
+
+### Quality Checks:
+- ESLint: ✅ No errors
+- Build: ✅ Success (dist/ 210.59 KB)
+- Mobile (375px): ✅ Time grid renders correctly, scrollable, current time indicator visible
+- Design System: ✅ Correct fonts, charcoal background, orange accent for time indicator
+- Grid structure: ✅ Consistent 16px slot height, proper spacing
+
+### Technical Details:
+- Slot height: 16px per 15-minute slot (64px per hour)
+- Total slots: 56 (14 hours × 4 slots/hour)
+- Grid height: 896px total
+- Time range: 6:00 AM – 8:00 PM
+- Current time updates: Every 60 seconds via useEffect interval
+- Current time calculation: Converts hours/minutes to pixel offset from grid top
+- Grid lines: Full hour lines use `border-secondary`, quarter hours use `border-secondary/30`
+
+### Learnings:
+- **Absolute Positioning for Time Grid:** Use a parent container with `position: relative` and fixed height, then position time labels and grid lines absolutely. This allows precise pixel positioning for time slots and events.
+- **Time Slot Calculations:** Formula: `slotsFromStart = (hours - START_HOUR) * 4 + minutes / 15`, then multiply by slot height to get pixel offset. This converts time strings to exact Y positions.
+- **Grid Line Opacity:** Use Tailwind's opacity modifiers (`border-secondary/30`) for lighter quarter-hour lines vs full hour lines. This creates visual hierarchy without additional color definitions.
+- **Current Time Auto-Update:** Use `setInterval` in `useEffect` with cleanup to update current time every minute. This keeps the orange indicator moving in real-time.
+- **Overflow Scrolling:** Parent container needs `overflow-y-auto` and `flex-1` to take remaining height. The inner content has explicit height based on total slots for proper scrolling.
+- **Time Label Formatting:** `date-fns` `format(date, 'h a')` produces "6 AM" style (12-hour with space before AM/PM). Uppercase applied via CSS.
+- **Future Event Positioning:** The grid provides an event rendering area (`.absolute left-16 right-0`) positioned to the right of time labels. Events in Story 7 will use the same slot height calculations for positioning.
+
+### Next Steps:
+- Story 6: Event Card Component (colored borders, status indicators, proportional height)
+

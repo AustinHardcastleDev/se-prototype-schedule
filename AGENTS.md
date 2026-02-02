@@ -299,3 +299,64 @@ WeekStrip.propTypes = {
   onDateSelect: PropTypes.func.isRequired,
 }
 ```
+
+### Story 5: Mobile Day Agenda Calendar Grid (2026-02-02)
+**Absolute Positioning for Time Grids:** Use a container with `position: relative` and explicit height, then absolutely position time labels and grid lines. This allows pixel-perfect positioning for time slots:
+```jsx
+<div className="relative" style={{ height: `${TOTAL_SLOTS * SLOT_HEIGHT}px` }}>
+  <div className="absolute left-0 right-0" style={{ top: `${topPosition}px` }}>
+    {/* Time label and grid line */}
+  </div>
+</div>
+```
+
+**Time-to-Pixel Calculations:** Convert time strings to pixel offsets using slot-based math:
+```javascript
+const SLOT_HEIGHT = 16 // px per 15-min slot
+const START_HOUR = 6
+const slotsFromStart = (hours - START_HOUR) * 4 + minutes / 15
+const pixelOffset = slotsFromStart * SLOT_HEIGHT
+```
+This formula is reusable for positioning events in future stories.
+
+**Grid Line Visual Hierarchy:** Use Tailwind opacity modifiers for different line weights without defining new colors:
+```jsx
+<div className="border-t border-secondary" /> {/* Full hour: solid */}
+<div className="border-t border-secondary/30" /> {/* Quarter hour: 30% opacity */}
+```
+
+**Auto-Updating Current Time Indicator:** Use `setInterval` in `useEffect` with cleanup to keep real-time indicators fresh:
+```jsx
+const [currentTime, setCurrentTime] = useState(new Date())
+
+useEffect(() => {
+  const interval = setInterval(() => {
+    setCurrentTime(new Date())
+  }, 60000) // Update every minute
+
+  return () => clearInterval(interval)
+}, [])
+```
+
+**Scrollable Grid Layout Pattern:** Container needs `flex-1` and `overflow-y-auto` to fill remaining height. Inner content has explicit pixel height for proper scroll behavior:
+```jsx
+<div className="flex-1 overflow-y-auto"> {/* Parent: fills remaining space */}
+  <div className="relative" style={{ height: '896px' }}> {/* Child: explicit height enables scroll */}
+```
+
+**date-fns Time Formatting for AM/PM:** Use `format(date, 'h a')` for 12-hour time with space before AM/PM:
+```javascript
+import { format } from 'date-fns'
+const date = new Date()
+date.setHours(6, 0, 0, 0)
+format(date, 'h a') // "6 AM"
+```
+Apply uppercase styling via CSS classes.
+
+**Event Rendering Area Preparation:** Reserve space to the right of time labels for future event rendering:
+```jsx
+<div className="absolute left-16 right-0 top-0 bottom-0">
+  {/* Events will be rendered here */}
+</div>
+```
+The `left-16` offset (4rem/64px) accounts for time label width.

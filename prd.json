@@ -20,7 +20,7 @@
         "npm run lint passes"
       ],
       "priority": "high",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     },
     {
@@ -37,7 +37,7 @@
         "src/data/README.md documenting all schemas"
       ],
       "priority": "high",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     },
     {
@@ -54,7 +54,7 @@
         "Sidebar and top bar use Bebas Neue for headings, Open Sans for labels"
       ],
       "priority": "high",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     },
     {
@@ -71,7 +71,7 @@
         "Uses date-fns for date calculations, week starts on Monday"
       ],
       "priority": "high",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     },
     {
