@@ -204,7 +204,7 @@
         "Long-pressing event card opens edit modal instead"
       ],
       "priority": "medium",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     },
     {
@@ -220,7 +220,7 @@
         "Event data updates in state on successful drop"
       ],
       "priority": "medium",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     },
     {
@@ -236,8 +236,8 @@
         "Resizing into a conflicting event is blocked with visual feedback and toast"
       ],
       "priority": "medium",
-      "passes": false,
-      "failedAttempts": 0
+      "passes": true,
+      "failedAttempts": 3
     },
     {
       "id": "story-15",
@@ -252,7 +252,7 @@
         "Desktop only (hidden on mobile)"
       ],
       "priority": "high",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     },
     {
@@ -269,7 +269,7 @@
         "Current time indicator line spans across all columns"
       ],
       "priority": "high",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     },
     {
@@ -284,7 +284,7 @@
         "Changing date updates all columns"
       ],
       "priority": "high",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     },
     {
@@ -299,7 +299,7 @@
         "At least 5 days rendered below selected day for smooth scrolling"
       ],
       "priority": "high",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     },
     {
@@ -315,7 +315,7 @@
         "Save adds event, Cancel closes modal"
       ],
       "priority": "high",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     },
     {
@@ -330,7 +330,7 @@
         "Cancel closes without changes"
       ],
       "priority": "high",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     },
     {
@@ -345,7 +345,7 @@
         "Event time updates in state on successful drop"
       ],
       "priority": "medium",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     },
     {
@@ -361,7 +361,7 @@
         "Event data (assignee and time) updates in state on successful drop"
       ],
       "priority": "medium",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     },
     {
@@ -378,7 +378,7 @@
         "All interactive elements have hover/active brightness shift states"
       ],
       "priority": "medium",
-      "passes": false,
+      "passes": true,
       "failedAttempts": 0
     }
   ]

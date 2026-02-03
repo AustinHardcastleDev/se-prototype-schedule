@@ -101,15 +101,172 @@ export default function CreateEventModal({ isOpen, onClose, onSave, defaults = {
 
   const selectedEventType = eventTypes.find(et => et.key === eventType)
 
+  // Shared form fields component
+  const FormFields = ({ idPrefix = '' }) => (
+    <>
+      {/* Event Type Dropdown */}
+      <div className="mb-4">
+        <label htmlFor={`eventType${idPrefix}`} className="block text-sm font-body text-text-dark font-semibold mb-2">
+          Event Type
+        </label>
+        <div className="relative">
+          <select
+            id={`eventType${idPrefix}`}
+            value={eventType}
+            onChange={(e) => setEventType(e.target.value)}
+            className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg appearance-none font-body text-sm pr-10"
+          >
+            {eventTypes.map((et) => (
+              <option key={et.key} value={et.key}>
+                {et.label}
+              </option>
+            ))}
+          </select>
+          {/* Color Indicator */}
+          <div
+            className="absolute left-4 top-1/2 transform -translate-y-1/2 w-3 h-3 rounded-full pointer-events-none"
+            style={{ backgroundColor: selectedEventType?.borderColor }}
+          />
+          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
+            <svg className="w-4 h-4 text-text-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      {/* Person Dropdown */}
+      <div className="mb-4">
+        <label htmlFor={`assignee${idPrefix}`} className="block text-sm font-body text-text-dark font-semibold mb-2">
+          Person
+        </label>
+        <select
+          id={`assignee${idPrefix}`}
+          value={assigneeId}
+          onChange={(e) => setAssigneeId(e.target.value)}
+          className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg appearance-none font-body text-sm"
+        >
+          {allMembers.map((member) => (
+            <option key={member.id} value={member.id}>
+              {member.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Date Picker */}
+      <div className="mb-4">
+        <label htmlFor={`date${idPrefix}`} className="block text-sm font-body text-text-dark font-semibold mb-2">
+          Date
+        </label>
+        <input
+          type="date"
+          id={`date${idPrefix}`}
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg font-body text-sm"
+        />
+      </div>
+
+      {/* Start Time */}
+      <div className="mb-4">
+        <label htmlFor={`startTime${idPrefix}`} className="block text-sm font-body text-text-dark font-semibold mb-2">
+          Start Time
+        </label>
+        <select
+          id={`startTime${idPrefix}`}
+          value={startTime}
+          onChange={(e) => {
+            setStartTime(e.target.value)
+            setValidationError('')
+          }}
+          className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg appearance-none font-body text-sm"
+        >
+          {timeOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* End Time */}
+      <div className="mb-4">
+        <label htmlFor={`endTime${idPrefix}`} className="block text-sm font-body text-text-dark font-semibold mb-2">
+          End Time
+        </label>
+        <select
+          id={`endTime${idPrefix}`}
+          value={endTime}
+          onChange={(e) => {
+            setEndTime(e.target.value)
+            setValidationError('')
+          }}
+          className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg appearance-none font-body text-sm"
+        >
+          {timeOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* Validation Error */}
+      {validationError && (
+        <div className="mb-4 px-4 py-2 bg-rose-100 text-time-off rounded-lg text-sm font-body">
+          {validationError}
+        </div>
+      )}
+
+      {/* Title Input */}
+      <div className="mb-6">
+        <label htmlFor={`title${idPrefix}`} className="block text-sm font-body text-text-dark font-semibold mb-2">
+          Title
+        </label>
+        <input
+          type="text"
+          id={`title${idPrefix}`}
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Enter event title"
+          className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg font-body text-sm placeholder-muted"
+          required
+        />
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex gap-3 pb-4">
+        <button
+          type="button"
+          onClick={handleCancel}
+          className="flex-1 px-6 py-3 bg-secondary text-text-light rounded-full font-body font-semibold text-sm hover:brightness-110 transition-all"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          className="flex-1 px-6 py-3 bg-accent text-white rounded-full font-body font-semibold text-sm hover:brightness-110 transition-all"
+        >
+          Save
+        </button>
+      </div>
+    </>
+  )
+
+  FormFields.propTypes = {
+    idPrefix: PropTypes.string
+  }
+
   return (
     <>
-      {/* Backdrop */}
+      {/* Backdrop - both mobile and desktop */}
       <div
-        className="fixed inset-0 bg-black/50 z-40 md:hidden"
+        className="fixed inset-0 bg-black/50 z-40"
         onClick={handleBackdropClick}
       />
 
-      {/* Bottom Sheet Modal */}
+      {/* Bottom Sheet Modal - Mobile */}
       <div
         className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-50 md:hidden transform transition-transform duration-300 ${
           isOpen ? 'translate-y-0' : 'translate-y-full'
@@ -127,153 +284,24 @@ export default function CreateEventModal({ isOpen, onClose, onSave, defaults = {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="px-6 py-4 max-h-[70vh] overflow-y-auto">
-          {/* Event Type Dropdown */}
-          <div className="mb-4">
-            <label htmlFor="eventType" className="block text-sm font-body text-text-dark font-semibold mb-2">
-              Event Type
-            </label>
-            <div className="relative">
-              <select
-                id="eventType"
-                value={eventType}
-                onChange={(e) => setEventType(e.target.value)}
-                className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg appearance-none font-body text-sm pr-10"
-              >
-                {eventTypes.map((et) => (
-                  <option key={et.key} value={et.key}>
-                    {et.label}
-                  </option>
-                ))}
-              </select>
-              {/* Color Indicator */}
-              <div
-                className="absolute left-4 top-1/2 transform -translate-y-1/2 w-3 h-3 rounded-full pointer-events-none"
-                style={{ backgroundColor: selectedEventType?.borderColor }}
-              />
-              <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-                <svg className="w-4 h-4 text-text-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                </svg>
-              </div>
-            </div>
-          </div>
+          <FormFields idPrefix="" />
+        </form>
+      </div>
 
-          {/* Person Dropdown */}
-          <div className="mb-4">
-            <label htmlFor="assignee" className="block text-sm font-body text-text-dark font-semibold mb-2">
-              Person
-            </label>
-            <select
-              id="assignee"
-              value={assigneeId}
-              onChange={(e) => setAssigneeId(e.target.value)}
-              className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg appearance-none font-body text-sm"
-            >
-              {allMembers.map((member) => (
-                <option key={member.id} value={member.id}>
-                  {member.name}
-                </option>
-              ))}
-            </select>
-          </div>
+      {/* Centered Modal - Desktop */}
+      <div
+        className={`hidden md:block fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl z-50 w-[480px] max-h-[80vh] overflow-hidden ${
+          isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
+        } transition-all duration-200`}
+      >
+        {/* Modal Header */}
+        <div className="px-6 py-4 border-b border-secondary">
+          <h2 className="font-heading text-2xl text-text-dark uppercase">Create Event</h2>
+        </div>
 
-          {/* Date Picker */}
-          <div className="mb-4">
-            <label htmlFor="date" className="block text-sm font-body text-text-dark font-semibold mb-2">
-              Date
-            </label>
-            <input
-              type="date"
-              id="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg font-body text-sm"
-            />
-          </div>
-
-          {/* Start Time */}
-          <div className="mb-4">
-            <label htmlFor="startTime" className="block text-sm font-body text-text-dark font-semibold mb-2">
-              Start Time
-            </label>
-            <select
-              id="startTime"
-              value={startTime}
-              onChange={(e) => {
-                setStartTime(e.target.value)
-                setValidationError('')
-              }}
-              className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg appearance-none font-body text-sm"
-            >
-              {timeOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* End Time */}
-          <div className="mb-4">
-            <label htmlFor="endTime" className="block text-sm font-body text-text-dark font-semibold mb-2">
-              End Time
-            </label>
-            <select
-              id="endTime"
-              value={endTime}
-              onChange={(e) => {
-                setEndTime(e.target.value)
-                setValidationError('')
-              }}
-              className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg appearance-none font-body text-sm"
-            >
-              {timeOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          {/* Validation Error */}
-          {validationError && (
-            <div className="mb-4 px-4 py-2 bg-rose-100 text-time-off rounded-lg text-sm font-body">
-              {validationError}
-            </div>
-          )}
-
-          {/* Title Input */}
-          <div className="mb-6">
-            <label htmlFor="title" className="block text-sm font-body text-text-dark font-semibold mb-2">
-              Title
-            </label>
-            <input
-              type="text"
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter event title"
-              className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg font-body text-sm placeholder-muted"
-              required
-            />
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-3 pb-4">
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="flex-1 px-6 py-3 bg-secondary text-text-light rounded-full font-body font-semibold text-sm hover:brightness-110 transition-all"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className="flex-1 px-6 py-3 bg-accent text-white rounded-full font-body font-semibold text-sm hover:brightness-110 transition-all"
-            >
-              Save
-            </button>
-          </div>
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="px-6 py-4 max-h-[calc(80vh-80px)] overflow-y-auto">
+          <FormFields idPrefix="-desktop" />
         </form>
       </div>
     </>

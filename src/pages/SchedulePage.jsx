@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { format } from 'date-fns'
 import WeekStrip from '../components/schedule/WeekStrip'
 import TimeGrid from '../components/schedule/TimeGrid'
+import DesktopTimeGrid from '../components/schedule/DesktopTimeGrid'
 import FloatingActionButton from '../components/schedule/FloatingActionButton'
 import TeamMemberSwitcher from '../components/schedule/TeamMemberSwitcher'
 import CreateEventModal from '../components/schedule/CreateEventModal'
 import EditEventModal from '../components/schedule/EditEventModal'
+import DesktopDatePicker from '../components/schedule/DesktopDatePicker'
 import { getAllMembers, getAllEvents } from '../utils/dataAccess'
 
 export default function SchedulePage() {
@@ -59,6 +61,28 @@ export default function SchedulePage() {
     setIsEditModalOpen(true)
   }
 
+  const handleLongPressSlot = ({ startTime, endTime }) => {
+    // Open create modal with pre-filled time from long-pressed slot
+    setCreateModalDefaults({
+      assigneeId: selectedMember.id,
+      date: format(selectedDate, 'yyyy-MM-dd'),
+      startTime,
+      endTime,
+    })
+    setIsCreateModalOpen(true)
+  }
+
+  const handleDesktopSlotClick = ({ memberId, date, startTime, endTime }) => {
+    // Open create modal with pre-filled time and person from clicked slot
+    setCreateModalDefaults({
+      assigneeId: memberId,
+      date,
+      startTime,
+      endTime,
+    })
+    setIsCreateModalOpen(true)
+  }
+
   const handleUpdateEvent = (updatedEvent) => {
     // Update event in state
     setEvents(events.map((evt) => (evt.id === updatedEvent.id ? updatedEvent : evt)))
@@ -76,11 +100,33 @@ export default function SchedulePage() {
 
   return (
     <div className="flex flex-col h-full">
+      {/* Desktop Date Picker Bar - Desktop Only */}
+      <DesktopDatePicker selectedDate={selectedDate} onDateChange={handleDateSelect} />
+
       {/* Week Strip - Mobile Only */}
       <WeekStrip selectedDate={selectedDate} onDateSelect={handleDateSelect} />
 
-      {/* Time Grid - Mobile Day Agenda View */}
-      <TimeGrid selectedDate={selectedDate} selectedMember={selectedMember} events={events} onEventClick={handleEventClick} />
+      {/* Time Grid - Mobile Day Agenda View - Mobile Only */}
+      <div className="md:hidden flex flex-col flex-1">
+        <TimeGrid
+          selectedDate={selectedDate}
+          selectedMember={selectedMember}
+          events={events}
+          onEventClick={handleEventClick}
+          onLongPressSlot={handleLongPressSlot}
+          onEventUpdate={handleUpdateEvent}
+        />
+      </div>
+
+      {/* Desktop Time Grid - Multi-Column View - Desktop Only */}
+      <DesktopTimeGrid
+        selectedDate={selectedDate}
+        events={events}
+        onDateChange={handleDateSelect}
+        onSlotClick={handleDesktopSlotClick}
+        onEventClick={handleEventClick}
+        onEventUpdate={handleUpdateEvent}
+      />
 
       {/* Team Member Switcher - Mobile Only - Bottom Left */}
       <TeamMemberSwitcher selectedMember={selectedMember} onMemberSelect={handleMemberSelect} />

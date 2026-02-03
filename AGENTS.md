@@ -798,3 +798,978 @@ Without this check, clicking anywhere inside the modal (including form fields) w
 <div className="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-50 md:hidden">
 ```
 Desktop views will use centered modals (Stories 19-20) instead of bottom sheets.
+
+### Story 12: Long-Press to Create Event on Mobile (2026-02-02)
+**Pointer Events for Cross-Platform Input:** Using pointer events (`onPointerDown`, `onPointerUp`, `onPointerLeave`) provides unified handling for touch, mouse, and pen input. This is more future-proof and cleaner than maintaining separate touch and mouse event handlers:
+```jsx
+<div
+  onPointerDown={handlePointerDown}
+  onPointerUp={handlePointerUp}
+  onPointerLeave={handlePointerLeave}
+>
+```
+Pointer events abstract away the input device, making code work consistently across desktop and mobile.
+
+**Timer-Based Long Press Pattern:** Implement long press detection using setTimeout with cleanup:
+```javascript
+const [longPressTimer, setLongPressTimer] = useState(null)
+const [isLongPressing, setIsLongPressing] = useState(false)
+
+const handlePointerDown = (e) => {
+  setIsLongPressing(true)
+  const timer = setTimeout(() => {
+    // Long press detected after 500ms
+    onLongPress()
+    setIsLongPressing(false)
+  }, 500)
+  setLongPressTimer(timer)
+}
+
+const handlePointerUp = () => {
+  if (longPressTimer) {
+    clearTimeout(longPressTimer)
+    setLongPressTimer(null)
+    // If released before 500ms, treat as regular click
+    if (isLongPressing) {
+      onClick()
+    }
+  }
+  setIsLongPressing(false)
+}
+
+// Cleanup on unmount
+useEffect(() => {
+  return () => {
+    if (longPressTimer) clearTimeout(longPressTimer)
+  }
+}, [longPressTimer])
+```
+Key aspects: track timer reference, track long-press state for visual feedback, clear timer on up/leave, distinguish long press from click.
+
+**Visual Feedback During Long Press:** Use state to conditionally apply styles while long press is active:
+```jsx
+// TimeGrid: Highlight the slot being pressed
+{longPressSlot !== null && (
+  <div
+    className="absolute left-0 right-0 bg-accent/20 pointer-events-none"
+    style={{ top: `${longPressSlot * SLOT_HEIGHT}px`, height: `${SLOT_HEIGHT}px` }}
+  />
+)}
+
+// EventCard: Dim the card during long press
+<div className={`... ${isLongPressing ? 'brightness-90' : ''}`}>
+```
+The `pointer-events-none` on the feedback overlay prevents it from interfering with pointer events.
+
+**Preventing Event Bubbling in Nested Handlers:** When you have nested interactive areas (events within a time grid), prevent child events from triggering parent handlers:
+```javascript
+// EventCard: Stop propagation to prevent slot handler from firing
+const handlePointerDown = (e) => {
+  e.stopPropagation() // Critical!
+  // ... long press logic
+}
+
+// TimeGrid: Also check if click is on an event as fallback
+const handlePointerDown = (e) => {
+  if (e.target.closest('[data-event-card]')) return
+  // ... slot long press logic
+}
+```
+Use both `stopPropagation()` and a `data-event-card` attribute check for robust event handling.
+
+**Touch-Action CSS for Mobile:** Add `touch-none` class to prevent browser scroll interference during long press on touch devices:
+```jsx
+<div className="... touch-none" onPointerDown={...}>
+```
+Without this, attempting to long-press on mobile would often trigger scrolling instead of the long-press action. `touch-none` disables all default touch behaviors (pan, zoom, etc.) on that element.
+
+**Y-Position to Time Calculation:** Convert pixel Y offset within the grid to a time string:
+```javascript
+const calculateTimeFromY = (yPosition) => {
+  const slots = Math.floor(yPosition / SLOT_HEIGHT) // Which 15-min slot?
+  const totalMinutes = slots * 15
+  const hours = Math.floor(totalMinutes / 60) + START_HOUR
+  const minutes = totalMinutes % 60
+  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`
+}
+```
+This reuses the same slot-based math as event positioning, ensuring consistency. The `getBoundingClientRect()` on the grid container gives us the reference point for calculating relative Y position from `e.clientY`.
+
+**Default End Time Logic:** When creating an event from a long-press, default the end time to start + 1 hour:
+```javascript
+const [startHour, startMin] = startTime.split(':').map(Number)
+const endHour = startHour + 1
+const endTime = `${endHour.toString().padStart(2, '0')}:${startMin.toString().padStart(2, '0')}`
+```
+Edge case: if start is 7:30 PM or later, end time may exceed 8 PM (grid boundary). The modal validation will catch this, or you can clamp it to END_HOUR in the calculation.
+
+**Dual-Purpose Long Press on Events:** Long-pressing an event card should open the edit modal (same as a regular click in this implementation). The EventCard component accepts both `onClick` and `onLongPress` props:
+```jsx
+// TimeGrid passes onEventClick for both
+<EventCard
+  event={event}
+  onClick={() => onEventClick(event)}
+  onLongPress={() => onEventClick(event)}
+/>
+```
+This keeps the UX consistent—both actions lead to editing. In other scenarios, you might use long-press for a different action (e.g., delete confirmation menu).
+
+### Story 13: Mobile Drag-and-Drop - Move Events (2026-02-02)
+**@dnd-kit Library Integration:** Use @dnd-kit/core for drag-and-drop instead of manual touch event handling. The library handles both touch and mouse automatically via pointer events. Install with:
+```bash
+npm install @dnd-kit/core @dnd-kit/sortable react-hot-toast
+```
+
+**DndContext Setup:** Wrap the draggable area with DndContext and implement drag handlers:
+```jsx
+import { DndContext, DragOverlay, pointerWithin } from '@dnd-kit/core'
+
+<DndContext
+  onDragStart={handleDragStart}
+  onDragMove={handleDragMove}
+  onDragEnd={handleDragEnd}
+  onDragCancel={handleDragCancel}
+  collisionDetection={pointerWithin}
+>
+  {/* Draggable content */}
+  <DragOverlay dropAnimation={null}>
+    {activeEvent ? <EventCard event={activeEvent} /> : null}
+  </DragOverlay>
+</DndContext>
+```
+The DragOverlay shows a copy of the dragged element following the cursor for visual feedback.
+
+**DraggableEvent Wrapper Component:** Create a wrapper that uses the useDraggable hook:
+```jsx
+import { useDraggable } from '@dnd-kit/core'
+import { CSS } from '@dnd-kit/utilities'
+
+export default function DraggableEvent({ event, onEventClick, isDragging }) {
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: event.id,
+    data: { event },
+  })
+
+  const style = {
+    transform: CSS.Translate.toString(transform),
+    opacity: isDragging ? 0.5 : 1,
+  }
+
+  return (
+    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
+      <EventCard event={event} disableInteraction={true} />
+    </div>
+  )
+}
+```
+The wrapper receives drag attributes/listeners from @dnd-kit and passes them to the DOM element. Set opacity to 0.5 during drag for visual feedback.
+
+**Pointer Event Conflicts:** Components with `e.stopPropagation()` in pointer handlers will block @dnd-kit's drag detection. Solution: Add a `disableInteraction` prop to conditionally disable pointer handlers when component is wrapped in DraggableEvent:
+```jsx
+const pointerHandlers = disableInteraction
+  ? {}
+  : {
+      onPointerDown: handlePointerDown,
+      onPointerUp: handlePointerUp,
+      onPointerLeave: handlePointerLeave,
+    }
+
+<div {...pointerHandlers}>
+```
+This pattern allows EventCard to work both standalone (clickable/long-pressable) and in drag context (draggable only).
+
+**Drag Ghost Preview:** Show a visual indicator at the target drop location during drag:
+```jsx
+{dragOverSlot !== null && activeEvent && (
+  <div
+    className="absolute left-0 right-0 pointer-events-none z-20 border-2 border-dashed border-accent bg-accent/10"
+    style={{ top: `${dragOverSlot * SLOT_HEIGHT}px`, height: `${eventHeight}px` }}
+  >
+    <div className="p-1.5 text-xs text-accent font-semibold truncate">
+      {activeEvent.title}
+    </div>
+  </div>
+)}
+```
+Use dashed orange border with 10% opacity background. Update dragOverSlot in onDragMove based on delta.y.
+
+**Drag Handlers - onDragStart:** Store the active dragged element ID:
+```javascript
+const handleDragStart = (event) => {
+  setActiveId(event.active.id)
+}
+```
+
+**Drag Handlers - onDragMove:** Calculate which slot is being hovered over:
+```javascript
+const handleDragMove = (event) => {
+  const { delta } = event
+  const draggedEvent = events.find((e) => e.id === activeId)
+  const originalOffset = calculateEventOffset(draggedEvent.startTime)
+  const newOffset = originalOffset + delta.y
+  const newSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, Math.floor(newOffset / SLOT_HEIGHT)))
+  setDragOverSlot(newSlot)
+}
+```
+Clamp slot to valid range (0 to TOTAL_SLOTS - 1).
+
+**Drag Handlers - onDragEnd:** Calculate new time, check conflicts, update state:
+```javascript
+const handleDragEnd = (event) => {
+  const { active, delta } = event
+
+  // Calculate new slot and time
+  const draggedEvent = events.find((e) => e.id === active.id)
+  const originalOffset = calculateEventOffset(draggedEvent.startTime)
+  const newSlot = Math.floor((originalOffset + delta.y) / SLOT_HEIGHT)
+  const newStartTime = calculateTimeFromSlot(newSlot)
+
+  // Preserve duration
+  const durationMinutes = /* calculate */
+  const newEndTime = /* add duration to newStartTime */
+
+  // Check bounds
+  if (newStartHour < START_HOUR || newEndHour > END_HOUR) {
+    toast.error('Event cannot be moved outside of 6 AM - 8 PM')
+    return
+  }
+
+  // Check conflicts
+  if (hasConflict(draggedEvent.id, newStartTime, newEndTime, draggedEvent.date)) {
+    toast.error('Cannot move event - time slot conflicts with another event')
+    return
+  }
+
+  // Update event
+  onEventUpdate({ ...draggedEvent, startTime: newStartTime, endTime: newEndTime })
+}
+```
+
+**Conflict Detection:** Check if two time ranges overlap:
+```javascript
+const eventsOverlap = (event1Start, event1End, event2Start, event2End) => {
+  return event1Start < event2End && event1End > event2Start
+}
+
+const hasConflict = (eventId, newStartTime, newEndTime, newDate) => {
+  return events.some((existingEvent) => {
+    if (existingEvent.id === eventId) return false // Don't check against self
+    if (existingEvent.date !== newDate || existingEvent.assigneeId !== selectedMember.id) {
+      return false // Only check same date/person
+    }
+    return eventsOverlap(newStartTime, newEndTime, existingEvent.startTime, existingEvent.endTime)
+  })
+}
+```
+Check both time range overlap and same date/assignee.
+
+**Time Snapping to 15-Minute Increments:** Round calculated times to nearest 15-minute slot:
+```javascript
+const roundToNearestSlot = (timeStr) => {
+  const [hours, minutes] = timeStr.split(':').map(Number)
+  const totalMinutes = hours * 60 + minutes
+  const roundedMinutes = Math.round(totalMinutes / 15) * 15
+  const roundedHours = Math.floor(roundedMinutes / 60)
+  const roundedMins = roundedMinutes % 60
+  return `${roundedHours.toString().padStart(2, '0')}:${roundedMins.toString().padStart(2, '0')}`
+}
+```
+
+**Toast Notifications with react-hot-toast:** Configure Toaster with design system styles:
+```jsx
+import { Toaster, toast } from 'react-hot-toast'
+
+<Toaster
+  position="top-center"
+  toastOptions={{
+    duration: 3000,
+    style: {
+      background: '#2A2A2A',
+      color: '#FFFFFF',
+      border: '1px solid #F47A20',
+    },
+  }}
+/>
+```
+Show errors with `toast.error('message')`. Position at top-center to avoid FABs at bottom.
+
+**Duration Preservation During Drag:** Calculate original duration and add to new start time:
+```javascript
+const [oldStartHour, oldStartMin] = draggedEvent.startTime.split(':').map(Number)
+const [oldEndHour, oldEndMin] = draggedEvent.endTime.split(':').map(Number)
+const durationMinutes = (oldEndHour * 60 + oldEndMin) - (oldStartHour * 60 + oldStartMin)
+
+const [newStartHour, newStartMin] = newStartTime.split(':').map(Number)
+const endTotalMinutes = (newStartHour * 60 + newStartMin) + durationMinutes
+const newEndHour = Math.floor(endTotalMinutes / 60)
+const newEndMin = endTotalMinutes % 60
+const newEndTime = `${newEndHour.toString().padStart(2, '0')}:${newEndMin.toString().padStart(2, '0')}`
+```
+This ensures event duration stays constant when moved to a new time.
+
+**State Management for Drag Updates:** Pass an onEventUpdate callback from parent page to TimeGrid:
+```jsx
+// SchedulePage.jsx
+const handleUpdateEvent = (updatedEvent) => {
+  setEvents(events.map((evt) => (evt.id === updatedEvent.id ? updatedEvent : evt)))
+}
+
+<TimeGrid onEventUpdate={handleUpdateEvent} />
+
+// TimeGrid.jsx - in onDragEnd
+if (onEventUpdate) {
+  onEventUpdate({ ...draggedEvent, startTime: newStartTime, endTime: newEndTime })
+}
+```
+Keep state management centralized at the page level.
+
+### Story 15: Desktop Date Picker Bar (2026-02-02)
+**Controlled Date Component Pattern:** The DesktopDatePicker is a controlled component receiving `selectedDate` as a prop and calling `onDateChange` callback. This allows the parent (SchedulePage) to manage date state centrally and share it with other components:
+```jsx
+// Parent (SchedulePage)
+const [selectedDate, setSelectedDate] = useState(new Date())
+
+<DesktopDatePicker selectedDate={selectedDate} onDateChange={setSelectedDate} />
+<WeekStrip selectedDate={selectedDate} onDateSelect={setSelectedDate} />
+<TimeGrid selectedDate={selectedDate} ... />
+```
+Both mobile (WeekStrip) and desktop (DesktopDatePicker) date pickers use the same state and callback, ensuring consistency.
+
+**Conditional Today Button:** Use `isSameDay(selectedDate, new Date())` to determine if the Today button should be shown:
+```jsx
+const isToday = isSameDay(selectedDate, new Date())
+
+{!isToday && (
+  <button onClick={handleToday}>Today</button>
+)}
+```
+Only show when viewing a date other than today. This reduces UI clutter and provides clear affordance for returning to today's date.
+
+**date-fns Navigation Helpers:** The `addDays(date, 1)` and `subDays(date, 1)` functions provide clean day-by-day navigation:
+```jsx
+const handlePreviousDay = () => onDateChange(subDays(selectedDate, 1))
+const handleNextDay = () => onDateChange(addDays(selectedDate, 1))
+const handleToday = () => onDateChange(new Date())
+```
+These handle month boundaries and edge cases automatically, unlike manual date arithmetic.
+
+**Full Date Format Display:** Use `format(selectedDate, 'EEEE, MMMM d, yyyy')` for the complete date format:
+```jsx
+<h1 className="font-heading text-3xl uppercase">
+  {format(selectedDate, 'EEEE, MMMM d, yyyy')}
+</h1>
+```
+Output: "MONDAY, FEBRUARY 2, 2026". The uppercase styling is applied via CSS class on the Bebas Neue heading.
+
+**Desktop-Only Component Pattern:** Use `hidden md:flex` to show only on desktop:
+```jsx
+<div className="hidden md:flex items-center justify-between ...">
+```
+Component is invisible on mobile (<768px) and visible as flexbox on desktop (≥768px). Cleaner than conditional rendering and keeps component in DOM for future enhancements like scroll-sync (Story 18).
+
+**Preparing for External Updates:** The controlled component pattern with props makes external date updates possible. In Story 18, scroll position can update the `selectedDate` state in the parent, which automatically propagates to DesktopDatePicker. No changes to the component needed - it's already prepared for this use case.
+
+**SVG Arrow Icons:** Using inline SVG with Tailwind classes provides crisp rendering and keeps components self-contained:
+```jsx
+<svg className="w-6 h-6 text-text-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+</svg>
+```
+No external icon library dependencies needed.
+
+**Accessibility for Icon Buttons:** Always add `aria-label` to icon-only buttons:
+```jsx
+<button aria-label="Previous day" onClick={handlePreviousDay}>
+  <svg>...</svg>
+</button>
+```
+Critical for screen reader users who can't see the visual icon.
+
+### Story 16: Desktop Multi-Column Time Grid (2026-02-02)
+**Desktop Multi-Column Pattern:** The desktop grid uses a fundamentally different layout than mobile. Instead of filtering events for one person, it shows all team members simultaneously. This requires a flexible column system where each column has the same time scale but different event content:
+```jsx
+<div className="hidden md:flex md:flex-col flex-1">
+  {/* Sticky header row with team member columns */}
+  <div className="sticky top-0 z-30">
+    <div className="flex">
+      <div className="w-16 flex-shrink-0" /> {/* Time label spacer */}
+      {teamMembers.map(member => (
+        <div key={member.id} className="flex-1">
+          {/* Avatar and name */}
+        </div>
+      ))}
+    </div>
+  </div>
+
+  {/* Grid body with time labels and columns */}
+  <div className="relative" style={{ height: TOTAL_HEIGHT }}>
+    {/* Time labels and grid lines for each column */}
+  </div>
+</div>
+```
+The desktop view is hidden on mobile with `hidden md:flex`, while the mobile single-column view uses `md:hidden`.
+
+**Sticky Column Headers:** Using `sticky top-0 z-30` on the header row keeps team member names visible during scroll. The z-index (30) ensures headers stay above grid content (z-10 for current time indicator, z-20 for drag previews) but below modals (z-40+):
+```jsx
+<div className="sticky top-0 z-30 bg-charcoal border-b border-secondary">
+  {/* Column headers */}
+</div>
+```
+Without `bg-charcoal`, the grid content would show through the transparent sticky header during scroll.
+
+**Flexbox for Even Column Distribution:** Using `flex-1` on each column div ensures all columns have equal width regardless of the number of team members:
+```jsx
+{teamMembers.map((member, index) => (
+  <div
+    key={member.id}
+    className="flex-1 relative"
+    style={{ borderLeft: index === 0 ? 'none' : '1px solid #2A2A2A' }}
+  >
+    {/* Column content */}
+  </div>
+))}
+```
+The `flex-shrink-0` on the time label column (`w-16`) prevents it from shrinking when columns compete for space.
+
+**Shared Grid Lines Pattern:** Grid lines are rendered within each column div, not globally. This ensures each column has its own set of lines that stay aligned with the column boundaries:
+```jsx
+<div className="flex ml-16"> {/* ml-16 accounts for time label width */}
+  {teamMembers.map((member, index) => (
+    <div key={member.id} className="flex-1 relative">
+      {/* Hour line */}
+      <div className="absolute left-0 right-0 border-t border-secondary" />
+
+      {/* Quarter hour lines (lighter) */}
+      <div className="absolute left-0 right-0 border-t border-secondary/30"
+        style={{ top: `${SLOT_HEIGHT}px` }}
+      />
+      {/* ... more quarter lines */}
+    </div>
+  ))}
+</div>
+```
+Each column's grid lines are positioned absolutely within the column's relative container.
+
+**Border Management Between Columns:** The first column (index 0) has no left border to avoid double-border with the time label area. Subsequent columns have `border-left: 1px solid #2A2A2A` for visual separation:
+```jsx
+style={{ borderLeft: index === 0 ? 'none' : '1px solid #2A2A2A' }}
+```
+This creates clean vertical dividers between columns without doubling up at the edges.
+
+**Responsive Grid Switching:** The mobile TimeGrid is wrapped in a responsive container to ensure proper height management and visibility control:
+```jsx
+{/* Mobile: Single-column view */}
+<div className="md:hidden flex flex-col flex-1">
+  <TimeGrid selectedDate={selectedDate} selectedMember={selectedMember} ... />
+</div>
+
+{/* Desktop: Multi-column view */}
+<DesktopTimeGrid selectedDate={selectedDate} />
+```
+The mobile container uses `flex flex-col flex-1` to ensure TimeGrid takes full available height. DesktopTimeGrid has its own `hidden md:flex md:flex-col flex-1` classes built-in.
+
+**Reusing Time Grid Constants:** The same SLOT_HEIGHT (16px), START_HOUR (6), END_HOUR (20), SLOTS_PER_HOUR (4), TOTAL_SLOTS constants should be used across mobile TimeGrid and DesktopTimeGrid for consistency:
+```javascript
+const SLOT_HEIGHT = 16 // pixels per 15-minute slot
+const SLOTS_PER_HOUR = 4
+const START_HOUR = 6 // 6 AM
+const END_HOUR = 20 // 8 PM
+const TOTAL_HOURS = END_HOUR - START_HOUR
+const TOTAL_SLOTS = TOTAL_HOURS * SLOTS_PER_HOUR
+```
+This ensures events will align correctly at the same pixel positions when rendered in Story 17, regardless of which grid view is active.
+
+**Current Time Indicator Spanning Columns:** The current time line must be positioned outside the column loop to span all columns:
+```jsx
+{/* Current time indicator - positioned at grid level, spans all columns */}
+{currentTimeOffset !== null && (
+  <div className="absolute left-16 right-0 z-10" style={{ top: `${currentTimeOffset}px` }}>
+    <div className="flex items-center">
+      <div className="w-2 h-2 rounded-full bg-accent" />
+      <div className="flex-1 h-0.5 bg-accent" />
+    </div>
+  </div>
+)}
+```
+The `left-16` offset accounts for time labels, and `right-0` extends to the right edge, spanning all columns. The dot marker on the left provides a visual anchor point.
+
+**Event Rendering Area Preparation:** Create placeholder divs for each column positioned absolutely within the grid to prepare for event rendering:
+```jsx
+<div className="absolute left-16 right-0 top-0 bottom-0 flex">
+  {teamMembers.map((member, index) => (
+    <div
+      key={member.id}
+      className="flex-1 relative px-1"
+      style={{ borderLeft: index === 0 ? 'none' : '1px solid #2A2A2A' }}
+    >
+      {/* Events for this member will be rendered here in Story 17 */}
+    </div>
+  ))}
+</div>
+```
+The `px-1` horizontal padding ensures events don't touch column borders. The `relative` positioning allows events to be positioned absolutely within each column.
+
+**ESLint Unused Variable Pattern for Future Props:** When a prop is needed for future stories but currently unused, add an inline eslint-disable comment and a code comment explaining its future use:
+```jsx
+export default function DesktopTimeGrid({ selectedDate }) { // eslint-disable-line no-unused-vars
+  // ...
+  // selectedDate will be used in Story 17 to filter events by date
+```
+This passes linting while documenting the prop's intended future use, avoiding the need to add/remove props between stories.
+
+### Story 17: Render Events on Desktop Grid (2026-02-02)
+**Reusing EventCard Component Across Views:** The same EventCard component works seamlessly in both mobile (TimeGrid) and desktop (DesktopTimeGrid) contexts without modification. The card handles its own height calculation and styling based on event data. Using `disableInteraction={false}` and `disableResize={true}` for desktop prepares for future click handlers (Stories 19-20) while disabling mobile-specific resize functionality:
+```jsx
+// Desktop rendering
+<EventCard
+  event={event}
+  disableInteraction={false}  // Enable clicks for future stories
+  disableResize={true}        // Resize is mobile-only (Story 14)
+/>
+```
+This pattern allows the same component to adapt to different interaction models per platform.
+
+**Filtering Events Per Column:** Each team member column independently filters the events array in the render loop:
+```jsx
+const getEventsForMember = (memberId) => {
+  return events.filter(
+    (event) => event.assigneeId === memberId && event.date === formattedDate
+  )
+}
+
+// In render
+{teamMembers.map((member) => {
+  const memberEvents = getEventsForMember(member.id)
+  return (
+    <div key={member.id} className="flex-1 relative">
+      {memberEvents.map((event) => (
+        <EventCard key={event.id} event={event} />
+      ))}
+    </div>
+  )
+})}
+```
+This approach is performant for the current dataset size and keeps filtering logic simple. Each column gets its own filtered subset without needing complex memoization.
+
+**Date Formatting for Filtering:** Convert Date objects to 'yyyy-MM-dd' format before filtering to match JSON schema:
+```javascript
+import { format } from 'date-fns'
+
+const formattedDate = format(selectedDate, 'yyyy-MM-dd')
+const memberEvents = events.filter(e => e.assigneeId === memberId && e.date === formattedDate)
+```
+This pattern is consistent across mobile TimeGrid and desktop DesktopTimeGrid.
+
+**Vertical Event Positioning Reuse:** The `calculateEventOffset()` function uses the same slot-based math as mobile TimeGrid:
+```javascript
+const calculateEventOffset = (startTime) => {
+  const [hours, minutes] = startTime.split(':').map(Number)
+  const slotsFromStart = (hours - START_HOUR) * SLOTS_PER_HOUR + minutes / 15
+  return slotsFromStart * SLOT_HEIGHT
+}
+```
+This ensures pixel-perfect alignment across both mobile and desktop views. Events always render at the same vertical position relative to the time grid, regardless of view.
+
+**Absolute Positioning Within Columns:** Events are positioned absolutely within each column's relative container:
+```jsx
+<div className="flex-1 relative px-1">
+  {memberEvents.map((event) => {
+    const topOffset = calculateEventOffset(event.startTime)
+    return (
+      <div
+        key={event.id}
+        className="absolute left-0 right-0"
+        style={{ top: `${topOffset}px` }}
+      >
+        <EventCard event={event} />
+      </div>
+    )
+  })}
+</div>
+```
+The outer column container uses `flex-1` for even width distribution, while the inner event wrappers use absolute positioning for vertical placement. The `px-1` padding prevents events from touching column borders.
+
+**PropTypes for Events Array:** Validate array of event objects with full shape definition:
+```jsx
+DesktopTimeGrid.propTypes = {
+  selectedDate: PropTypes.instanceOf(Date).isRequired,
+  events: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      title: PropTypes.string.isRequired,
+      type: PropTypes.string.isRequired,
+      assigneeId: PropTypes.string.isRequired,
+      date: PropTypes.string.isRequired,
+      startTime: PropTypes.string.isRequired,
+      endTime: PropTypes.string.isRequired,
+      status: PropTypes.string,
+    })
+  ).isRequired,
+}
+```
+This provides clear documentation and runtime validation of the expected data structure.
+
+**Empty Columns Handle Gracefully:** When a team member has no events for the selected date, the column rendering naturally handles it:
+```jsx
+{memberEvents.map((event) => (...))}  // If memberEvents is [], nothing renders
+```
+No special empty state message needed at the column level - data-driven rendering handles this elegantly. Empty columns simply show grid lines without events.
+
+**Column Layout Independence:** Each column's layout is independent - event positioning in one column doesn't affect others. This is achieved through:
+1. Flexbox for horizontal column distribution (`flex-1` on each column)
+2. Relative positioning on column container
+3. Absolute positioning on events within the column
+4. No shared state between columns (each filters independently)
+
+This architecture makes it easy to add features like column-specific drag-drop zones in future stories.
+
+### Story 18: Desktop Continuous Day Scroll with Sticky Headers (2026-02-02)
+**Multi-Day Scroll Pattern with Sticky Headers:** The key to continuous day scrolling is rendering multiple day sections vertically, each with its own complete grid and a sticky header. Using `position: sticky` with appropriate `top` offsets creates a layered sticky effect:
+```jsx
+{/* Team headers: sticky at very top */}
+<div className="sticky top-0 z-40 bg-charcoal">
+  {/* Team member columns */}
+</div>
+
+{/* Day sections: each with sticky header */}
+{daysToRender.map((dayDate) => (
+  <div key={dateKey}>
+    {/* Day header: sticky below team headers */}
+    <div className="sticky top-14 z-30 bg-charcoal border-b-2 border-accent">
+      <h2 className="font-heading text-xl uppercase">
+        {format(dayDate, 'EEEE, MMMM d, yyyy')}
+      </h2>
+    </div>
+    {/* Day grid: 6 AM - 8 PM */}
+    <div className="relative" style={{ height: '896px' }}>
+      {/* Time slots and events */}
+    </div>
+  </div>
+))}
+```
+Team headers stay at the very top (top-0, z-40), day headers stick below them (top-14 to account for team header height, z-30). The `top-14` offset ensures day headers slide under the team headers when scrolling.
+
+**IntersectionObserver for Scroll-to-Date Sync:** IntersectionObserver is perfect for detecting which day section is currently in view and updating the date picker accordingly:
+```javascript
+useEffect(() => {
+  const observer = new IntersectionObserver(
+    (entries) => {
+      const visibleEntry = entries.find(
+        (entry) => entry.isIntersecting && entry.intersectionRatio > 0.5
+      )
+      if (visibleEntry) {
+        const dateStr = visibleEntry.target.dataset.date
+        const newDate = new Date(dateStr)
+        if (format(newDate, 'yyyy-MM-dd') !== format(selectedDate, 'yyyy-MM-dd')) {
+          onDateChange(newDate)
+        }
+      }
+    },
+    {
+      root: scrollContainerRef.current,
+      threshold: [0, 0.5, 1],
+      rootMargin: '-10% 0px -80% 0px', // Trigger when header is near top
+    }
+  )
+
+  Object.values(dayRefs.current).forEach((ref) => {
+    if (ref) observer.observe(ref)
+  })
+
+  return () => observer.disconnect()
+}, [selectedDate, onDateChange])
+```
+The `rootMargin: '-10% 0px -80% 0px'` configuration triggers when a day header enters the top 10% of the viewport, ensuring the date picker updates early during scroll rather than waiting for the entire header to be visible. The 50% intersection threshold prevents rapid toggling between days.
+
+**Bidirectional Sync Pattern (Date Picker ↔ Scroll):** The date picker and scroll position are bidirectionally synced using two separate mechanisms:
+1. **Date picker → scroll**: useEffect watches selectedDate and scrolls to the corresponding day
+2. **Scroll → date picker**: IntersectionObserver detects visible day and updates selectedDate
+
+```javascript
+// Direction 1: Date picker changes → scroll to day
+useEffect(() => {
+  const dateKey = format(selectedDate, 'yyyy-MM-dd')
+  const dayRef = dayRefs.current[dateKey]
+
+  if (dayRef && scrollContainerRef.current) {
+    dayRef.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+}, [selectedDate])
+
+// Direction 2: Scroll changes → update date picker (via IntersectionObserver above)
+```
+This creates seamless navigation whether the user clicks date picker arrows (triggers Direction 1) or manually scrolls (triggers Direction 2). The key is preventing infinite loops by checking if the date actually changed before calling onDateChange.
+
+**scrollIntoView with Smooth Behavior:** Using `scrollIntoView({ behavior: 'smooth', block: 'start' })` provides smooth animated scrolling when navigating via date picker. The `block: 'start'` option ensures the day header aligns at the top of the scrollable container, not at some arbitrary position.
+
+**useRef Pattern for Multiple DOM References:** Storing refs to multiple day headers in an object allows both the IntersectionObserver (to observe them) and the scroll effect (to scroll to them) to access the same DOM elements:
+```jsx
+const dayRefs = useRef({})
+
+// In render:
+<div
+  ref={(el) => (dayRefs.current[dateKey] = el)}
+  data-date={dateKey}
+  className="sticky top-14 z-30"
+>
+```
+This is cleaner than querying the DOM with `querySelector` because refs remain valid across re-renders and don't require complex CSS selectors. The `data-date` attribute allows the IntersectionObserver callback to identify which day header is visible.
+
+**Z-Index Layering Strategy for Multi-Level Sticky:** Proper z-index layering is critical when multiple elements need to stick at different levels:
+- z-40: Team member headers (highest priority, always visible at top)
+- z-30: Day separator headers (second priority, stick below team headers)
+- z-10: Current time indicator (above grid content but below headers)
+- default (0): Events and grid lines (lowest priority)
+
+Without proper z-index, day headers would appear above team headers during scroll, obscuring the team member names. The higher z-index on team headers ensures they always stay on top.
+
+**Conditional Current Time Indicator by Day:** The current time indicator (orange line with dot) should only render on today's grid section, not on future days:
+```jsx
+const isToday = format(new Date(), 'yyyy-MM-dd') === dateKey
+
+{isToday && currentTimeOffset !== null && (
+  <div className="absolute left-16 right-0 z-10" style={{ top: `${currentTimeOffset}px` }}>
+    <div className="flex items-center">
+      <div className="w-2 h-2 rounded-full bg-accent" />
+      <div className="flex-1 h-0.5 bg-accent" />
+    </div>
+  </div>
+)}
+```
+Showing the time indicator on future days would be confusing - the current time hasn't happened yet on those days. This check ensures the indicator only appears where it makes temporal sense.
+
+**Generating Consecutive Dates with addDays:** The `addDays` function from date-fns makes it trivial to generate an array of consecutive dates:
+```javascript
+import { addDays } from 'date-fns'
+
+const daysToRender = []
+for (let i = 0; i < 6; i++) {
+  daysToRender.push(addDays(selectedDate, i))
+}
+```
+This generates 6 Date objects starting from selectedDate (Monday, Tuesday, Wednesday, Thursday, Friday, Saturday). The loop pattern is clear and handles month/year boundaries automatically.
+
+**Event Filtering Per Day Section:** Each day section independently filters events by both team member and date:
+```javascript
+const getEventsForMember = (memberId, date) => {
+  const formattedDate = format(date, 'yyyy-MM-dd')
+  return events.filter(
+    (event) => event.assigneeId === memberId && event.date === formattedDate
+  )
+}
+
+// In each day section's render:
+{teamMembers.map((member) => {
+  const memberEvents = getEventsForMember(member.id, dayDate)
+  // Render memberEvents in this column
+})}
+```
+This allows the same events array to be filtered and rendered correctly across multiple day sections. Each day/member combination gets its own filtered subset without complex state management or memoization.
+
+**Performance Considerations:** Rendering 6 days × 6 team members × 14 hours = 504 grid sections is manageable with React's virtual DOM and efficient reconciliation. The IntersectionObserver efficiently handles scroll detection without performance issues. For production scenarios requiring more days (e.g., 2 weeks or a month), consider:
+1. Virtual scrolling libraries (react-window, react-virtualized) to render only visible days
+2. Memoizing day sections with React.memo to prevent unnecessary re-renders
+3. Lazy loading events for future days only when they become visible
+
+**Memory and Ref Cleanup:** When using IntersectionObserver and refs, always clean up in the useEffect return function:
+```javascript
+useEffect(() => {
+  const observer = new IntersectionObserver(...)
+  Object.values(dayRefs.current).forEach((ref) => {
+    if (ref) observer.observe(ref)
+  })
+  return () => observer.disconnect() // Critical: cleanup on unmount
+}, [selectedDate, onDateChange])
+```
+Failing to disconnect the observer can cause memory leaks and unexpected behavior if the component unmounts and remounts.
+### Story 22: Desktop Drag-and-Drop Between Columns (2026-02-02)
+**React Hooks Rules Violation:** React Hooks MUST be called at the component level, never inside loops, conditions, or callbacks. When ESLint reports "React Hook cannot be called inside a callback", it means a hook is being called in a `.map()`, `.forEach()`, conditional block, or other non-component context:
+```jsx
+// ❌ WRONG - Hook called inside .map() callback:
+{teamMembers.map((member) => {
+  const { setNodeRef } = useDroppable({ id: member.id }) // Violates Rules of Hooks
+  return <div ref={setNodeRef}>...</div>
+})}
+
+// ✅ CORRECT - Extract component, use hook at component level:
+function DroppableColumn({ memberId }) {
+  const { setNodeRef } = useDroppable({ id: memberId })
+  return <div ref={setNodeRef}>...</div>
+}
+
+{teamMembers.map((member) => (
+  <DroppableColumn key={member.id} memberId={member.id} />
+))}
+```
+The fix is always the same: extract a component that uses the hook, then map over your data to render multiple instances of that component.
+
+**Component Extraction Pattern for Hooks in Lists:** When you need to use a hook for each item in a mapped list:
+1. Create a new component that accepts the item data as props
+2. Use the hook inside that component at the top level
+3. Map over your list to render the component multiple times
+4. Each component instance gets its own isolated hook call
+
+This pattern applies to all hooks: `useState`, `useEffect`, `useDroppable`, `useDraggable`, custom hooks, etc.
+
+**dnd-kit Droppable Zone Registration:** Each droppable zone requires:
+- Unique `id` (typically `${itemId}-${contextId}` for multi-dimensional drops)
+- Optional `data` payload accessible in drag handlers via `over.data.current`
+```jsx
+const { setNodeRef } = useDroppable({
+  id: `${memberId}-${date}`,
+  data: { memberId, date }, // Available in onDragEnd as event.over.data.current
+})
+```
+
+The data payload enables intelligent drop handling — you can determine which column AND which day section received the drop.
+
+**Cross-Column Drag Implementation:** For dragging between columns (reassignment):
+1. Track hover state: `onDragMove` detects which droppable zone is active via `event.over.data.current`
+2. Visual feedback: Apply highlight class to hovered column (`bg-accent/10` when `dragOverColumn === memberId`)
+3. Ghost preview: Render dashed preview in target column showing where event will land
+4. Conflict detection: In `onDragEnd`, check for conflicts against TARGET assignee's events, not source
+5. Update event: Set new `assigneeId`, `date`, and `time` based on drop location
+6. User feedback: Toast success message with target member's name
+
+**Dual State Tracking for Reliability:** The implementation tracks which column is being hovered in two ways:
+1. Component state (`dragOverColumn`, `dragOverDate`) updated in `onDragMove`
+2. Direct check of `event.over.data.current` in `onDragEnd`
+
+This dual approach provides a fallback if the `over` object becomes null or undefined during the drop event. The console logs show both values being checked: "over.data:", "prevDragOverColumn:".
+
+**Conflict Detection for Cross-Column Drops:** When dragging between columns, the conflict check MUST compare against the target assignee's schedule:
+```javascript
+const hasConflict = (eventId, newStartTime, newEndTime, newDate, newAssigneeId) => {
+  return events.some((existingEvent) => {
+    if (existingEvent.id === eventId) return false
+    if (existingEvent.date !== newDate || existingEvent.assigneeId !== newAssigneeId) {
+      return false // Only check events for the TARGET assignee on the TARGET date
+    }
+    return eventsOverlap(newStartTime, newEndTime, existingEvent.startTime, existingEvent.endTime)
+  })
+}
+```
+Checking against the source assignee would allow invalid drops. Always filter by the target assignee ID when validating cross-column drops.
+
+**Visual Feedback Coordination:** Multiple visual elements must coordinate to show drag state:
+- Column highlight: `isColumnOver ? 'bg-accent/10' : ''` where `isColumnOver = dragOverColumn === memberId && dragOverDate === date`
+- Ghost preview: Dashed border preview rendered only in the column where `isColumnOver === true`
+- Dragged event opacity: `isDragging ? 'opacity-50' : 'opacity-100'` on source event
+- Drag overlay: `<DragOverlay>` shows a floating copy of the event following the cursor
+
+All these elements use the same `activeId`, `dragOverColumn`, and `isDragging` state to stay synchronized.
+
+**Playwright Drag Testing Best Practices:**
+- Use `page.locator().dragTo()` instead of manual mouse events for more reliable drag testing
+- Add console listeners with `page.on('console', msg => ...)` to capture debug logs during drag
+- Wait 1500-2000ms after drag completes to allow for animations and toast messages
+- Take screenshots during drag (`await page.mouse.move()` then `await page.screenshot()`) to verify visual feedback
+- Check column counts before and after to verify state updates correctly
+
+**Event Handler Propagation in dnd-kit:** When wrapping draggable events with click handlers, ensure clicks don't trigger during drag:
+```jsx
+const handleClick = (e) => {
+  if (!isDragging && e.detail === 1) { // Only single-click when not dragging
+    onEventClick(event)
+  }
+}
+```
+The `e.detail === 1` check prevents double-click handling, and `!isDragging` prevents clicks during drag operations.
+
+### Story 23: Polish and Responsive Transitions (2026-02-02)
+**Design System Consistency Audit:** A final polish pass ensures all components follow the same patterns. Key areas to audit:
+- **Fonts:** Verify Bebas Neue used for all headings (h1-h6, .font-heading), Open Sans for all body text (.font-body, default)
+- **Buttons:** Confirm all use rounded-full (pill shape), correct background colors (accent/secondary), and hover states (brightness-110/95)
+- **Colors:** Check orange accent (#F47A20) consistently applied to active states, borders, primary buttons, highlights
+- **Hover states:** Verify all interactive elements have hover:brightness-* transitions
+- **Spacing:** Ensure consistent padding/margin patterns across similar components
+
+Use grep to find all instances: `grep -r "font-heading\|font-body" src/` to audit font usage across codebase.
+
+**Responsive Breakpoint Testing Strategy:** Test at exact breakpoint values and common device widths to catch edge cases:
+- **375px (mobile):** Standard mobile width, tests mobile-only components (FAB, week strip, bottom sheets)
+- **768px (breakpoint):** md breakpoint where layout switches from mobile to desktop
+- **1280px (desktop):** Standard desktop width, tests multi-column layout with full content visibility
+
+Testing AT the breakpoint (768px) is critical - off-by-one errors in Tailwind classes (md:block vs md:hidden) cause layout issues exactly at the transition point.
+
+**Browser Automation for Visual QA:** Using dev-browser with configured viewports enables systematic visual regression testing:
+```javascript
+const page = await client.page("mobile", { viewport: { width: 375, height: 812 } });
+await page.goto("http://localhost:5174");
+await page.waitForTimeout(2000); // Let content render
+await page.screenshot({ path: "tmp/mobile-375px.png", fullPage: true });
+```
+
+Taking fullPage screenshots captures scroll behavior and ensures nothing is cut off. Save screenshots with descriptive names (viewport width in filename) for easy comparison during code review.
+
+**Toaster Styling for Custom Design Systems:** react-hot-toast requires explicit styling via `toastOptions` to match custom design systems:
+```jsx
+<Toaster
+  position="top-center"
+  toastOptions={{
+    duration: 3000,
+    style: {
+      background: '#2A2A2A',      // Secondary dark background
+      color: '#FFFFFF',            // White text
+      border: '1px solid #F47A20', // Orange accent border
+    },
+  }}
+/>
+```
+
+Place the `<Toaster>` component at the root level of the page that triggers toasts (e.g., TimeGrid for mobile, DesktopTimeGrid for desktop). Each Toaster instance manages its own toast queue independently.
+
+**Hover State Brightness Pattern:** Consistent use of Tailwind brightness utilities creates predictable interactive feedback:
+- `hover:brightness-110` for dark backgrounds (accent buttons, secondary buttons) - makes them lighter
+- `hover:brightness-95` for light backgrounds (white cards, white buttons) - makes them slightly darker
+- Never change colors on hover (no bg-accent to bg-orange transition) - only brightness
+
+This pattern maintains color consistency while providing clear visual feedback. The `transition-all` class smooths the brightness change for polish.
+
+**Responsive Component Visibility Pattern:** Use Tailwind responsive prefixes consistently:
+- Mobile-only: `md:hidden` (visible below 768px, hidden at/above)
+- Desktop-only: `hidden md:block` (hidden below 768px, visible at/above)
+- Both: No responsive prefix
+
+Never use negative logic like `max-md:block` - positive prefixes (md:, lg:) are clearer and more maintainable. The pattern "default mobile, add desktop" is more intuitive than "default desktop, override mobile".
+
+**Typography Scale Hierarchy:** Maintain clear type hierarchy using size and weight, not color:
+- Headings: font-heading class + text-2xl/3xl/4xl + uppercase
+- Body text: font-body class + text-sm/base
+- Labels: font-body + text-xs/sm + font-semibold
+- Muted text: font-body + text-muted color
+
+Avoid using color to establish hierarchy (e.g., blue headings, gray body) in dark chrome designs - size and weight are more effective.
+
+**Pill Button Implementation Checklist:**
+```jsx
+// ✅ Primary Button (Orange):
+className="px-6 py-3 bg-accent text-white rounded-full font-body font-semibold text-sm hover:brightness-110 transition-all"
+
+// ✅ Secondary Button (Dark):
+className="px-6 py-3 bg-secondary text-text-light rounded-full font-body font-semibold text-sm hover:brightness-110 transition-all"
+
+// ✅ Text Button (No background):
+className="px-6 py-3 text-accent font-body font-semibold text-sm hover:brightness-110 transition-all"
+```
+
+All buttons should include: rounded-full, font-body, font-semibold, hover:brightness-*, transition-all. Consistent padding (px-6 py-3) ensures buttons have similar hit targets.
+
+**Verifying Design System Compliance:** Before marking polish story complete, verify:
+1. Run `npm run lint` (should pass with 0 errors)
+2. Run `npm run build` (should succeed without warnings)
+3. Browser test at 375px, 768px, 1280px viewports
+4. Check fonts in browser DevTools (Elements → Computed → font-family)
+5. Inspect hover states on all interactive elements
+6. Verify no console errors during normal usage
+7. Test all modals, dropdowns, and overlays for consistent styling
+
+**Screenshot-Based Code Review:** Save viewport screenshots in a consistent location (e.g., `docs/screenshots/`) with naming convention like `{feature}-{viewport}px.png`. These serve as:
+- Visual regression test baseline
+- Design review artifacts
+- Documentation for future developers
+- QA verification reference
+
+Include screenshots in PRs to show exact visual output at different breakpoints without requiring reviewers to run the code locally.
+

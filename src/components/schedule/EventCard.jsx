@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { getEventTypeByKey } from '../../utils/dataAccess'
 
@@ -13,8 +14,10 @@ const STATUS_COLORS = {
   'closed-invoiced': '#8B5CF6', // Purple
 }
 
-export default function EventCard({ event, onClick }) {
+export default function EventCard({ event, onClick, onLongPress, onResizeStart, disableInteraction = false, disableResize = false }) {
   const eventType = getEventTypeByKey(event.type)
+  const [longPressTimer, setLongPressTimer] = useState(null)
+  const [isLongPressing, setIsLongPressing] = useState(false)
 
   // Calculate event duration in minutes
   const calculateDurationMinutes = (startTime, endTime) => {
@@ -46,15 +49,90 @@ export default function EventCard({ event, onClick }) {
   const isJobType = JOB_TYPES.includes(event.type)
   const statusColor = isJobType ? STATUS_COLORS[event.status] : null
 
+  // Long-press handlers
+  const handlePointerDown = (e) => {
+    if (disableInteraction) return
+
+    e.stopPropagation() // Prevent triggering slot long-press
+
+    setIsLongPressing(true)
+
+    const timer = setTimeout(() => {
+      // Long press detected - call onLongPress if provided, otherwise onClick
+      if (onLongPress) {
+        onLongPress(event)
+      } else if (onClick) {
+        onClick(event)
+      }
+      setIsLongPressing(false)
+    }, 500) // 500ms for long press
+
+    setLongPressTimer(timer)
+  }
+
+  const handlePointerUp = (e) => {
+    if (disableInteraction) return
+
+    if (longPressTimer) {
+      clearTimeout(longPressTimer)
+      setLongPressTimer(null)
+
+      // If released before 500ms, treat as click
+      if (isLongPressing && onClick) {
+        onClick(e)
+      }
+    }
+    setIsLongPressing(false)
+  }
+
+  const handlePointerLeave = () => {
+    if (disableInteraction) return
+
+    if (longPressTimer) {
+      clearTimeout(longPressTimer)
+      setLongPressTimer(null)
+    }
+    setIsLongPressing(false)
+  }
+
+  // Cleanup timer on unmount
+  useEffect(() => {
+    return () => {
+      if (longPressTimer) {
+        clearTimeout(longPressTimer)
+      }
+    }
+  }, [longPressTimer])
+
+  const pointerHandlers = disableInteraction
+    ? {}
+    : {
+        onPointerDown: handlePointerDown,
+        onPointerUp: handlePointerUp,
+        onPointerLeave: handlePointerLeave,
+      }
+
+  // Resize handle handler - separate from card click
+  const handleResizeStart = (e) => {
+    if (disableResize) return
+    e.stopPropagation() // Prevent card click and drag
+
+    if (onResizeStart) {
+      onResizeStart(event, e)
+    }
+  }
+
   return (
     <div
-      className="absolute left-0 right-0 bg-white rounded-md overflow-hidden cursor-pointer hover:brightness-95 transition-all"
+      className={`absolute left-0 right-0 bg-white rounded-md overflow-visible cursor-pointer hover:brightness-95 transition-all ${
+        disableInteraction ? '' : 'touch-none'
+      } ${isLongPressing ? 'brightness-90' : ''}`}
       style={{
         height: `${cardHeight}px`,
         borderLeft: `4px solid ${eventType.borderColor}`,
         minHeight: `${SLOT_HEIGHT}px`, // Minimum 15 minutes
       }}
-      onClick={onClick}
+      {...pointerHandlers}
     >
       <div className="relative h-full p-1.5">
         {/* Status indicator dot (top-right) */}
@@ -86,6 +164,17 @@ export default function EventCard({ event, onClick }) {
           </div>
         )}
       </div>
+
+      {/* Resize handle (bottom edge) */}
+      {!disableResize && onResizeStart && (
+        <div
+          className="absolute bottom-0 left-0 right-0 h-3 cursor-ns-resize flex items-center justify-center z-30"
+          onPointerDown={handleResizeStart}
+          style={{ touchAction: 'none' }}
+        >
+          <div className="w-8 h-1 bg-secondary rounded-full" />
+        </div>
+      )}
     </div>
   )
 }
@@ -102,4 +191,8 @@ EventCard.propTypes = {
     status: PropTypes.string,
   }).isRequired,
   onClick: PropTypes.func,
+  onLongPress: PropTypes.func,
+  onResizeStart: PropTypes.func,
+  disableInteraction: PropTypes.bool,
+  disableResize: PropTypes.bool,
 }
