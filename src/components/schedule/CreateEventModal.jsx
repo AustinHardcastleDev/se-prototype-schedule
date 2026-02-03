@@ -105,8 +105,8 @@ export default function CreateEventModal({ isOpen, onClose, onSave, defaults = {
 
   if (!isOpen) return null
 
-  // Shared form fields component
-  const FormFields = ({ idPrefix = '' }) => (
+  // Render form fields inline to avoid component recreation on state changes
+  const renderFormFields = (idPrefix = '') => (
     <>
       {/* Event Type Dropdown */}
       <CustomDropdown
@@ -209,10 +209,6 @@ export default function CreateEventModal({ isOpen, onClose, onSave, defaults = {
     </>
   )
 
-  FormFields.propTypes = {
-    idPrefix: PropTypes.string
-  }
-
   return (
     <>
       {/* Backdrop - both mobile and desktop */}
@@ -239,7 +235,7 @@ export default function CreateEventModal({ isOpen, onClose, onSave, defaults = {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="px-6 py-4 max-h-[70vh] overflow-y-auto">
-          <FormFields idPrefix="" />
+          {renderFormFields('')}
         </form>
       </div>
 
@@ -256,7 +252,7 @@ export default function CreateEventModal({ isOpen, onClose, onSave, defaults = {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="px-6 py-4 max-h-[calc(80vh-80px)] overflow-y-auto">
-          <FormFields idPrefix="-desktop" />
+          {renderFormFields('-desktop')}
         </form>
       </div>
     </>

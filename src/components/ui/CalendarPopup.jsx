@@ -35,10 +35,14 @@ export default function CalendarPopup({ selectedDate, onDateSelect, onClose }) {
   const today = new Date()
 
   return (
-    <div className="absolute top-full mt-2 bg-secondary rounded-lg shadow-2xl p-4 z-[60] border border-accent/20 min-w-[320px]">
+    <div
+      className="absolute top-full mt-2 bg-secondary rounded-lg shadow-2xl p-4 z-[60] border border-accent/20 min-w-[320px]"
+      onClick={(e) => e.stopPropagation()}
+    >
       {/* Month/Year Header with Navigation */}
       <div className="flex items-center justify-between mb-4">
         <button
+          type="button"
           onClick={handlePreviousMonth}
           className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-accent/10 transition-colors"
           aria-label="Previous month"
@@ -53,6 +57,7 @@ export default function CalendarPopup({ selectedDate, onDateSelect, onClose }) {
         </h2>
 
         <button
+          type="button"
           onClick={handleNextMonth}
           className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-accent/10 transition-colors"
           aria-label="Next month"
@@ -81,6 +86,7 @@ export default function CalendarPopup({ selectedDate, onDateSelect, onClose }) {
 
           return (
             <button
+              type="button"
               key={index}
               onClick={() => handleDateClick(day)}
               className={`

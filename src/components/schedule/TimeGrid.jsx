@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { format } from 'date-fns'
-import { DndContext, DragOverlay, pointerWithin } from '@dnd-kit/core'
+import { DndContext, DragOverlay, pointerWithin, TouchSensor, MouseSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { Toaster, toast } from 'react-hot-toast'
 import DraggableEvent from './DraggableEvent'
 import EventCard from './EventCard'
@@ -24,6 +24,20 @@ export default function TimeGrid({ selectedDate, selectedMember, events: allEven
   const [resizingEvent, setResizingEvent] = useState(null)
   const [resizePreviewEndTime, setResizePreviewEndTime] = useState(null)
   const resizePreviewEndTimeRef = useRef(null)
+
+  // Configure sensors for both mouse and touch
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 5, // 5px movement required to start drag
+    },
+  })
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 200, // 200ms hold before drag starts
+      tolerance: 5, // 5px movement tolerance during delay
+    },
+  })
+  const sensors = useSensors(mouseSensor, touchSensor)
 
   // Update current time every minute
   useEffect(() => {
@@ -358,6 +372,7 @@ export default function TimeGrid({ selectedDate, selectedMember, events: allEven
       />
 
       <DndContext
+        sensors={sensors}
         onDragStart={handleDragStart}
         onDragMove={handleDragMove}
         onDragEnd={handleDragEnd}

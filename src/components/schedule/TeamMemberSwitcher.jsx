@@ -79,15 +79,15 @@ export default function TeamMemberSwitcher({ selectedMember, onMemberSelect }) {
           </div>
         )}
 
-        {/* Main Switcher Button - Always shows current user (Mike Torres) */}
+        {/* Main Switcher Button - Shows selected member */}
         <button
           onClick={handleToggle}
           className="w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-white hover:brightness-110 transition-all"
-          style={{ backgroundColor: currentUser.color }}
+          style={{ backgroundColor: selectedMember.color }}
           aria-label={isOpen ? 'Close member list' : 'Switch team member'}
         >
-          {/* Current user initials */}
-          <span className="text-sm font-body font-semibold">{currentUser.avatar}</span>
+          {/* Selected member initials */}
+          <span className="text-sm font-body font-semibold">{selectedMember.avatar}</span>
         </button>
       </div>
     </>

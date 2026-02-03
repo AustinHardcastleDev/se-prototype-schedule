@@ -30,13 +30,18 @@ export default function DraggableEvent({ event, onEventClick, onResizeStart, isD
   }
 
   // Filter out drag listeners for the resize handle and track drag vs click
+  const isResizeHandleRef = useRef(false)
+
   const dragListeners = {
     ...listeners,
     onPointerDown: (e) => {
       // Don't start drag if clicking on the resize handle
-      if (e.target.closest('[class*="cursor-ns-resize"]')) {
+      if (e.target.closest('[data-resize-handle]')) {
+        isResizeHandleRef.current = true
         return
       }
+
+      isResizeHandleRef.current = false
 
       // Track pointer down position
       pointerDownRef.current = { x: e.clientX, y: e.clientY }
@@ -47,6 +52,11 @@ export default function DraggableEvent({ event, onEventClick, onResizeStart, isD
       }
     },
     onPointerMove: (e) => {
+      // Don't process move events if we started on resize handle
+      if (isResizeHandleRef.current) {
+        return
+      }
+
       // If pointer has moved significantly from down position, it's a drag
       if (pointerDownRef.current) {
         const dx = Math.abs(e.clientX - pointerDownRef.current.x)
@@ -58,6 +68,14 @@ export default function DraggableEvent({ event, onEventClick, onResizeStart, isD
 
       if (listeners.onPointerMove) {
         listeners.onPointerMove(e)
+      }
+    },
+    onPointerUp: (e) => {
+      // Reset resize handle tracking
+      isResizeHandleRef.current = false
+
+      if (listeners.onPointerUp) {
+        listeners.onPointerUp(e)
       }
     }
   }

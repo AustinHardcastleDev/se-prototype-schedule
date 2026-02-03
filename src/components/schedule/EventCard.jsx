@@ -45,8 +45,9 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
 
   const durationMinutes = calculateDurationMinutes(event.startTime, event.endTime)
   const cardHeight = calculateHeight()
-  const isTinyEvent = durationMinutes === 15 // 15-min events: title only
-  const isShortEvent = durationMinutes < 45 // Events under 45 min: condensed layout
+  const isVeryTinyEvent = durationMinutes === 15 // 15 min: centered title only
+  const isTinyEvent = durationMinutes <= 30 // 15-30 min events: title only
+  const isShortEvent = durationMinutes < 60 // 45 min events: title + time only
   const isJobType = JOB_TYPES.includes(event.type)
   const statusColor = isJobType ? STATUS_COLORS[event.status] : null
 
@@ -135,7 +136,7 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
       }}
       {...pointerHandlers}
     >
-      <div className="relative h-full p-1.5">
+      <div className={`relative h-full ${isVeryTinyEvent ? 'px-1.5 flex items-center' : 'p-1.5'}`}>
         {/* Status indicator dot (top-right) */}
         {statusColor && (
           <div
@@ -150,12 +151,12 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
 
         {/* Content */}
         {isTinyEvent ? (
-          // 15-min events: title only, single line
-          <div className="text-xs font-body text-text-dark font-semibold truncate pr-3">
+          // 15-30 min events: title only (centered for 15 min)
+          <div className="text-xs font-body text-text-dark font-semibold truncate pr-3 leading-none">
             {event.title}
           </div>
         ) : isShortEvent ? (
-          // Events < 45 min: condensed layout (title + time)
+          // 45 min events: title + time
           <div className="flex flex-col gap-0.5 h-full">
             <div className="text-xs font-body text-text-dark font-semibold truncate pr-3">
               {event.title}
@@ -165,7 +166,7 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
             </div>
           </div>
         ) : (
-          // Full layout for events >= 45 min (title, time, type)
+          // 60+ min events: title, time, and type
           <div className="flex flex-col gap-0.5 h-full">
             <div className="text-xs font-body text-text-dark font-semibold truncate pr-3">
               {event.title}
@@ -183,6 +184,7 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
       {/* Resize handle (bottom edge) */}
       {!disableResize && onResizeStart && (
         <div
+          data-resize-handle
           className="absolute bottom-0 left-0 right-0 h-3 cursor-ns-resize flex items-center justify-center z-30"
           onPointerDown={handleResizeStart}
           style={{ touchAction: 'none' }}

@@ -1,7 +1,7 @@
 import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { format, addDays, isSameDay } from 'date-fns'
-import { DndContext, DragOverlay, rectIntersection, useDroppable } from '@dnd-kit/core'
+import { DndContext, DragOverlay, rectIntersection, useDroppable, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { toast } from 'react-hot-toast'
 import { getAllMembers } from '../../utils/dataAccess'
 import EventCard from './EventCard'
@@ -140,8 +140,6 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
   const [currentTime, setCurrentTime] = useState(new Date())
   const dayRefs = useRef({}) // Store refs to each day section
   const scrollContainerRef = useRef(null) // Ref to the scrollable container
-  const headerScrollRef = useRef(null) // Ref to the header scroll container
-  const gridScrollRef = useRef(null) // Ref to the grid scroll container
   const [activeId, setActiveId] = useState(null) // Track actively dragged event
   const [dragOverSlot, setDragOverSlot] = useState(null) // Track which slot is being dragged over
   const [dragOverColumn, setDragOverColumn] = useState(null) // Track which column (memberId) is being dragged over
@@ -156,6 +154,21 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
   const [resizePreviewEndTime, setResizePreviewEndTime] = useState(null)
   const resizePreviewEndTimeRef = useRef(null)
   const justFinishedResizingRef = useRef(false)
+  const ignoreDragRef = useRef(false) // Track if current drag should be ignored (started from resize handle)
+
+  // Configure sensors for both mouse and touch - require movement before drag starts
+  const mouseSensor = useSensor(MouseSensor, {
+    activationConstraint: {
+      distance: 5, // 5px movement required to start drag
+    },
+  })
+  const touchSensor = useSensor(TouchSensor, {
+    activationConstraint: {
+      delay: 200, // 200ms hold before drag starts
+      tolerance: 5, // 5px movement tolerance during delay
+    },
+  })
+  const sensors = useSensors(mouseSensor, touchSensor)
 
   // Get all team members for columns
   const teamMembers = getAllMembers()
@@ -356,33 +369,6 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     }
   }
 
-  // Sync horizontal scroll between header and grid
-  useEffect(() => {
-    const headerScroll = headerScrollRef.current
-    const gridScroll = gridScrollRef.current
-
-    if (!headerScroll || !gridScroll) return
-
-    const syncHeaderToGrid = () => {
-      if (gridScroll.scrollLeft !== headerScroll.scrollLeft) {
-        gridScroll.scrollLeft = headerScroll.scrollLeft
-      }
-    }
-
-    const syncGridToHeader = () => {
-      if (headerScroll.scrollLeft !== gridScroll.scrollLeft) {
-        headerScroll.scrollLeft = gridScroll.scrollLeft
-      }
-    }
-
-    headerScroll.addEventListener('scroll', syncHeaderToGrid)
-    gridScroll.addEventListener('scroll', syncGridToHeader)
-
-    return () => {
-      headerScroll.removeEventListener('scroll', syncHeaderToGrid)
-      gridScroll.removeEventListener('scroll', syncGridToHeader)
-    }
-  }, [])
 
   // Generate time labels for each hour
   const timeLabels = []
@@ -511,10 +497,19 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
 
   // Drag handlers
   const handleDragStart = (event) => {
+    // Check if drag started from resize handle - if so, ignore this drag
+    if (event.activatorEvent?.target?.closest('[data-resize-handle]')) {
+      ignoreDragRef.current = true
+      return
+    }
+    ignoreDragRef.current = false
     setActiveId(event.active.id)
   }
 
   const handleDragMove = (event) => {
+    // Ignore if this drag started from resize handle
+    if (ignoreDragRef.current) return
+
     const { delta, over, activatorEvent } = event
 
     if (!activeId) return
@@ -554,6 +549,16 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
   }
 
   const handleDragEnd = (event) => {
+    // If this drag was from resize handle, just reset and ignore
+    if (ignoreDragRef.current) {
+      ignoreDragRef.current = false
+      setActiveId(null)
+      setDragOverSlot(null)
+      setDragOverColumn(null)
+      setDragOverDate(null)
+      return
+    }
+
     const { active, delta, over, activatorEvent } = event
 
     const prevDragOverColumn = dragOverColumn
@@ -662,6 +667,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
   }
 
   const handleDragCancel = () => {
+    ignoreDragRef.current = false
     setActiveId(null)
     setDragOverSlot(null)
     setDragOverColumn(null)
@@ -750,6 +756,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
 
   return (
     <DndContext
+      sensors={sensors}
       onDragStart={handleDragStart}
       onDragMove={handleDragMove}
       onDragEnd={handleDragEnd}
@@ -759,16 +766,18 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
       <div
         ref={scrollContainerRef}
         tabIndex={-1}
-        className="hidden md:flex md:flex-col flex-1 min-h-0 overflow-y-auto bg-charcoal relative focus:outline-none"
+        className="hidden md:flex md:flex-col flex-1 min-h-0 overflow-auto bg-charcoal relative focus:outline-none"
       >
+      {/* Content wrapper with min-width to enable horizontal scrolling */}
+      <div style={{ minWidth: `${64 + teamMembers.length * 150}px` }}>
       {/* Column Headers - Sticky at very top */}
       <div className="sticky top-0 z-40 bg-charcoal border-b border-secondary">
         <div className="flex">
-          {/* Time label column header (spacer) - Fixed on left */}
-          <div className="w-16 flex-shrink-0 bg-charcoal" />
+          {/* Time label column header (spacer) - Sticky on left */}
+          <div className="w-16 flex-shrink-0 bg-charcoal sticky left-0 z-10" />
 
-          {/* Team member column headers - Horizontally scrollable */}
-          <div ref={headerScrollRef} className="flex flex-1 overflow-x-auto scrollbar-hide">
+          {/* Team member column headers */}
+          <div className="flex flex-1">
             {teamMembers.map((member) => (
               <div
                 key={member.id}
@@ -861,8 +870,8 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
 
             {/* Grid Body for this day */}
             <div className="flex relative" style={{ height: `${TOTAL_SLOTS * SLOT_HEIGHT}px` }}>
-              {/* Time labels column - Fixed on left */}
-              <div className="w-16 flex-shrink-0 bg-charcoal relative">
+              {/* Time labels column - Sticky on left */}
+              <div className="w-16 flex-shrink-0 bg-charcoal relative sticky left-0 z-10">
                 {timeLabels.map((time, index) => {
                   const topPosition = index * SLOTS_PER_HOUR * SLOT_HEIGHT
                   return (
@@ -877,9 +886,9 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
                 })}
               </div>
 
-              {/* Grid content - Horizontally scrollable */}
-              <div ref={gridScrollRef} className="flex-1 overflow-x-auto scrollbar-hide relative">
-                <div className="flex" style={{ minWidth: `${teamMembers.length * 150}px` }}>
+              {/* Grid content */}
+              <div className="flex-1 relative">
+                <div className="flex">
                   {/* Grid lines for each column */}
                   {teamMembers.map((member, memberIndex) => (
                     <div
@@ -970,7 +979,8 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
           </div>
         )
       })}
-      </div>
+      </div> {/* End content wrapper */}
+      </div> {/* End scroll container */}
 
       {/* Drag overlay - shows dragged event following cursor */}
       <DragOverlay dropAnimation={null}>

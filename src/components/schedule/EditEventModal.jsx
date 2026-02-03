@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
-import { format } from 'date-fns'
+import { format, parseISO } from 'date-fns'
 import { getEventTypes, getAllMembers } from '../../utils/dataAccess'
 import CustomDropdown from '../ui/CustomDropdown'
 import TimePicker from '../ui/TimePicker'
+import CalendarPopup from '../ui/CalendarPopup'
 
 export default function EditEventModal({ isOpen, onClose, onSave, onDelete, event }) {
   const eventTypes = getEventTypes()
@@ -18,6 +19,7 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
   const [title, setTitle] = useState(event?.title || '')
   const [validationError, setValidationError] = useState('')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [showCalendar, setShowCalendar] = useState(false)
 
   // Reset form when modal opens with event data
   useEffect(() => {
@@ -30,6 +32,7 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
       setTitle(event.title)
       setValidationError('')
       setShowDeleteConfirm(false)
+      setShowCalendar(false)
     }
   }, [isOpen, event])
 
@@ -95,8 +98,8 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
 
   if (!isOpen || !event) return null
 
-  // Shared form fields component
-  const FormFields = ({ idPrefix = '' }) => (
+  // Render form fields inline to avoid component recreation on state changes
+  const renderFormFields = (idPrefix = '') => (
     <>
       {/* Event Type Dropdown */}
       <CustomDropdown
@@ -122,17 +125,30 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
       />
 
       {/* Date Picker */}
-      <div className="mb-4">
+      <div className="mb-4 relative">
         <label htmlFor={`date${idPrefix}`} className="block text-sm font-body text-text-dark font-semibold mb-2">
           Date
         </label>
-        <input
-          type="date"
+        <button
+          type="button"
           id={`date${idPrefix}`}
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg font-body text-sm"
-        />
+          onClick={() => setShowCalendar(!showCalendar)}
+          className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg font-body text-sm text-left flex items-center justify-between"
+        >
+          <span>{format(parseISO(date), 'EEEE, MMMM d, yyyy')}</span>
+          <svg className="w-5 h-5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </button>
+        {showCalendar && (
+          <CalendarPopup
+            selectedDate={parseISO(date)}
+            onDateSelect={(newDate) => {
+              setDate(format(newDate, 'yyyy-MM-dd'))
+            }}
+            onClose={() => setShowCalendar(false)}
+          />
+        )}
       </div>
 
       {/* Start Time */}
@@ -208,12 +224,8 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
     </>
   )
 
-  FormFields.propTypes = {
-    idPrefix: PropTypes.string
-  }
-
-  // Delete confirmation view
-  const DeleteConfirmation = () => (
+  // Delete confirmation view as render function
+  const renderDeleteConfirmation = () => (
     <div className="px-6 py-8">
       <p className="text-center font-body text-text-dark mb-6">
         Are you sure you want to delete this event?
@@ -263,10 +275,10 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
 
         {/* Delete Confirmation or Form */}
         {showDeleteConfirm ? (
-          <DeleteConfirmation />
+          renderDeleteConfirmation()
         ) : (
           <form onSubmit={handleSubmit} className="px-6 py-4 max-h-[70vh] overflow-y-auto">
-            <FormFields idPrefix="" />
+            {renderFormFields('')}
           </form>
         )}
       </div>
@@ -284,10 +296,10 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
 
         {/* Delete Confirmation or Form */}
         {showDeleteConfirm ? (
-          <DeleteConfirmation />
+          renderDeleteConfirmation()
         ) : (
           <form onSubmit={handleSubmit} className="px-6 py-4 max-h-[calc(80vh-80px)] overflow-y-auto">
-            <FormFields idPrefix="-desktop" />
+            {renderFormFields('-desktop')}
           </form>
         )}
       </div>
