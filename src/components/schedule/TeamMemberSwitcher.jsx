@@ -19,11 +19,17 @@ export default function TeamMemberSwitcher({ selectedMember, onMemberSelect }) {
     onMemberSelect(member)
   }
 
-  // Sort members so current user is at the bottom
+  // Mike Torres (tm-1) is the current user and always appears at bottom
+  const CURRENT_USER_ID = 'tm-1'
+  const currentUser = allMembers.find(m => m.id === CURRENT_USER_ID)
+
+  // Sort members: Mike Torres at bottom, others alphabetically by first name
   const sortedMembers = [...allMembers].sort((a, b) => {
-    if (a.id === selectedMember.id) return 1
-    if (b.id === selectedMember.id) return -1
-    return 0
+    // Mike Torres always goes to bottom
+    if (a.id === CURRENT_USER_ID) return 1
+    if (b.id === CURRENT_USER_ID) return -1
+    // Sort others alphabetically by first name
+    return a.name.localeCompare(b.name)
   })
 
   return (
@@ -73,15 +79,15 @@ export default function TeamMemberSwitcher({ selectedMember, onMemberSelect }) {
           </div>
         )}
 
-        {/* Main Switcher Button */}
+        {/* Main Switcher Button - Always shows current user (Mike Torres) */}
         <button
           onClick={handleToggle}
           className="w-12 h-12 rounded-full shadow-lg flex items-center justify-center text-white hover:brightness-110 transition-all"
-          style={{ backgroundColor: selectedMember.color }}
+          style={{ backgroundColor: currentUser.color }}
           aria-label={isOpen ? 'Close member list' : 'Switch team member'}
         >
           {/* Current user initials */}
-          <span className="text-sm font-body font-semibold">{selectedMember.avatar}</span>
+          <span className="text-sm font-body font-semibold">{currentUser.avatar}</span>
         </button>
       </div>
     </>

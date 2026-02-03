@@ -7,7 +7,7 @@ import FloatingActionButton from '../components/schedule/FloatingActionButton'
 import TeamMemberSwitcher from '../components/schedule/TeamMemberSwitcher'
 import CreateEventModal from '../components/schedule/CreateEventModal'
 import EditEventModal from '../components/schedule/EditEventModal'
-import DesktopDatePicker from '../components/schedule/DesktopDatePicker'
+import EventDetailsModal from '../components/schedule/EventDetailsModal'
 import { getAllMembers, getAllEvents } from '../utils/dataAccess'
 
 export default function SchedulePage() {
@@ -24,6 +24,7 @@ export default function SchedulePage() {
   // Modal state
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [createModalDefaults, setCreateModalDefaults] = useState({})
+  const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false)
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState(null)
 
@@ -38,7 +39,7 @@ export default function SchedulePage() {
       assigneeId: selectedMember.id,
       date: format(selectedDate, 'yyyy-MM-dd'),
       startTime: '09:00',
-      endTime: '10:00',
+      endTime: '09:15',
     })
     setIsCreateModalOpen(true)
   }
@@ -57,8 +58,20 @@ export default function SchedulePage() {
   }
 
   const handleEventClick = (event) => {
+    // Open details modal first (not edit modal)
     setSelectedEvent(event)
+    setIsDetailsModalOpen(true)
+  }
+
+  const handleEditFromDetails = () => {
+    // Transition from details modal to edit modal
+    setIsDetailsModalOpen(false)
     setIsEditModalOpen(true)
+  }
+
+  const handleCloseDetailsModal = () => {
+    setIsDetailsModalOpen(false)
+    setSelectedEvent(null)
   }
 
   const handleLongPressSlot = ({ startTime, endTime }) => {
@@ -99,9 +112,7 @@ export default function SchedulePage() {
   }
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Desktop Date Picker Bar - Desktop Only */}
-      <DesktopDatePicker selectedDate={selectedDate} onDateChange={handleDateSelect} />
+    <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
 
       {/* Week Strip - Mobile Only */}
       <WeekStrip selectedDate={selectedDate} onDateSelect={handleDateSelect} />
@@ -140,9 +151,18 @@ export default function SchedulePage() {
         onClose={handleCloseModal}
         onSave={handleCreateEvent}
         defaults={createModalDefaults}
+        events={events}
       />
 
-      {/* Edit Event Modal - Mobile Only */}
+      {/* Event Details Modal - Both Mobile and Desktop */}
+      <EventDetailsModal
+        isOpen={isDetailsModalOpen}
+        onClose={handleCloseDetailsModal}
+        onEdit={handleEditFromDetails}
+        event={selectedEvent}
+      />
+
+      {/* Edit Event Modal - Both Mobile and Desktop */}
       <EditEventModal
         isOpen={isEditModalOpen}
         onClose={handleCloseEditModal}

@@ -1676,6 +1676,40 @@ const handleClick = (e) => {
 ```
 The `e.detail === 1` check prevents double-click handling, and `!isDragging` prevents clicks during drag operations.
 
+### Story 1-2: Font and Mock Data Updates (2026-02-03)
+**Font Replacement:** Successfully replaced Bebas Neue with uppercase Open Sans throughout the application. All headings now use `font-body uppercase` styling instead of `font-heading`. The design system was updated in index.html, tailwind.config.js, and index.css. Visual hierarchy is maintained through size and weight rather than font family.
+
+**Mock Data Extension:** Added two additional weeks of events (2026-02-06 through 2026-02-20) following the existing distribution patterns. Maintained ~60% open, ~25% closed-no-invoice, ~15% closed-invoiced status distribution. Tech schedules favor job types, sales schedules favor sales-stops, ops schedules favor meetings.
+
+### Story 3: Change Default Event Duration to 15 Minutes (2026-02-03)
+**Multiple Event Creation Entry Points:** Applications can have multiple paths to the same action. For SE Schedule, there are 4 distinct event creation paths:
+1. FAB button on mobile → uses SchedulePage `handleEventTypeSelect` defaults
+2. Long-press on mobile grid → TimeGrid calculates `endTime` from pointer position
+3. Click on desktop grid → DesktopTimeGrid calculates `endTime` from click position
+4. Modal defaults → CreateEventModal fallback when no defaults provided
+
+When changing default behavior, audit ALL entry points. Missing even one creates inconsistent UX.
+
+**Time Calculation with Minute Overflow:** When adding minutes to a time, handle overflow into the next hour correctly:
+```javascript
+// ❌ Wrong - creates invalid times like 10:60
+const endHour = startHour + (startMin === 45 ? 1 : 0)
+const endMin = startMin + 15
+
+// ✅ Correct - handles overflow with modulo arithmetic
+const endMinutes = startMin + 15
+const endHour = startHour + Math.floor(endMinutes / 60)
+const endMin = endMinutes % 60
+```
+Examples: 10:00 + 15 = 10:15, 10:45 + 15 = 11:00, 10:30 + 15 = 10:45. The modulo pattern works for any minute value.
+
+**Testing Event Creation Flows:** Use dev-browser to verify all event creation paths programmatically:
+- FAB: Click FAB → click event type → check modal time values
+- Desktop click: Calculate grid click position → verify modal time values
+- Mobile long-press: Dispatch pointer events with 500ms+ duration → check modal times
+
+Browser automation catches edge cases that manual testing might miss (e.g., time calculations at hour boundaries).
+
 ### Story 23: Polish and Responsive Transitions (2026-02-02)
 **Design System Consistency Audit:** A final polish pass ensures all components follow the same patterns. Key areas to audit:
 - **Fonts:** Verify Bebas Neue used for all headings (h1-h6, .font-heading), Open Sans for all body text (.font-body, default)
@@ -1772,4 +1806,344 @@ All buttons should include: rounded-full, font-body, font-semibold, hover:bright
 - QA verification reference
 
 Include screenshots in PRs to show exact visual output at different breakpoints without requiring reviewers to run the code locally.
+
+### Story 4: Fix Short Event Card Display (2026-02-03)
+**Multi-Threshold Layout Pattern:** When a component needs to display differently based on continuous values (like duration), use multiple thresholds for clear visual hierarchy:
+```javascript
+const isTinyEvent = durationMinutes === 15      // Title only
+const isShortEvent = durationMinutes < 45       // Title + time
+// else: 45+ minutes                            // Title + time + type
+```
+This creates distinct layouts at meaningful boundaries. Using `===` for the smallest case (15 min) ensures it gets the most minimal treatment, while `<` for mid-range cases captures everything below the threshold.
+
+**Inline Styles for Exact Sizing:** When design specs require exact pixel values that don't align with Tailwind's spacing scale, use inline styles:
+```jsx
+// ❌ Tailwind w-2 h-2 = 8px (not precise enough)
+<div className="w-2 h-2 rounded-full" />
+
+// ✅ Inline style for exact 10px spec
+<div className="rounded-full" style={{ width: '10px', height: '10px' }} />
+```
+This is especially important when implementing design system specs that call out exact measurements (e.g., "10px diameter status dot").
+
+**Test Data for Boundary Conditions:** When verifying layout changes, ensure test data includes edge cases at critical thresholds. For event cards with duration-based layouts:
+- 15-minute events (minimum duration)
+- 30-minute events (mid-range short)
+- 45-minute events (threshold between short and full layout)
+- 60+ minute events (full layout)
+
+Without test data at these boundaries, you can't verify the conditional logic works correctly. Add temporary test events to the JSON data during development.
+
+**Browser Automation for Style Verification:** Use dev-browser to programmatically verify CSS properties that are hard to check manually:
+```javascript
+const borderLeft = card.style.borderLeft  // "6px solid rgb(37, 99, 235)"
+const dotWidth = statusDot.style.width    // "10px"
+const textLineCount = visibleLines.length // 1, 2, or 3
+```
+This provides concrete evidence that acceptance criteria are met and catches subtle issues like "border is 5.5px instead of 6px" that visual inspection might miss.
+
+**Nested Conditional Rendering:** Use ternary operators for multi-way conditional rendering when layouts have clear precedence:
+```jsx
+{isTinyEvent ? (
+  // Most specific case first
+  <TitleOnly />
+) : isShortEvent ? (
+  // Mid-range case
+  <TitleAndTime />
+) : (
+  // Default/fallback case
+  <FullLayout />
+)}
+```
+Order from most specific to most general. The first condition (`isTinyEvent`) is the most restrictive (exactly 15 min), the second is broader (< 45 min), and the else is the catch-all (everything else).
+
+### Story 7: Fix Mobile Scroll vs Tap Interaction Conflict (2026-02-03)
+**touch-none Blocks All Touch Behaviors:** The Tailwind `touch-none` class sets `touch-action: none`, which disables ALL browser-managed touch interactions including scroll, pinch-zoom, and pan gestures. This was blocking mobile scroll in the calendar grid.
+
+**Solution:** Remove `touch-none` from the event rendering area. The pointer event handlers (`onPointerDown/Up/Leave`) do NOT inherently block scrolling when `touch-action` is set to `auto` (the default).
+
+**Long-Press Compatible with Scroll:** The long-press pattern using setTimeout works correctly alongside native scroll:
+```javascript
+handlePointerDown → start 500ms timer
+handlePointerUp → cancel timer (quick tap)
+handlePointerLeave → cancel timer (finger moves during scroll)
+```
+
+When scrolling, the finger movement triggers `pointerleave`, canceling the timer. Only a stationary 500ms hold triggers the long-press callback.
+
+**Touch Action Values:**
+- `auto` (default): Browser handles scroll, zoom, pan; app receives pointer events
+- `none`: Disables all touch behaviors; app must handle everything
+- `pan-y`: Allows vertical scroll only
+- `pan-x`: Allows horizontal scroll only
+
+For calendar grids that need both scroll AND custom interactions (long-press, drag), use `touch-action: auto` and let the browser manage scroll natively.
+
+**Testing Touch Interactions:** Automated browser testing (Playwright) has limitations for touch:
+- Programmatic CSS checks are reliable (`touchAction: 'auto'`)
+- Simulating long-press with timers is difficult
+- Manual device testing confirms UX for touch-specific behaviors
+
+Verify fixes by checking computed styles (`window.getComputedStyle`) and testing programmatic scroll (`element.scrollTop = value`).
+
+### Story 8: Fix Person Switcher Ordering and Highlight (2026-02-03)
+**Current User vs Selected Member Pattern:** In team collaboration apps, distinguish between:
+- **Current User:** The logged-in user (identity anchor)
+- **Selected Member:** The person whose data is currently being viewed
+
+The UI should maintain both concepts simultaneously:
+```javascript
+const CURRENT_USER_ID = 'tm-1' // Mike Torres
+const currentUser = allMembers.find(m => m.id === CURRENT_USER_ID)
+
+// FAB always shows current user
+<button style={{ backgroundColor: currentUser.color }}>
+  {currentUser.avatar}
+</button>
+
+// List shows selection indicator on viewed member
+{sortedMembers.map(member => {
+  const isSelected = member.id === selectedMember.id
+  return (
+    <button className={isSelected ? 'ring-2 ring-accent' : ''}>
+      {member.name}
+      {isSelected && <div className="bg-accent" />}
+    </button>
+  )
+})}
+```
+
+**Sorting with Fixed Item Positioning:** When one item must always appear in a specific position (e.g., current user at bottom), use special-case logic before applying general sorting:
+```javascript
+const sortedMembers = [...allMembers].sort((a, b) => {
+  // Special case: Mike Torres always to bottom
+  if (a.id === CURRENT_USER_ID) return 1
+  if (b.id === CURRENT_USER_ID) return -1
+  // General case: alphabetize others
+  return a.name.localeCompare(b.name)
+})
+```
+
+Result: `[David, James, Jennifer, Rachel, Sarah, Mike]` - Mike always at end, others alphabetical.
+
+**localeCompare for Alphabetical Sorting:** Use `string.localeCompare()` instead of manual comparison:
+```javascript
+// ✅ Correct: handles accents, case, locale rules
+return a.name.localeCompare(b.name)
+
+// ❌ Avoid: breaks with special characters
+return a.name < b.name ? -1 : 1
+```
+
+`localeCompare()` correctly sorts names like "José" vs "John" and respects locale-specific alphabetization rules.
+
+**FAB as Identity Anchor:** The FAB (Floating Action Button) represents the current user's identity in mobile UIs. Even when viewing other members' data, the FAB shows the logged-in user's avatar/color. This provides a persistent visual anchor for "whose account am I using?"
+
+**Dual Indicators When Current User is Selected:** When Mike Torres (current user) is also the selected member (viewing his own schedule), BOTH indicators appear:
+- Blue FAB button (current user identity)
+- Orange ring + dot on list item (selection state)
+
+This is expected behavior - the dual indication shows "I am viewing my own schedule."
+
+
+### Story 10: Replace Time Dropdowns with Time Picker Component (2026-02-03)
+**TimePicker Component Pattern:** Created a reusable time picker following the same architecture as CustomDropdown:
+- Self-contained component with internal time option generation
+- Dark theme styling matching design system (#2A2A2A, orange accents)
+- Clock icon for semantic clarity (distinguishes from regular dropdowns)
+- Scrollable list with auto-scroll to selected time
+- Touch-friendly design with large tap targets (py-3 = 48px+ height)
+
+**Auto-Scroll to Selected Option:**
+```javascript
+const selectedRef = useRef(null)
+
+useEffect(() => {
+  if (isOpen && selectedRef.current) {
+    selectedRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+}, [isOpen])
+
+// Attach ref only to selected item:
+<li ref={isSelected ? selectedRef : null}>
+```
+This pattern improves UX for long scrollable lists by ensuring the current selection is visible when opening.
+
+**Eliminating Code Duplication:** Moving `generateTimeOptions()` from both modals into TimePicker component:
+- Removes ~30 lines of duplicate code from each modal
+- Ensures consistency in time options across the app
+- Single source of truth for time range and increment configuration
+- Makes modals simpler and more focused on their specific concerns
+
+**12-Hour Time Format Conversion:** Proper handling of edge cases when converting 24-hour to 12-hour:
+```javascript
+const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour
+const period = hour >= 12 ? 'PM' : 'AM'
+```
+Key cases: 0 → 12 AM, 12 → 12 PM, 13 → 1 PM, 23 → 11 PM.
+
+**Touch Target Sizing for Mobile:** Using `py-3` (12px vertical padding) creates ~48px touch targets, meeting accessibility guidelines for mobile interaction. This is more important for time pickers than regular dropdowns because:
+1. Users scroll through many options
+2. Selecting the wrong time has direct consequences
+3. Mobile users expect generous spacing for precise selection
+
+**Icon Choice for Context:** Clock icon instead of down arrow provides semantic clarity. The icon choice signals "this is a time selection" rather than "this is a generic dropdown", helping users understand the control's purpose at a glance.
+
+### Story 11: Desktop Sticky Headers (2026-02-03)
+**Nested Sticky Context Pattern:** CSS `position: sticky` behaves differently depending on the scroll container:
+- Elements sticky within the viewport (page scroll) vs elements sticky within a scrollable div
+- DesktopDatePicker: `sticky top-0` as direct child of SchedulePage → sticks to viewport during window.scroll
+- Column Headers: `sticky top-0` inside DesktopTimeGrid (which has `overflow-y: auto`) → sticks within that container
+- Result: Date picker always visible at top, column headers stick within their grid container
+
+**Z-Index Layering Across Contexts:** Even though sticky elements are in different scroll contexts, z-index determines visual stacking order:
+```jsx
+// Page-level sticky (viewport)
+<DesktopDatePicker className="sticky top-0 z-50" />
+
+// Container-level sticky (grid scroll)
+<DesktopTimeGrid className="overflow-y-auto">
+  <ColumnHeaders className="sticky top-0 z-40" />
+  <DaySeparator className="sticky top-14 z-30" />
+</DesktopTimeGrid>
+```
+Layering: z-50 > z-40 > z-30 ensures proper visual hierarchy during scroll.
+
+**Sticky Top Offset Calculation:** When multiple sticky elements stack, use `top` offset to position them:
+- Column headers: `top-0` (0px) → stick at top of container
+- Day separators: `top-14` (56px = 3.5rem) → stick below column headers
+- The offset should match or exceed the height of elements above to prevent overlap
+
+**One-Line Fix Principle:** Sometimes a story's description implies more work than needed. Story-11 mentioned "make date picker AND column headers sticky" but the column headers were already sticky within their context. Only the date picker needed the change. Always verify existing implementation before making changes.
+
+### Story 12: Date Picker Scroll-to-Day (2026-02-03)
+**Expanded Day Window for scrollIntoView:** When implementing scroll-to-section functionality, ensure enough content exists in the DOM for scrollIntoView to work. The original implementation rendered only 6 days (selectedDate + 5), which prevented scrolling because:
+- Clicking "next" changed selectedDate from Feb 3 → Feb 4
+- The grid re-rendered showing Feb 4-9 (new range)
+- Feb 4 was now at position 0 (top of grid)
+- scrollIntoView had nowhere to scroll TO
+
+Solution: Render 21 days centered on selectedDate (-10 to +10). This creates a "window" where the target day already exists in the DOM before the click, allowing smooth scroll to occur.
+
+**scrollIntoView Prerequisites:**
+1. Target element MUST exist in DOM before calling
+2. Target element MUST be in a different scroll position than current
+3. Scroll container must have overflow and sufficient content
+
+**Bidirectional Date-Scroll Sync:** Two-way synchronization pattern:
+```javascript
+// Direction 1: Date Change → Scroll
+useEffect(() => {
+  dayRefs.current[dateKey]?.scrollIntoView({ behavior: 'smooth' })
+}, [selectedDate])
+
+// Direction 2: Scroll → Date Change
+useEffect(() => {
+  const observer = new IntersectionObserver((entries) => {
+    const visibleEntry = entries.find(e => e.isIntersecting)
+    if (visibleEntry) onDateChange(new Date(visibleEntry.target.dataset.date))
+  })
+  // ... observe day headers
+}, [selectedDate])
+```
+
+This creates synchronized behavior: clicking arrows scrolls the grid, manual scrolling updates the date picker.
+
+### Story 13: Horizontal Scroll with Fixed Column (2026-02-03)
+**Horizontal Scroll with Fixed Columns Pattern:** The key architectural difference from vertical scroll:
+- **Vertical sticky**: Use `position: sticky` - elements stay in DOM flow, CSS handles positioning
+- **Horizontal fixed**: Separate DOM structure - fixed column outside scroll container
+
+Structure for horizontal scroll with fixed left column:
+```jsx
+<div className="flex">
+  <div className="w-16 flex-shrink-0">Fixed column (time labels)</div>
+  <div className="flex-1 overflow-x-auto">
+    <div style={{ minWidth: 'calculated-width' }}>
+      Scrollable content
+    </div>
+  </div>
+</div>
+```
+
+The fixed column is a SIBLING to the scroll container, not a child with `position: sticky`.
+
+**Bidirectional Scroll Synchronization Pattern:**
+When two containers need synchronized horizontal scroll (headers and grid):
+```javascript
+useEffect(() => {
+  const sync = (source, target) => {
+    // CRITICAL: Check before setting to prevent infinite loop
+    if (target.scrollLeft !== source.scrollLeft) {
+      target.scrollLeft = source.scrollLeft
+    }
+  }
+
+  headerRef.current.addEventListener('scroll', () => sync(headerRef.current, gridRef.current))
+  gridRef.current.addEventListener('scroll', () => sync(gridRef.current, headerRef.current))
+
+  return () => {
+    // Cleanup listeners
+  }
+}, [])
+```
+
+The conditional `if (target.scrollLeft !== source.scrollLeft)` is CRITICAL. Without it, setting `scrollLeft` triggers another scroll event, creating an infinite loop that freezes the browser.
+
+**flex-shrink-0 for Minimum Width Enforcement:**
+In flexbox with `overflow-x-auto`, child elements will shrink by default even with `minWidth`. You MUST add `flex-shrink-0`:
+```jsx
+<div style={{ minWidth: '150px' }} className="flex-shrink-0">
+  Column content
+</div>
+```
+
+Without `flex-shrink-0`, the browser ignores minWidth and shrinks columns to fit the viewport, preventing horizontal scroll from ever appearing.
+
+**scrollbar-hide Utility:**
+Hide scrollbars while maintaining scroll functionality for cleaner UI:
+```css
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;      /* Firefox */
+}
+```
+
+Apply to both scroll containers for consistent appearance.
+
+**Restructuring for Scroll Requirements:** The original DesktopTimeGrid used absolute positioning:
+```jsx
+// Original (vertical scroll only)
+<div className="relative">
+  <div className="absolute left-0 w-16">Time labels</div>
+  <div className="ml-16">Grid content</div>
+</div>
+```
+
+This doesn't work for horizontal scroll because `ml-16` (margin-left) scrolls with the parent.
+
+Restructured for horizontal scroll:
+```jsx
+// New (horizontal + vertical scroll)
+<div className="flex">
+  <div className="w-16 flex-shrink-0">Time labels</div>
+  <div className="flex-1 overflow-x-auto">
+    <div className="flex" style={{ minWidth: 'total-width' }}>
+      {columns.map(col => <div style={{ minWidth: '150px' }} />)}
+    </div>
+  </div>
+</div>
+```
+
+**Minimum Width Calculation for Scroll Trigger:**
+Calculate total width to determine when scroll appears:
+- 6 team members × 150px min-width = 900px
+- + 64px fixed time labels = 964px total
+- Viewports < 964px → horizontal scroll appears
+- Viewports >= 964px → columns stretch to fill available space
+
+The grid gracefully adapts: narrow viewports get scroll, wide viewports get expanded columns.
+
+**Event Positioning in Scrollable Grid:** Events positioned absolutely within their parent columns scroll WITH the grid because they're inside the scroll container. The absolute positioning is relative to the column, not the viewport, so horizontal scroll maintains correct alignment.
 

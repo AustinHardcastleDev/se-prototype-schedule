@@ -18,7 +18,7 @@
         "Verify in browser at mobile (375px) and desktop (1280px)"
       ],
       "priority": "high",
-      "passes": true,
+      "passes": false,
       "failedAttempts": 0
     },
     {
@@ -37,7 +37,7 @@
         "Events display correctly in both mobile and desktop views"
       ],
       "priority": "high",
-      "passes": true,
+      "passes": false,
       "failedAttempts": 0
     },
     {
@@ -53,7 +53,7 @@
         "Verify in browser: create event via FAB, long-press, desktop click"
       ],
       "priority": "high",
-      "passes": true,
+      "passes": false,
       "failedAttempts": 0
     },
     {
@@ -70,7 +70,7 @@
         "Verify in browser with events of 15, 30, 45, and 60+ minute durations"
       ],
       "priority": "high",
-      "passes": true,
+      "passes": false,
       "failedAttempts": 0
     },
     {
@@ -87,7 +87,7 @@
         "Verify by trying to create overlapping events"
       ],
       "priority": "high",
-      "passes": true,
+      "passes": false,
       "failedAttempts": 0
     },
     {
@@ -106,7 +106,7 @@
         "Verify in browser on both mobile and desktop"
       ],
       "priority": "high",
-      "passes": true,
+      "passes": false,
       "failedAttempts": 0
     },
     {
@@ -123,7 +123,7 @@
         "Verify in browser at mobile width: scroll up/down, tap events, long-press empty slots"
       ],
       "priority": "high",
-      "passes": true,
+      "passes": false,
       "failedAttempts": 0
     },
     {
@@ -140,7 +140,7 @@
         "Verify in browser: open switcher, check order, switch members, confirm indicators"
       ],
       "priority": "high",
-      "passes": true,
+      "passes": false,
       "failedAttempts": 0
     },
     {
@@ -160,7 +160,7 @@
         "Verify in browser: open modal, interact with dropdowns"
       ],
       "priority": "medium",
-      "passes": true,
+      "passes": false,
       "failedAttempts": 0
     },
     {
@@ -179,7 +179,7 @@
         "Verify in browser: open modal, select times, confirm values"
       ],
       "priority": "medium",
-      "passes": true,
+      "passes": false,
       "failedAttempts": 0
     },
     {
@@ -196,7 +196,7 @@
         "Verify in browser at desktop width: scroll through multiple days, headers stay fixed"
       ],
       "priority": "high",
-      "passes": true,
+      "passes": false,
       "failedAttempts": 0
     },
     {
@@ -213,7 +213,7 @@
         "Verify in browser: click arrows, observe smooth scroll to correct day"
       ],
       "priority": "high",
-      "passes": true,
+      "passes": false,
       "failedAttempts": 0
     },
     {
@@ -230,7 +230,7 @@
         "Verify in browser: resize to narrow width, confirm horizontal scroll appears"
       ],
       "priority": "medium",
-      "passes": true,
+      "passes": false,
       "failedAttempts": 0
     },
     {
@@ -249,7 +249,7 @@
         "Verify in browser: click date, navigate calendar, select date"
       ],
       "priority": "medium",
-      "passes": true,
+      "passes": false,
       "failedAttempts": 0
     },
     {
@@ -266,7 +266,7 @@
         "Verify in browser at desktop width: click various events, confirm modal opens"
       ],
       "priority": "high",
-      "passes": true,
+      "passes": false,
       "failedAttempts": 0
     },
     {
@@ -292,7 +292,7 @@
         "Verify in browser at 375px, 768px, 1280px viewports"
       ],
       "priority": "high",
-      "passes": true,
+      "passes": false,
       "failedAttempts": 0
     }
   ]

@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import PropTypes from 'prop-types'
 import { useDraggable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
@@ -9,6 +10,9 @@ export default function DraggableEvent({ event, onEventClick, onResizeStart, isD
     data: { event },
   })
 
+  const pointerDownRef = useRef(null)
+  const hasDraggedRef = useRef(false)
+
   const style = {
     transform: CSS.Translate.toString(transform),
     opacity: isDragging ? 0.5 : 1,
@@ -16,13 +20,16 @@ export default function DraggableEvent({ event, onEventClick, onResizeStart, isD
   }
 
   const handleClick = (e) => {
-    // Only trigger onClick if not currently dragging
-    if (!isDragging && e.detail === 1) {
+    // Only trigger onClick if not currently dragging and didn't drag
+    if (!isDragging && !hasDraggedRef.current && e.detail === 1) {
       onEventClick(event)
     }
+    // Reset drag tracking
+    hasDraggedRef.current = false
+    pointerDownRef.current = null
   }
 
-  // Filter out drag listeners for the resize handle
+  // Filter out drag listeners for the resize handle and track drag vs click
   const dragListeners = {
     ...listeners,
     onPointerDown: (e) => {
@@ -30,8 +37,27 @@ export default function DraggableEvent({ event, onEventClick, onResizeStart, isD
       if (e.target.closest('[class*="cursor-ns-resize"]')) {
         return
       }
+
+      // Track pointer down position
+      pointerDownRef.current = { x: e.clientX, y: e.clientY }
+      hasDraggedRef.current = false
+
       if (listeners.onPointerDown) {
         listeners.onPointerDown(e)
+      }
+    },
+    onPointerMove: (e) => {
+      // If pointer has moved significantly from down position, it's a drag
+      if (pointerDownRef.current) {
+        const dx = Math.abs(e.clientX - pointerDownRef.current.x)
+        const dy = Math.abs(e.clientY - pointerDownRef.current.y)
+        if (dx > 5 || dy > 5) {
+          hasDraggedRef.current = true
+        }
+      }
+
+      if (listeners.onPointerMove) {
+        listeners.onPointerMove(e)
       }
     }
   }

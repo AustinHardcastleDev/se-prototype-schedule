@@ -1,7 +1,11 @@
+import { useState, useRef, useEffect } from 'react'
 import { format, addDays, subDays, isSameDay } from 'date-fns'
 import PropTypes from 'prop-types'
+import CalendarPopup from '../ui/CalendarPopup'
 
 export default function DesktopDatePicker({ selectedDate, onDateChange }) {
+  const [showCalendar, setShowCalendar] = useState(false)
+  const calendarRef = useRef(null)
   const handlePreviousDay = () => {
     onDateChange(subDays(selectedDate, 1))
   }
@@ -16,8 +20,34 @@ export default function DesktopDatePicker({ selectedDate, onDateChange }) {
 
   const isToday = isSameDay(selectedDate, new Date())
 
+  // Handle outside click to close calendar
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (calendarRef.current && !calendarRef.current.contains(event.target)) {
+        setShowCalendar(false)
+      }
+    }
+
+    if (showCalendar) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [showCalendar])
+
+  const handleDateClick = () => {
+    setShowCalendar(!showCalendar)
+  }
+
+  const handleDateSelect = (date) => {
+    onDateChange(date)
+    setShowCalendar(false)
+  }
+
   return (
-    <div className="hidden md:flex items-center justify-between px-6 py-4 bg-charcoal border-b border-secondary">
+    <div className="hidden md:flex items-center justify-between px-6 py-4 bg-charcoal border-b border-secondary sticky top-0 z-50">
       {/* Left: Previous Day Arrow */}
       <button
         onClick={handlePreviousDay}
@@ -35,10 +65,22 @@ export default function DesktopDatePicker({ selectedDate, onDateChange }) {
       </button>
 
       {/* Center: Date Display */}
-      <div className="flex items-center gap-4">
-        <h1 className="font-heading text-3xl text-text-light uppercase tracking-wide">
+      <div className="flex items-center gap-4 relative" ref={calendarRef}>
+        <button
+          onClick={handleDateClick}
+          className="font-body text-3xl text-text-light uppercase tracking-wide font-bold hover:text-accent transition-colors cursor-pointer"
+        >
           {format(selectedDate, 'EEEE, MMMM d, yyyy')}
-        </h1>
+        </button>
+
+        {/* Calendar Popup */}
+        {showCalendar && (
+          <CalendarPopup
+            selectedDate={selectedDate}
+            onDateSelect={handleDateSelect}
+            onClose={() => setShowCalendar(false)}
+          />
+        )}
 
         {/* Today Button */}
         {!isToday && (

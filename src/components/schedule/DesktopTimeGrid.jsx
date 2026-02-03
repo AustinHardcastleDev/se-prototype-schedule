@@ -1,11 +1,12 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
-import { format, addDays } from 'date-fns'
+import { format, addDays, isSameDay } from 'date-fns'
 import { DndContext, DragOverlay, rectIntersection, useDroppable } from '@dnd-kit/core'
 import { toast } from 'react-hot-toast'
 import { getAllMembers } from '../../utils/dataAccess'
 import EventCard from './EventCard'
 import DraggableEvent from './DraggableEvent'
+import CalendarPopup from '../ui/CalendarPopup'
 
 const SLOT_HEIGHT = 16 // pixels per 15-minute slot
 const SLOTS_PER_HOUR = 4
@@ -27,6 +28,9 @@ function DroppableEventColumn({
   dragOverSlot,
   onColumnClick,
   onEventClick,
+  onResizeStart,
+  resizingEvent,
+  resizePreviewEndTime,
   calculateEventOffset
 }) {
   const { setNodeRef } = useDroppable({
@@ -39,32 +43,62 @@ function DroppableEventColumn({
   return (
     <div
       ref={setNodeRef}
-      className={`flex-1 relative px-1 cursor-pointer transition-colors ${
+      className={`relative px-1 cursor-pointer transition-colors flex-shrink-0 flex-1 ${
         isColumnOver ? 'bg-accent/10' : ''
       }`}
-      style={{ borderLeft: memberIndex === 0 ? 'none' : '1px solid #2A2A2A' }}
+      style={{
+        minWidth: '150px',
+        borderLeft: memberIndex === 0 ? 'none' : '1px solid #2A2A2A'
+      }}
       onClick={onColumnClick}
     >
       {/* Render events for this member on this day */}
       {events.map((event) => {
         const topOffset = calculateEventOffset(event.startTime)
         const isDragging = activeId === event.id
+        const isResizing = resizingEvent && resizingEvent.id === event.id
 
         return (
           <div
             key={event.id}
             data-event-card
             className="absolute left-0 right-0"
-            style={{ top: `${topOffset}px` }}
+            style={{
+              top: `${topOffset}px`,
+              opacity: isResizing ? 0.3 : 1,
+            }}
           >
             <DraggableEvent
               event={event}
               onEventClick={onEventClick}
+              onResizeStart={onResizeStart}
               isDragging={isDragging}
             />
           </div>
         )
       })}
+
+      {/* Resize preview */}
+      {resizingEvent && resizePreviewEndTime && resizingEvent.assigneeId === memberId && resizingEvent.date === date && (
+        <div
+          className="absolute left-0 right-0 pointer-events-none z-20"
+          style={{
+            top: `${calculateEventOffset(resizingEvent.startTime)}px`,
+          }}
+        >
+          <div className="absolute left-0 right-0 border-2 border-dashed border-accent bg-accent/10 rounded-md"
+            style={{
+              height: `${calculateEventOffset(resizePreviewEndTime) - calculateEventOffset(resizingEvent.startTime)}px`,
+            }}
+          >
+            <div className="p-1.5">
+              <div className="text-xs font-body text-accent font-semibold truncate">
+                {resizingEvent.title}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Drag preview ghost - show where event will land in TARGET column */}
       {dragOverSlot !== null && activeEvent && isColumnOver && (
@@ -96,6 +130,9 @@ DroppableEventColumn.propTypes = {
   dragOverSlot: PropTypes.number,
   onColumnClick: PropTypes.func.isRequired,
   onEventClick: PropTypes.func.isRequired,
+  onResizeStart: PropTypes.func,
+  resizingEvent: PropTypes.object,
+  resizePreviewEndTime: PropTypes.string,
   calculateEventOffset: PropTypes.func.isRequired,
 }
 
@@ -103,17 +140,29 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
   const [currentTime, setCurrentTime] = useState(new Date())
   const dayRefs = useRef({}) // Store refs to each day section
   const scrollContainerRef = useRef(null) // Ref to the scrollable container
+  const headerScrollRef = useRef(null) // Ref to the header scroll container
+  const gridScrollRef = useRef(null) // Ref to the grid scroll container
   const [activeId, setActiveId] = useState(null) // Track actively dragged event
   const [dragOverSlot, setDragOverSlot] = useState(null) // Track which slot is being dragged over
   const [dragOverColumn, setDragOverColumn] = useState(null) // Track which column (memberId) is being dragged over
   const [dragOverDate, setDragOverDate] = useState(null) // Track which date section is being dragged over
+  const [calendarOpenForDate, setCalendarOpenForDate] = useState(null) // Track which date's calendar is open
+  const calendarButtonRef = useRef(null) // Ref for calendar button positioning
+  const scrollChangeSource = useRef(null) // 'scroll' | 'picker' | null - tracks source of date change
+  const ignoreObserverUntil = useRef(0) // Timestamp until which to ignore observer updates
+
+  // Resize state
+  const [resizingEvent, setResizingEvent] = useState(null)
+  const [resizePreviewEndTime, setResizePreviewEndTime] = useState(null)
+  const resizePreviewEndTimeRef = useRef(null)
+  const justFinishedResizingRef = useRef(false)
 
   // Get all team members for columns
   const teamMembers = getAllMembers()
 
-  // Generate array of dates to render (selected date + 5 more days)
+  // Generate array of dates to render (10 days before + selected date + 10 days after = 21 days total)
   const daysToRender = []
-  for (let i = 0; i < 6; i++) {
+  for (let i = -10; i <= 10; i++) {
     daysToRender.push(addDays(selectedDate, i))
   }
 
@@ -123,6 +172,17 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
 
     const observer = new IntersectionObserver(
       (entries) => {
+        const now = Date.now()
+        const ignoreUntil = ignoreObserverUntil.current
+
+        // Ignore observer updates briefly after programmatic scrolling
+        if (now < ignoreUntil) {
+          console.log('[IntersectionObserver] Ignoring - within ignore window. now:', now, 'ignoreUntil:', ignoreUntil, 'diff:', ignoreUntil - now)
+          return
+        }
+
+        console.log('[IntersectionObserver] NOT ignoring - processing entries. Entries count:', entries.length)
+
         // Find the day header that is most visible at the top of the viewport
         const visibleEntry = entries.find(
           (entry) => entry.isIntersecting && entry.intersectionRatio > 0.5
@@ -130,10 +190,20 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
 
         if (visibleEntry) {
           const dateStr = visibleEntry.target.dataset.date
+          console.log('[IntersectionObserver] Visible entry date:', dateStr, 'ratio:', visibleEntry.intersectionRatio)
+
           if (dateStr) {
             const newDate = new Date(dateStr)
+            const newDateStr = format(newDate, 'yyyy-MM-dd')
+            const currentDateStr = format(selectedDate, 'yyyy-MM-dd')
+
+            console.log('[IntersectionObserver] newDateStr:', newDateStr, 'currentDateStr:', currentDateStr)
+
             // Only update if it's a different day
-            if (format(newDate, 'yyyy-MM-dd') !== format(selectedDate, 'yyyy-MM-dd')) {
+            if (newDateStr !== currentDateStr) {
+              console.log('[IntersectionObserver] UPDATING selectedDate from', currentDateStr, 'to', newDateStr)
+              // Mark this as scroll-initiated so we don't scroll back to it
+              scrollChangeSource.current = 'scroll'
               onDateChange(newDate)
             }
           }
@@ -154,15 +224,92 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     return () => observer.disconnect()
   }, [selectedDate, onDateChange])
 
-  // Scroll to selected date when it changes externally (from date picker)
-  useEffect(() => {
+  // Scroll to selected date when it changes from date picker (not from scrolling)
+  // Using useLayoutEffect to ensure scroll happens synchronously after DOM updates
+  useLayoutEffect(() => {
     const dateKey = format(selectedDate, 'yyyy-MM-dd')
-    const dayRef = dayRefs.current[dateKey]
+    console.log('[useLayoutEffect] selectedDate changed to:', dateKey)
+    console.log('[useLayoutEffect] scrollChangeSource.current:', scrollChangeSource.current)
 
-    if (dayRef && scrollContainerRef.current) {
-      dayRef.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    // If this change came from scrolling, don't scroll back to it
+    if (scrollChangeSource.current === 'scroll') {
+      console.log('[useLayoutEffect] Skipping scroll - change came from scrolling')
+      scrollChangeSource.current = null
+      return
     }
+
+    // Immediately ignore observer updates to prevent race conditions
+    ignoreObserverUntil.current = Date.now() + 500 // Increased to 500ms for debugging
+    console.log('[useLayoutEffect] Set ignoreObserverUntil to:', ignoreObserverUntil.current)
+
+    // Use requestAnimationFrame to ensure layout is fully calculated
+    requestAnimationFrame(() => {
+      console.log('[rAF] Calculating scroll position for date:', dateKey)
+
+      if (scrollContainerRef.current) {
+        // Calculate scroll position based on known layout:
+        // - Team header: ~56px (sticky at top-0)
+        // - Each day section: dayHeader (~50px) + grid (896px) = 946px
+        // - Today is always at index 10 in daysToRender (center of -10 to +10 range)
+        const teamHeaderHeight = 56
+        const dayHeaderHeight = 50 // py-2 (16px) + content (~32px) + border-b-2 (2px)
+        const gridHeight = TOTAL_SLOTS * SLOT_HEIGHT // 56 * 16 = 896
+        const daySectionHeight = dayHeaderHeight + gridHeight // 936
+        const todayIndex = 10 // selectedDate is always at center
+
+        // Position of today's day header in scroll content
+        const todayHeaderPosition = teamHeaderHeight + (todayIndex * daySectionHeight)
+
+        // Position of today's 6 AM (start of grid, right after day header)
+        const today6AMPosition = todayHeaderPosition + dayHeaderHeight
+
+        // We want 6 AM to be visible right below the sticky day header
+        // Sticky team header: 0-56px, Sticky day header: 56-96px
+        // So visible content starts at ~96px
+        const visibleContentStart = teamHeaderHeight + dayHeaderHeight // 96
+
+        const targetScrollTop = today6AMPosition - visibleContentStart
+
+        console.log('[rAF] todayIndex:', todayIndex)
+        console.log('[rAF] todayHeaderPosition:', todayHeaderPosition)
+        console.log('[rAF] today6AMPosition:', today6AMPosition)
+        console.log('[rAF] visibleContentStart:', visibleContentStart)
+        console.log('[rAF] targetScrollTop:', targetScrollTop)
+        console.log('[rAF] scrollTopBefore:', scrollContainerRef.current.scrollTop)
+
+        scrollContainerRef.current.scrollTop = targetScrollTop
+
+        console.log('[rAF] scrollTopAfter:', scrollContainerRef.current.scrollTop)
+
+        // Debug: Check which day headers are near the top after scroll
+        setTimeout(() => {
+          console.log('[DEBUG 100ms after scroll] Checking visible day headers...')
+          const allDayHeaders = scrollContainerRef.current?.querySelectorAll('[data-date]')
+          if (allDayHeaders) {
+            const containerTop = scrollContainerRef.current.getBoundingClientRect().top
+            allDayHeaders.forEach(header => {
+              const rect = header.getBoundingClientRect()
+              const relativeTop = rect.top - containerTop
+              // Only log headers near the top of the viewport (within 200px)
+              if (relativeTop >= -50 && relativeTop <= 200) {
+                console.log('[DEBUG] Day header', header.dataset.date, 'is at relativeTop:', relativeTop)
+              }
+            })
+          }
+          console.log('[DEBUG] Current scrollTop:', scrollContainerRef.current?.scrollTop)
+        }, 100)
+      } else {
+        console.log('[rAF] scrollContainerRef not available')
+      }
+    })
+
+    scrollChangeSource.current = null
   }, [selectedDate])
+
+  // Debug: Log selectedDate on every render
+  useEffect(() => {
+    console.log('[DEBUG RENDER] selectedDate is now:', format(selectedDate, 'yyyy-MM-dd'))
+  })
 
   // Update current time every minute
   useEffect(() => {
@@ -171,6 +318,70 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     }, 60000) // Update every 60 seconds
 
     return () => clearInterval(interval)
+  }, [])
+
+  // Handle outside click to close calendar
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (calendarButtonRef.current && !calendarButtonRef.current.contains(event.target)) {
+        setCalendarOpenForDate(null)
+      }
+    }
+
+    if (calendarOpenForDate) {
+      document.addEventListener('mousedown', handleClickOutside)
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [calendarOpenForDate])
+
+  const handleCalendarClick = (dateKey) => {
+    setCalendarOpenForDate(calendarOpenForDate === dateKey ? null : dateKey)
+  }
+
+  const handleCalendarDateSelect = (date) => {
+    if (onDateChange) {
+      onDateChange(date)
+    }
+    setCalendarOpenForDate(null)
+  }
+
+  const handleTodayClick = () => {
+    if (onDateChange) {
+      const today = new Date()
+      console.log('[handleTodayClick] Calling onDateChange with:', format(today, 'yyyy-MM-dd'))
+      onDateChange(today)
+    }
+  }
+
+  // Sync horizontal scroll between header and grid
+  useEffect(() => {
+    const headerScroll = headerScrollRef.current
+    const gridScroll = gridScrollRef.current
+
+    if (!headerScroll || !gridScroll) return
+
+    const syncHeaderToGrid = () => {
+      if (gridScroll.scrollLeft !== headerScroll.scrollLeft) {
+        gridScroll.scrollLeft = headerScroll.scrollLeft
+      }
+    }
+
+    const syncGridToHeader = () => {
+      if (headerScroll.scrollLeft !== gridScroll.scrollLeft) {
+        headerScroll.scrollLeft = gridScroll.scrollLeft
+      }
+    }
+
+    headerScroll.addEventListener('scroll', syncHeaderToGrid)
+    gridScroll.addEventListener('scroll', syncGridToHeader)
+
+    return () => {
+      headerScroll.removeEventListener('scroll', syncHeaderToGrid)
+      gridScroll.removeEventListener('scroll', syncGridToHeader)
+    }
   }, [])
 
   // Generate time labels for each hour
@@ -261,6 +472,12 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     // Don't trigger if clicking on an event card
     if (e.target.closest('[data-event-card]')) return
 
+    // Don't trigger if we just finished resizing
+    if (justFinishedResizingRef.current) {
+      justFinishedResizingRef.current = false
+      return
+    }
+
     const gridElement = e.currentTarget
     const rect = gridElement.getBoundingClientRect()
     const yPosition = e.clientY - rect.top
@@ -268,10 +485,11 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     // Calculate start time from click position
     const startTime = calculateTimeFromY(yPosition)
 
-    // Default end time: start + 1 hour
+    // Default end time: start + 15 minutes
     const [startHour, startMin] = startTime.split(':').map(Number)
-    let endHour = startHour + 1
-    let endMin = startMin
+    const endMinutes = startMin + 15
+    let endHour = startHour + Math.floor(endMinutes / 60)
+    let endMin = endMinutes % 60
 
     // Cap at END_HOUR (8 PM)
     if (endHour > END_HOUR || (endHour === END_HOUR && endMin > 0)) {
@@ -297,7 +515,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
   }
 
   const handleDragMove = (event) => {
-    const { delta, over } = event
+    const { delta, over, activatorEvent } = event
 
     if (!activeId) return
 
@@ -305,36 +523,42 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     const draggedEvent = events.find((e) => e.id === activeId)
     if (!draggedEvent) return
 
-    // Calculate which slot we're hovering over based on Y delta
-    const originalOffset = calculateEventOffset(draggedEvent.startTime)
-    const newOffset = originalOffset + delta.y
-    const newSlot = Math.floor(newOffset / SLOT_HEIGHT)
-
-    // Clamp to valid range
-    const clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
-    setDragOverSlot(clampedSlot)
-
     // Detect which column and date we're over
     if (over && over.data.current) {
       const { memberId, date } = over.data.current
-      console.log('[DragMove] Over column:', memberId, 'date:', date)
       setDragOverColumn(memberId)
       setDragOverDate(date)
+
+      // Calculate slot based on pointer position within the target droppable
+      // Get the droppable element's rect
+      const droppableRect = over.rect
+      if (droppableRect && activatorEvent) {
+        // Current pointer Y = activator start Y + delta.y
+        const currentPointerY = activatorEvent.clientY + delta.y
+        // Y position within the droppable grid
+        const yInGrid = currentPointerY - droppableRect.top
+        const newSlot = Math.floor(yInGrid / SLOT_HEIGHT)
+        const clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
+        setDragOverSlot(clampedSlot)
+      }
     } else {
-      console.log('[DragMove] Not over any droppable')
       setDragOverColumn(null)
       setDragOverDate(null)
+      // Fallback: calculate slot based on delta from original position (same-day drag)
+      const originalOffset = calculateEventOffset(draggedEvent.startTime)
+      const newOffset = originalOffset + delta.y
+      const newSlot = Math.floor(newOffset / SLOT_HEIGHT)
+      const clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
+      setDragOverSlot(clampedSlot)
     }
   }
 
   const handleDragEnd = (event) => {
-    const { active, delta, over } = event
+    const { active, delta, over, activatorEvent } = event
 
     const prevDragOverColumn = dragOverColumn
     const prevDragOverDate = dragOverDate
-
-    console.log('[DragEnd] over:', over?.id, 'over.data:', over?.data?.current)
-    console.log('[DragEnd] prevDragOverColumn:', prevDragOverColumn, 'prevDragOverDate:', prevDragOverDate)
+    const prevDragOverSlot = dragOverSlot
 
     setActiveId(null)
     setDragOverSlot(null)
@@ -347,27 +571,40 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     // Determine target column and date
     let targetAssigneeId = draggedEvent.assigneeId
     let targetDate = draggedEvent.date
+    let clampedSlot
 
-    // Check if dropped on a different column
+    // Check if dropped on a different column/date
     if (over && over.data.current) {
       targetAssigneeId = over.data.current.memberId
       targetDate = over.data.current.date
-      console.log('[DragEnd] Detected drop on column:', targetAssigneeId)
+
+      // Use the previously tracked slot which was calculated during drag move
+      // This slot is already calculated relative to the target droppable
+      if (prevDragOverSlot !== null) {
+        clampedSlot = prevDragOverSlot
+      } else {
+        // Fallback: try to calculate from rect
+        const droppableRect = over.rect
+        if (droppableRect && activatorEvent) {
+          const currentPointerY = activatorEvent.clientY + delta.y
+          const yInGrid = currentPointerY - droppableRect.top
+          const newSlot = Math.floor(yInGrid / SLOT_HEIGHT)
+          clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
+        } else {
+          clampedSlot = 0
+        }
+      }
     } else if (prevDragOverColumn && prevDragOverDate) {
       targetAssigneeId = prevDragOverColumn
       targetDate = prevDragOverDate
-      console.log('[DragEnd] Using prevDragOverColumn:', targetAssigneeId)
+      clampedSlot = prevDragOverSlot !== null ? prevDragOverSlot : 0
     } else {
-      console.log('[DragEnd] No target column detected, staying in same column')
+      // Same day, same column - use delta-based calculation
+      const originalOffset = calculateEventOffset(draggedEvent.startTime)
+      const newOffset = originalOffset + delta.y
+      const newSlot = Math.floor(newOffset / SLOT_HEIGHT)
+      clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
     }
-
-    // Calculate new time based on drag delta
-    const originalOffset = calculateEventOffset(draggedEvent.startTime)
-    const newOffset = originalOffset + delta.y
-    const newSlot = Math.floor(newOffset / SLOT_HEIGHT)
-
-    // Clamp to valid range
-    const clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
 
     // Calculate new start time
     const totalMinutes = clampedSlot * 15
@@ -431,6 +668,83 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     setDragOverDate(null)
   }
 
+  // Resize handlers
+  const handleResizeStart = (event, pointerEvent) => {
+    pointerEvent.stopPropagation()
+    const startY = pointerEvent.clientY
+
+    setResizingEvent(event)
+    setResizePreviewEndTime(event.endTime)
+    resizePreviewEndTimeRef.current = event.endTime
+
+    // Add global pointer move/up handlers
+    const handlePointerMove = (e) => {
+      const deltaY = e.clientY - startY
+      const deltaSlots = Math.round(deltaY / SLOT_HEIGHT)
+
+      // Calculate new end time
+      const [endHour, endMin] = event.endTime.split(':').map(Number)
+      const endTotalMinutes = endHour * 60 + endMin
+      const newEndTotalMinutes = endTotalMinutes + (deltaSlots * 15)
+
+      // Clamp to valid range and enforce minimum duration
+      const [startHour, startMin] = event.startTime.split(':').map(Number)
+      const startTotalMinutes = startHour * 60 + startMin
+      const minEndTotalMinutes = startTotalMinutes + 15 // Minimum 15 minutes
+
+      const clampedEndTotalMinutes = Math.max(
+        minEndTotalMinutes,
+        Math.min(newEndTotalMinutes, END_HOUR * 60)
+      )
+
+      const newEndHour = Math.floor(clampedEndTotalMinutes / 60)
+      const newEndMin = clampedEndTotalMinutes % 60
+      const newEndTime = `${newEndHour.toString().padStart(2, '0')}:${newEndMin.toString().padStart(2, '0')}`
+
+      setResizePreviewEndTime(newEndTime)
+      resizePreviewEndTimeRef.current = newEndTime
+    }
+
+    const handlePointerUp = () => {
+      // Get the final end time from the ref
+      const finalEndTime = resizePreviewEndTimeRef.current
+
+      cleanup()
+
+      if (!finalEndTime || finalEndTime === event.endTime) {
+        return
+      }
+
+      // Check for conflicts with new size
+      if (hasConflict(event.id, event.startTime, finalEndTime, event.date, event.assigneeId)) {
+        toast.error('Cannot resize event - conflicts with another event')
+        return
+      }
+
+      // Update the event
+      const updatedEvent = {
+        ...event,
+        endTime: finalEndTime,
+      }
+
+      if (onEventUpdate) {
+        onEventUpdate(updatedEvent)
+      }
+    }
+
+    const cleanup = () => {
+      setResizingEvent(null)
+      setResizePreviewEndTime(null)
+      resizePreviewEndTimeRef.current = null
+      justFinishedResizingRef.current = true
+      document.removeEventListener('pointermove', handlePointerMove)
+      document.removeEventListener('pointerup', handlePointerUp)
+    }
+
+    document.addEventListener('pointermove', handlePointerMove)
+    document.addEventListener('pointerup', handlePointerUp)
+  }
+
   // Get the active event being dragged for the overlay
   const activeEvent = activeId ? events.find((e) => e.id === activeId) : null
 
@@ -444,35 +758,39 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     >
       <div
         ref={scrollContainerRef}
-        className="hidden md:flex md:flex-col flex-1 overflow-y-auto bg-charcoal"
+        tabIndex={-1}
+        className="hidden md:flex md:flex-col flex-1 min-h-0 overflow-y-auto bg-charcoal relative focus:outline-none"
       >
       {/* Column Headers - Sticky at very top */}
       <div className="sticky top-0 z-40 bg-charcoal border-b border-secondary">
         <div className="flex">
-          {/* Time label column header (spacer) */}
-          <div className="w-16 flex-shrink-0" />
+          {/* Time label column header (spacer) - Fixed on left */}
+          <div className="w-16 flex-shrink-0 bg-charcoal" />
 
-          {/* Team member column headers */}
-          {teamMembers.map((member) => (
-            <div
-              key={member.id}
-              className="flex-1 px-4 py-3 border-l border-secondary"
-            >
-              <div className="flex items-center gap-2">
-                {/* Avatar/Initials */}
-                <div
-                  className="w-8 h-8 rounded-full flex items-center justify-center text-white font-body text-xs font-semibold"
-                  style={{ backgroundColor: member.color }}
-                >
-                  {member.avatar}
+          {/* Team member column headers - Horizontally scrollable */}
+          <div ref={headerScrollRef} className="flex flex-1 overflow-x-auto scrollbar-hide">
+            {teamMembers.map((member) => (
+              <div
+                key={member.id}
+                className="px-4 py-3 border-l border-secondary flex-shrink-0 flex-1"
+                style={{ minWidth: '150px' }}
+              >
+                <div className="flex items-center gap-2">
+                  {/* Avatar/Initials */}
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-white font-body text-xs font-semibold"
+                    style={{ backgroundColor: member.color }}
+                  >
+                    {member.avatar}
+                  </div>
+                  {/* Name */}
+                  <span className="font-body text-sm text-text-light font-semibold">
+                    {member.name}
+                  </span>
                 </div>
-                {/* Name */}
-                <span className="font-body text-sm text-text-light font-semibold">
-                  {member.name}
-                </span>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
 
@@ -489,98 +807,164 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
               data-date={dateKey}
               className="sticky top-14 z-30 bg-charcoal border-b-2 border-accent px-4 py-2"
             >
-              <h2 className="font-heading text-xl uppercase text-text-light">
-                {format(dayDate, 'EEEE, MMMM d, yyyy')}
-                {isToday && (
-                  <span className="ml-3 text-accent text-sm font-body">Today</span>
+              <div className="flex items-center gap-3">
+                {/* Calendar Icon Button */}
+                <div className="relative" ref={calendarOpenForDate === dateKey ? calendarButtonRef : null}>
+                  <button
+                    onClick={() => handleCalendarClick(dateKey)}
+                    className="flex items-center justify-center w-8 h-8 rounded hover:bg-secondary transition-colors"
+                    aria-label="Open calendar"
+                  >
+                    <svg
+                      className="w-5 h-5 text-text-light"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                      />
+                    </svg>
+                  </button>
+
+                  {/* Calendar Popup */}
+                  {calendarOpenForDate === dateKey && (
+                    <CalendarPopup
+                      selectedDate={selectedDate}
+                      onDateSelect={handleCalendarDateSelect}
+                      onClose={() => setCalendarOpenForDate(null)}
+                    />
+                  )}
+                </div>
+
+                {/* Date Text */}
+                <h2 className="font-body text-xl uppercase text-text-light font-bold">
+                  {format(dayDate, 'EEEE, MMMM d, yyyy')}
+                </h2>
+
+                {/* Today Badge or Button */}
+                {isToday ? (
+                  <span className="text-accent text-sm font-body font-semibold">Today</span>
+                ) : (
+                  <button
+                    onClick={handleTodayClick}
+                    className="px-3 py-1 bg-secondary text-text-light rounded-full font-body text-xs font-semibold hover:brightness-110 transition-all"
+                  >
+                    Today
+                  </button>
                 )}
-              </h2>
+              </div>
             </div>
 
             {/* Grid Body for this day */}
-            <div className="relative" style={{ height: `${TOTAL_SLOTS * SLOT_HEIGHT}px` }}>
-              {/* Time labels and grid lines */}
-              {timeLabels.map((time, index) => {
-                const topPosition = index * SLOTS_PER_HOUR * SLOT_HEIGHT
-
-                return (
-                  <div key={time.hour} className="absolute left-0 right-0" style={{ top: `${topPosition}px` }}>
-                    {/* Hour label */}
-                    <div className="absolute left-0 w-16 text-right pr-2 -translate-y-2">
+            <div className="flex relative" style={{ height: `${TOTAL_SLOTS * SLOT_HEIGHT}px` }}>
+              {/* Time labels column - Fixed on left */}
+              <div className="w-16 flex-shrink-0 bg-charcoal relative">
+                {timeLabels.map((time, index) => {
+                  const topPosition = index * SLOTS_PER_HOUR * SLOT_HEIGHT
+                  return (
+                    <div
+                      key={time.hour}
+                      className="absolute left-0 w-16 text-right pr-2 -translate-y-2"
+                      style={{ top: `${topPosition}px` }}
+                    >
                       <span className="text-xs font-body text-muted uppercase">{time.label}</span>
                     </div>
-
-                    {/* Grid lines for each column */}
-                    <div className="flex ml-16">
-                      {teamMembers.map((member, memberIndex) => (
-                        <div
-                          key={member.id}
-                          className="flex-1 relative"
-                          style={{ borderLeft: memberIndex === 0 ? 'none' : '1px solid #2A2A2A' }}
-                        >
-                          {/* Hour line (heavier) */}
-                          <div className="absolute left-0 right-0 border-t border-secondary" />
-
-                          {/* 15-minute grid lines (lighter) */}
-                          {index < timeLabels.length - 1 && (
-                            <>
-                              <div
-                                className="absolute left-0 right-0 border-t border-secondary/30"
-                                style={{ top: `${SLOT_HEIGHT}px` }}
-                              />
-                              <div
-                                className="absolute left-0 right-0 border-t border-secondary/30"
-                                style={{ top: `${SLOT_HEIGHT * 2}px` }}
-                              />
-                              <div
-                                className="absolute left-0 right-0 border-t border-secondary/30"
-                                style={{ top: `${SLOT_HEIGHT * 3}px` }}
-                              />
-                            </>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )
-              })}
-
-              {/* Current time indicator - only show for today */}
-              {isToday && currentTimeOffset !== null && (
-                <div
-                  className="absolute left-16 right-0 z-10"
-                  style={{ top: `${currentTimeOffset}px` }}
-                >
-                  <div className="flex items-center">
-                    <div className="w-2 h-2 rounded-full bg-accent" />
-                    <div className="flex-1 h-0.5 bg-accent" />
-                  </div>
-                </div>
-              )}
-
-              {/* Event rendering areas - one per column */}
-              <div className="absolute left-16 right-0 top-0 bottom-0 flex">
-                {teamMembers.map((member, memberIndex) => {
-                  const memberEvents = getEventsForMember(member.id, dayDate)
-
-                  return (
-                    <DroppableEventColumn
-                      key={member.id}
-                      memberId={member.id}
-                      date={dateKey}
-                      memberIndex={memberIndex}
-                      events={memberEvents}
-                      activeId={activeId}
-                      activeEvent={activeEvent}
-                      dragOverColumn={dragOverColumn}
-                      dragOverDate={dragOverDate}
-                      dragOverSlot={dragOverSlot}
-                      onColumnClick={(e) => handleColumnClick(e, member.id, dayDate)}
-                      onEventClick={onEventClick}
-                      calculateEventOffset={calculateEventOffset}
-                    />
                   )
                 })}
+              </div>
+
+              {/* Grid content - Horizontally scrollable */}
+              <div ref={gridScrollRef} className="flex-1 overflow-x-auto scrollbar-hide relative">
+                <div className="flex" style={{ minWidth: `${teamMembers.length * 150}px` }}>
+                  {/* Grid lines for each column */}
+                  {teamMembers.map((member, memberIndex) => (
+                    <div
+                      key={`grid-${member.id}`}
+                      className="relative flex-shrink-0 flex-1"
+                      style={{
+                        minWidth: '150px',
+                        borderLeft: memberIndex === 0 ? 'none' : '1px solid #2A2A2A',
+                        height: `${TOTAL_SLOTS * SLOT_HEIGHT}px`,
+                      }}
+                    >
+                      {/* Hour and 15-minute grid lines */}
+                      {timeLabels.map((time, index) => {
+                        const topPosition = index * SLOTS_PER_HOUR * SLOT_HEIGHT
+                        return (
+                          <div key={time.hour}>
+                            {/* Hour line (heavier) */}
+                            <div
+                              className="absolute left-0 right-0 border-t border-secondary"
+                              style={{ top: `${topPosition}px` }}
+                            />
+                            {/* 15-minute grid lines (lighter) */}
+                            {index < timeLabels.length - 1 && (
+                              <>
+                                <div
+                                  className="absolute left-0 right-0 border-t border-secondary/30"
+                                  style={{ top: `${topPosition + SLOT_HEIGHT}px` }}
+                                />
+                                <div
+                                  className="absolute left-0 right-0 border-t border-secondary/30"
+                                  style={{ top: `${topPosition + SLOT_HEIGHT * 2}px` }}
+                                />
+                                <div
+                                  className="absolute left-0 right-0 border-t border-secondary/30"
+                                  style={{ top: `${topPosition + SLOT_HEIGHT * 3}px` }}
+                                />
+                              </>
+                            )}
+                          </div>
+                        )
+                      })}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Current time indicator - only show for today */}
+                {isToday && currentTimeOffset !== null && (
+                  <div
+                    className="absolute left-0 right-0 z-10 pointer-events-none"
+                    style={{ top: `${currentTimeOffset}px` }}
+                  >
+                    <div className="flex items-center">
+                      <div className="w-2 h-2 rounded-full bg-accent" />
+                      <div className="flex-1 h-0.5 bg-accent" />
+                    </div>
+                  </div>
+                )}
+
+                {/* Event rendering areas - one per column */}
+                <div className="absolute left-0 right-0 top-0 bottom-0 flex">
+                  {teamMembers.map((member, memberIndex) => {
+                    const memberEvents = getEventsForMember(member.id, dayDate)
+
+                    return (
+                      <DroppableEventColumn
+                        key={member.id}
+                        memberId={member.id}
+                        date={dateKey}
+                        memberIndex={memberIndex}
+                        events={memberEvents}
+                        activeId={activeId}
+                        activeEvent={activeEvent}
+                        dragOverColumn={dragOverColumn}
+                        dragOverDate={dragOverDate}
+                        dragOverSlot={dragOverSlot}
+                        onColumnClick={(e) => handleColumnClick(e, member.id, dayDate)}
+                        onEventClick={onEventClick}
+                        onResizeStart={handleResizeStart}
+                        resizingEvent={resizingEvent}
+                        resizePreviewEndTime={resizePreviewEndTime}
+                        calculateEventOffset={calculateEventOffset}
+                      />
+                    )
+                  })}
+                </div>
               </div>
             </div>
           </div>

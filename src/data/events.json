@@ -1,5 +1,35 @@
 [
   {
+    "id": "evt-test-15min",
+    "title": "Quick Check - Unit 1A",
+    "type": "job-occupied",
+    "assigneeId": "tm-1",
+    "date": "2026-02-03",
+    "startTime": "06:00",
+    "endTime": "06:15",
+    "status": "closed-invoiced"
+  },
+  {
+    "id": "evt-test-30min",
+    "title": "Brief Inspection - Unit 2B",
+    "type": "callback-job",
+    "assigneeId": "tm-1",
+    "date": "2026-02-03",
+    "startTime": "06:30",
+    "endTime": "07:00",
+    "status": "closed-no-invoice"
+  },
+  {
+    "id": "evt-test-45min",
+    "title": "Medium Job - Unit 3C",
+    "type": "job-vacant",
+    "assigneeId": "tm-1",
+    "date": "2026-02-03",
+    "startTime": "07:15",
+    "endTime": "08:00",
+    "status": "open"
+  },
+  {
     "id": "evt-1",
     "title": "Oakwood Apartments - Unit 12B",
     "type": "job-occupied",
@@ -298,5 +328,2095 @@
     "startTime": "09:00",
     "endTime": "10:15",
     "status": "closed-no-invoice"
+  },
+  {
+    "id": "evt-31",
+    "title": "Crown Plaza - Unit 20A",
+    "type": "job-occupied",
+    "assigneeId": "tm-1",
+    "date": "2026-02-06",
+    "startTime": "08:00",
+    "endTime": "09:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-32",
+    "title": "Riverside Manor - Unit 13C",
+    "type": "job-vacant",
+    "assigneeId": "tm-1",
+    "date": "2026-02-06",
+    "startTime": "10:00",
+    "endTime": "11:15",
+    "status": "open"
+  },
+  {
+    "id": "evt-33",
+    "title": "Callback: Harbor Lights - Unit 7D",
+    "type": "callback-job",
+    "assigneeId": "tm-1",
+    "date": "2026-02-06",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "status": "closed-no-invoice"
+  },
+  {
+    "id": "evt-34",
+    "title": "Client Check-in",
+    "type": "meeting",
+    "assigneeId": "tm-1",
+    "date": "2026-02-06",
+    "startTime": "16:00",
+    "endTime": "16:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-35",
+    "title": "Lakeview Towers - Unit 9B",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-06",
+    "startTime": "07:30",
+    "endTime": "09:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-36",
+    "title": "Mountain View - Unit 16A",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-06",
+    "startTime": "09:30",
+    "endTime": "11:00",
+    "status": "closed-invoiced"
+  },
+  {
+    "id": "evt-37",
+    "title": "Silverstone Apartments - Unit 4E",
+    "type": "job-vacant",
+    "assigneeId": "tm-2",
+    "date": "2026-02-06",
+    "startTime": "12:00",
+    "endTime": "13:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-38",
+    "title": "Garden Court - Unit 10C",
+    "type": "job-occupied",
+    "assigneeId": "tm-3",
+    "date": "2026-02-06",
+    "startTime": "08:00",
+    "endTime": "09:45",
+    "status": "open"
+  },
+  {
+    "id": "evt-39",
+    "title": "Parkside Plaza - Unit 22B",
+    "type": "job-occupied",
+    "assigneeId": "tm-3",
+    "date": "2026-02-06",
+    "startTime": "10:30",
+    "endTime": "12:00",
+    "status": "closed-no-invoice"
+  },
+  {
+    "id": "evt-40",
+    "title": "Safety Training",
+    "type": "meeting",
+    "assigneeId": "tm-3",
+    "date": "2026-02-06",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-41",
+    "title": "Coastal Realty Group",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-06",
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-42",
+    "title": "Downtown Properties Inc",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-06",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-43",
+    "title": "Team Strategy Session",
+    "type": "meeting",
+    "assigneeId": "tm-4",
+    "date": "2026-02-06",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-44",
+    "title": "Pacific Northwest Builders",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-06",
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-45",
+    "title": "Highland Management",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-06",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-46",
+    "title": "Team Strategy Session",
+    "type": "meeting",
+    "assigneeId": "tm-5",
+    "date": "2026-02-06",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-47",
+    "title": "Operations Planning",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-06",
+    "startTime": "09:00",
+    "endTime": "10:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-48",
+    "title": "Resource Allocation Review",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-06",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-49",
+    "title": "Team Strategy Session",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-06",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-50",
+    "title": "Sunset Ridge - Unit 8F",
+    "type": "job-occupied",
+    "assigneeId": "tm-1",
+    "date": "2026-02-07",
+    "startTime": "08:00",
+    "endTime": "09:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-51",
+    "title": "Brookside Village - Unit 19D",
+    "type": "job-vacant",
+    "assigneeId": "tm-1",
+    "date": "2026-02-07",
+    "startTime": "10:00",
+    "endTime": "11:30",
+    "status": "closed-no-invoice"
+  },
+  {
+    "id": "evt-52",
+    "title": "Tech Sync",
+    "type": "meeting",
+    "assigneeId": "tm-1",
+    "date": "2026-02-07",
+    "startTime": "14:00",
+    "endTime": "14:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-53",
+    "title": "Meadowbrook Apartments - Unit 3C",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-07",
+    "startTime": "07:30",
+    "endTime": "09:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-54",
+    "title": "Heritage Square - Unit 12B",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-07",
+    "startTime": "09:30",
+    "endTime": "11:00",
+    "status": "closed-invoiced"
+  },
+  {
+    "id": "evt-55",
+    "title": "Callback: Willow Creek - Unit 6A",
+    "type": "callback-job",
+    "assigneeId": "tm-2",
+    "date": "2026-02-07",
+    "startTime": "12:00",
+    "endTime": "13:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-56",
+    "title": "Tech Sync",
+    "type": "meeting",
+    "assigneeId": "tm-2",
+    "date": "2026-02-07",
+    "startTime": "14:00",
+    "endTime": "14:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-57",
+    "title": "Evergreen Commons - Unit 15E",
+    "type": "job-vacant",
+    "assigneeId": "tm-3",
+    "date": "2026-02-07",
+    "startTime": "08:00",
+    "endTime": "09:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-58",
+    "title": "Stonebridge Towers - Unit 21A",
+    "type": "job-occupied",
+    "assigneeId": "tm-3",
+    "date": "2026-02-07",
+    "startTime": "10:00",
+    "endTime": "11:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-59",
+    "title": "Tech Sync",
+    "type": "meeting",
+    "assigneeId": "tm-3",
+    "date": "2026-02-07",
+    "startTime": "14:00",
+    "endTime": "14:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-60",
+    "title": "Redwood Properties",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-07",
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-61",
+    "title": "Crown Commercial Real Estate",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-07",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-62",
+    "title": "Sales Team Huddle",
+    "type": "meeting",
+    "assigneeId": "tm-4",
+    "date": "2026-02-07",
+    "startTime": "15:00",
+    "endTime": "15:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-63",
+    "title": "Pinnacle Developers",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-07",
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-64",
+    "title": "Riverside Investments",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-07",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-65",
+    "title": "Sales Team Huddle",
+    "type": "meeting",
+    "assigneeId": "tm-5",
+    "date": "2026-02-07",
+    "startTime": "15:00",
+    "endTime": "15:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-66",
+    "title": "Vendor Coordination",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-07",
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-67",
+    "title": "Budget Review",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-07",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-68",
+    "title": "Oakmont Village - Unit 5D",
+    "type": "job-occupied",
+    "assigneeId": "tm-1",
+    "date": "2026-02-09",
+    "startTime": "08:00",
+    "endTime": "09:45",
+    "status": "open"
+  },
+  {
+    "id": "evt-69",
+    "title": "Cedar Hills - Unit 11B",
+    "type": "job-vacant",
+    "assigneeId": "tm-1",
+    "date": "2026-02-09",
+    "startTime": "10:30",
+    "endTime": "12:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-70",
+    "title": "Quality Check Meeting",
+    "type": "meeting",
+    "assigneeId": "tm-1",
+    "date": "2026-02-09",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-71",
+    "title": "Ashwood Estates - Unit 17C",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-09",
+    "startTime": "07:30",
+    "endTime": "09:00",
+    "status": "closed-no-invoice"
+  },
+  {
+    "id": "evt-72",
+    "title": "Elmwood Towers - Unit 23A",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-09",
+    "startTime": "09:30",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-73",
+    "title": "Callback: Birchwood - Unit 8F",
+    "type": "callback-job",
+    "assigneeId": "tm-2",
+    "date": "2026-02-09",
+    "startTime": "12:00",
+    "endTime": "13:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-74",
+    "title": "Quality Check Meeting",
+    "type": "meeting",
+    "assigneeId": "tm-2",
+    "date": "2026-02-09",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-75",
+    "title": "Magnolia Place - Unit 14D",
+    "type": "job-vacant",
+    "assigneeId": "tm-3",
+    "date": "2026-02-09",
+    "startTime": "08:00",
+    "endTime": "09:30",
+    "status": "closed-invoiced"
+  },
+  {
+    "id": "evt-76",
+    "title": "Springdale Apartments - Unit 9E",
+    "type": "job-occupied",
+    "assigneeId": "tm-3",
+    "date": "2026-02-09",
+    "startTime": "10:00",
+    "endTime": "11:45",
+    "status": "open"
+  },
+  {
+    "id": "evt-77",
+    "title": "Quality Check Meeting",
+    "type": "meeting",
+    "assigneeId": "tm-3",
+    "date": "2026-02-09",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-78",
+    "title": "Horizon Property Management",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-09",
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-79",
+    "title": "Northstar Realty",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-09",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-80",
+    "title": "Client Presentation",
+    "type": "meeting",
+    "assigneeId": "tm-4",
+    "date": "2026-02-09",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-81",
+    "title": "Gateway Properties",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-09",
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-82",
+    "title": "Landmark Commercial",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-09",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-83",
+    "title": "Quarterly Planning",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-09",
+    "startTime": "09:00",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-84",
+    "title": "Team Performance Review",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-09",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-85",
+    "title": "Clearwater Condos - Unit 19B",
+    "type": "job-occupied",
+    "assigneeId": "tm-1",
+    "date": "2026-02-10",
+    "startTime": "08:00",
+    "endTime": "09:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-86",
+    "title": "Fairview Heights - Unit 6C",
+    "type": "job-vacant",
+    "assigneeId": "tm-1",
+    "date": "2026-02-10",
+    "startTime": "10:00",
+    "endTime": "11:15",
+    "status": "closed-no-invoice"
+  },
+  {
+    "id": "evt-87",
+    "title": "Callback: Summit Point - Unit 12A",
+    "type": "callback-job",
+    "assigneeId": "tm-1",
+    "date": "2026-02-10",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-88",
+    "title": "Bayshore Apartments - Unit 4F",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-10",
+    "startTime": "07:30",
+    "endTime": "09:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-89",
+    "title": "Woodlands Village - Unit 15D",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-10",
+    "startTime": "09:30",
+    "endTime": "11:00",
+    "status": "closed-invoiced"
+  },
+  {
+    "id": "evt-90",
+    "title": "Highlands Estates - Unit 21B",
+    "type": "job-vacant",
+    "assigneeId": "tm-2",
+    "date": "2026-02-10",
+    "startTime": "12:00",
+    "endTime": "13:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-91",
+    "title": "Rosewood Plaza - Unit 7E",
+    "type": "job-occupied",
+    "assigneeId": "tm-3",
+    "date": "2026-02-10",
+    "startTime": "08:00",
+    "endTime": "09:45",
+    "status": "open"
+  },
+  {
+    "id": "evt-92",
+    "title": "Linden Court - Unit 18C",
+    "type": "job-occupied",
+    "assigneeId": "tm-3",
+    "date": "2026-02-10",
+    "startTime": "10:30",
+    "endTime": "12:00",
+    "status": "closed-no-invoice"
+  },
+  {
+    "id": "evt-93",
+    "title": "Equipment Maintenance",
+    "type": "meeting",
+    "assigneeId": "tm-3",
+    "date": "2026-02-10",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-94",
+    "title": "Eastgate Development",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-10",
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-95",
+    "title": "Lakeside Properties",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-10",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-96",
+    "title": "Territory Planning",
+    "type": "meeting",
+    "assigneeId": "tm-4",
+    "date": "2026-02-10",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-97",
+    "title": "Vista Management Group",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-10",
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-98",
+    "title": "Central Park Developers",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-10",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-99",
+    "title": "Territory Planning",
+    "type": "meeting",
+    "assigneeId": "tm-5",
+    "date": "2026-02-10",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-100",
+    "title": "Staff Scheduling",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-10",
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-101",
+    "title": "Supply Chain Review",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-10",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-102",
+    "title": "Territory Planning",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-10",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-103",
+    "title": "Grandview Apartments - Unit 10A",
+    "type": "job-occupied",
+    "assigneeId": "tm-1",
+    "date": "2026-02-11",
+    "startTime": "08:00",
+    "endTime": "09:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-104",
+    "title": "Riverstone Commons - Unit 16D",
+    "type": "job-vacant",
+    "assigneeId": "tm-1",
+    "date": "2026-02-11",
+    "startTime": "10:00",
+    "endTime": "11:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-105",
+    "title": "Client Follow-up",
+    "type": "meeting",
+    "assigneeId": "tm-1",
+    "date": "2026-02-11",
+    "startTime": "14:00",
+    "endTime": "14:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-106",
+    "title": "Chestnut Ridge - Unit 5B",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-11",
+    "startTime": "07:30",
+    "endTime": "09:00",
+    "status": "closed-invoiced"
+  },
+  {
+    "id": "evt-107",
+    "title": "Sycamore Heights - Unit 13E",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-11",
+    "startTime": "09:30",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-108",
+    "title": "Callback: Maple Ridge - Unit 9C",
+    "type": "callback-job",
+    "assigneeId": "tm-2",
+    "date": "2026-02-11",
+    "startTime": "12:00",
+    "endTime": "13:00",
+    "status": "closed-no-invoice"
+  },
+  {
+    "id": "evt-109",
+    "title": "Pinebrook Village - Unit 20F",
+    "type": "job-vacant",
+    "assigneeId": "tm-3",
+    "date": "2026-02-11",
+    "startTime": "08:00",
+    "endTime": "09:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-110",
+    "title": "Hickory Pointe - Unit 24A",
+    "type": "job-occupied",
+    "assigneeId": "tm-3",
+    "date": "2026-02-11",
+    "startTime": "10:00",
+    "endTime": "11:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-111",
+    "title": "Westwood Properties",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-11",
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-112",
+    "title": "Sterling Estates",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-11",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-113",
+    "title": "Lead Review Meeting",
+    "type": "meeting",
+    "assigneeId": "tm-4",
+    "date": "2026-02-11",
+    "startTime": "15:00",
+    "endTime": "15:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-114",
+    "title": "Silverleaf Realty",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-11",
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-115",
+    "title": "Brookfield Management",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-11",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-116",
+    "title": "Lead Review Meeting",
+    "type": "meeting",
+    "assigneeId": "tm-5",
+    "date": "2026-02-11",
+    "startTime": "15:00",
+    "endTime": "15:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-117",
+    "title": "Process Improvement",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-11",
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-118",
+    "title": "Monthly Reporting",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-11",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-119",
+    "title": "Timberline Estates - Unit 3D",
+    "type": "job-occupied",
+    "assigneeId": "tm-1",
+    "date": "2026-02-12",
+    "startTime": "08:00",
+    "endTime": "09:45",
+    "status": "open"
+  },
+  {
+    "id": "evt-120",
+    "title": "Creekside Manor - Unit 11F",
+    "type": "job-vacant",
+    "assigneeId": "tm-1",
+    "date": "2026-02-12",
+    "startTime": "10:30",
+    "endTime": "12:00",
+    "status": "closed-no-invoice"
+  },
+  {
+    "id": "evt-121",
+    "title": "Client Site Visit",
+    "type": "meeting",
+    "assigneeId": "tm-1",
+    "date": "2026-02-12",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-122",
+    "title": "Aspen Grove - Unit 17A",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-12",
+    "startTime": "07:30",
+    "endTime": "09:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-123",
+    "title": "Cottonwood Apartments - Unit 22C",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-12",
+    "startTime": "09:30",
+    "endTime": "11:00",
+    "status": "closed-invoiced"
+  },
+  {
+    "id": "evt-124",
+    "title": "Cedarwood Village - Unit 8D",
+    "type": "job-vacant",
+    "assigneeId": "tm-2",
+    "date": "2026-02-12",
+    "startTime": "12:00",
+    "endTime": "13:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-125",
+    "title": "Redwood Terrace - Unit 14B",
+    "type": "job-occupied",
+    "assigneeId": "tm-3",
+    "date": "2026-02-12",
+    "startTime": "08:00",
+    "endTime": "09:45",
+    "status": "open"
+  },
+  {
+    "id": "evt-126",
+    "title": "Callback: Juniper Hills - Unit 19E",
+    "type": "callback-job",
+    "assigneeId": "tm-3",
+    "date": "2026-02-12",
+    "startTime": "10:30",
+    "endTime": "11:30",
+    "status": "closed-no-invoice"
+  },
+  {
+    "id": "evt-127",
+    "title": "Sequoia Heights - Unit 23F",
+    "type": "job-occupied",
+    "assigneeId": "tm-3",
+    "date": "2026-02-12",
+    "startTime": "13:00",
+    "endTime": "14:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-128",
+    "title": "Midtown Realty Partners",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-12",
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-129",
+    "title": "Urban Core Properties",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-12",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-130",
+    "title": "Contract Review",
+    "type": "meeting",
+    "assigneeId": "tm-4",
+    "date": "2026-02-12",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-131",
+    "title": "Keystone Development",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-12",
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-132",
+    "title": "Foundation Builders",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-12",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-133",
+    "title": "HR Coordination",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-12",
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-134",
+    "title": "Facility Inspection",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-12",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-135",
+    "title": "Shadowbrook Place - Unit 6E",
+    "type": "job-occupied",
+    "assigneeId": "tm-1",
+    "date": "2026-02-13",
+    "startTime": "08:00",
+    "endTime": "09:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-136",
+    "title": "Foxwood Commons - Unit 12C",
+    "type": "job-vacant",
+    "assigneeId": "tm-1",
+    "date": "2026-02-13",
+    "startTime": "10:00",
+    "endTime": "11:15",
+    "status": "closed-invoiced"
+  },
+  {
+    "id": "evt-137",
+    "title": "Callback: Deerfield - Unit 18B",
+    "type": "callback-job",
+    "assigneeId": "tm-1",
+    "date": "2026-02-13",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-138",
+    "title": "Hawthorne Village - Unit 4A",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-13",
+    "startTime": "07:30",
+    "endTime": "09:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-139",
+    "title": "Thornbury Estates - Unit 15F",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-13",
+    "startTime": "09:30",
+    "endTime": "11:00",
+    "status": "closed-no-invoice"
+  },
+  {
+    "id": "evt-140",
+    "title": "Weekly Wrap-up",
+    "type": "meeting",
+    "assigneeId": "tm-2",
+    "date": "2026-02-13",
+    "startTime": "16:00",
+    "endTime": "16:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-141",
+    "title": "Ferndale Apartments - Unit 21D",
+    "type": "job-vacant",
+    "assigneeId": "tm-3",
+    "date": "2026-02-13",
+    "startTime": "08:00",
+    "endTime": "09:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-142",
+    "title": "Millbrook Plaza - Unit 25A",
+    "type": "job-occupied",
+    "assigneeId": "tm-3",
+    "date": "2026-02-13",
+    "startTime": "10:00",
+    "endTime": "11:45",
+    "status": "open"
+  },
+  {
+    "id": "evt-143",
+    "title": "Weekly Wrap-up",
+    "type": "meeting",
+    "assigneeId": "tm-3",
+    "date": "2026-02-13",
+    "startTime": "16:00",
+    "endTime": "16:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-144",
+    "title": "Cornerstone Investments",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-13",
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-145",
+    "title": "Prestige Property Group",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-13",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-146",
+    "title": "Weekly Pipeline Review",
+    "type": "meeting",
+    "assigneeId": "tm-4",
+    "date": "2026-02-13",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-147",
+    "title": "Parkland Developers",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-13",
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-148",
+    "title": "Fairfield Management",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-13",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-149",
+    "title": "Weekly Pipeline Review",
+    "type": "meeting",
+    "assigneeId": "tm-5",
+    "date": "2026-02-13",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-150",
+    "title": "End of Week Review",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-13",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-151",
+    "title": "Weekend Planning",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-13",
+    "startTime": "16:00",
+    "endTime": "17:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-152",
+    "title": "Mountainside Condos - Unit 7C",
+    "type": "job-occupied",
+    "assigneeId": "tm-1",
+    "date": "2026-02-16",
+    "startTime": "08:00",
+    "endTime": "09:45",
+    "status": "open"
+  },
+  {
+    "id": "evt-153",
+    "title": "Valleybrook Apartments - Unit 13E",
+    "type": "job-vacant",
+    "assigneeId": "tm-1",
+    "date": "2026-02-16",
+    "startTime": "10:30",
+    "endTime": "12:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-154",
+    "title": "Monday Kickoff",
+    "type": "meeting",
+    "assigneeId": "tm-1",
+    "date": "2026-02-16",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-155",
+    "title": "Harborview Estates - Unit 9D",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-16",
+    "startTime": "07:30",
+    "endTime": "09:00",
+    "status": "closed-no-invoice"
+  },
+  {
+    "id": "evt-156",
+    "title": "Oceanside Towers - Unit 16B",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-16",
+    "startTime": "09:30",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-157",
+    "title": "Callback: Seaside Plaza - Unit 22F",
+    "type": "callback-job",
+    "assigneeId": "tm-2",
+    "date": "2026-02-16",
+    "startTime": "12:00",
+    "endTime": "13:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-158",
+    "title": "Monday Kickoff",
+    "type": "meeting",
+    "assigneeId": "tm-2",
+    "date": "2026-02-16",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-159",
+    "title": "Bayside Village - Unit 5A",
+    "type": "job-vacant",
+    "assigneeId": "tm-3",
+    "date": "2026-02-16",
+    "startTime": "08:00",
+    "endTime": "09:30",
+    "status": "closed-invoiced"
+  },
+  {
+    "id": "evt-160",
+    "title": "Portside Apartments - Unit 11C",
+    "type": "job-occupied",
+    "assigneeId": "tm-3",
+    "date": "2026-02-16",
+    "startTime": "10:00",
+    "endTime": "11:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-161",
+    "title": "Monday Kickoff",
+    "type": "meeting",
+    "assigneeId": "tm-3",
+    "date": "2026-02-16",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-162",
+    "title": "Beacon Hill Properties",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-16",
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-163",
+    "title": "Capitol Management",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-16",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-164",
+    "title": "Monday Kickoff",
+    "type": "meeting",
+    "assigneeId": "tm-4",
+    "date": "2026-02-16",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-165",
+    "title": "Summit Real Estate",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-16",
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-166",
+    "title": "Highland Ventures",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-16",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-167",
+    "title": "Monday Kickoff",
+    "type": "meeting",
+    "assigneeId": "tm-5",
+    "date": "2026-02-16",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-168",
+    "title": "Weekly Goal Setting",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-16",
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-169",
+    "title": "Capacity Planning",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-16",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-170",
+    "title": "Monday Kickoff",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-16",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-171",
+    "title": "Cliffside Condos - Unit 14F",
+    "type": "job-occupied",
+    "assigneeId": "tm-1",
+    "date": "2026-02-17",
+    "startTime": "08:00",
+    "endTime": "09:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-172",
+    "title": "Ridgemont Apartments - Unit 20D",
+    "type": "job-vacant",
+    "assigneeId": "tm-1",
+    "date": "2026-02-17",
+    "startTime": "10:00",
+    "endTime": "11:15",
+    "status": "closed-no-invoice"
+  },
+  {
+    "id": "evt-173",
+    "title": "Project Review",
+    "type": "meeting",
+    "assigneeId": "tm-1",
+    "date": "2026-02-17",
+    "startTime": "14:00",
+    "endTime": "14:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-174",
+    "title": "Bluffside Village - Unit 6C",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-17",
+    "startTime": "07:30",
+    "endTime": "09:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-175",
+    "title": "Crestview Estates - Unit 12E",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-17",
+    "startTime": "09:30",
+    "endTime": "11:00",
+    "status": "closed-invoiced"
+  },
+  {
+    "id": "evt-176",
+    "title": "Peakview Heights - Unit 18A",
+    "type": "job-vacant",
+    "assigneeId": "tm-2",
+    "date": "2026-02-17",
+    "startTime": "12:00",
+    "endTime": "13:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-177",
+    "title": "Summitview Plaza - Unit 23B",
+    "type": "job-occupied",
+    "assigneeId": "tm-3",
+    "date": "2026-02-17",
+    "startTime": "08:00",
+    "endTime": "09:45",
+    "status": "open"
+  },
+  {
+    "id": "evt-178",
+    "title": "Callback: Hillcrest Towers - Unit 29C",
+    "type": "callback-job",
+    "assigneeId": "tm-3",
+    "date": "2026-02-17",
+    "startTime": "10:30",
+    "endTime": "11:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-179",
+    "title": "Skyline Ridge - Unit 15D",
+    "type": "job-occupied",
+    "assigneeId": "tm-3",
+    "date": "2026-02-17",
+    "startTime": "13:00",
+    "endTime": "14:30",
+    "status": "closed-no-invoice"
+  },
+  {
+    "id": "evt-180",
+    "title": "Eastside Ventures",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-17",
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-181",
+    "title": "Northside Properties",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-17",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-182",
+    "title": "Account Planning",
+    "type": "meeting",
+    "assigneeId": "tm-4",
+    "date": "2026-02-17",
+    "startTime": "15:00",
+    "endTime": "15:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-183",
+    "title": "Westside Realty",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-17",
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-184",
+    "title": "Southpoint Development",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-17",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-185",
+    "title": "Account Planning",
+    "type": "meeting",
+    "assigneeId": "tm-5",
+    "date": "2026-02-17",
+    "startTime": "15:00",
+    "endTime": "15:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-186",
+    "title": "Supplier Meeting",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-17",
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-187",
+    "title": "Cost Analysis",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-17",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-188",
+    "title": "Woodland Park - Unit 8B",
+    "type": "job-occupied",
+    "assigneeId": "tm-1",
+    "date": "2026-02-18",
+    "startTime": "08:00",
+    "endTime": "09:45",
+    "status": "open"
+  },
+  {
+    "id": "evt-189",
+    "title": "Forest Glen - Unit 14A",
+    "type": "job-vacant",
+    "assigneeId": "tm-1",
+    "date": "2026-02-18",
+    "startTime": "10:30",
+    "endTime": "12:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-190",
+    "title": "Training Session",
+    "type": "meeting",
+    "assigneeId": "tm-1",
+    "date": "2026-02-18",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-191",
+    "title": "Grove Park Estates - Unit 19E",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-18",
+    "startTime": "07:30",
+    "endTime": "09:00",
+    "status": "closed-invoiced"
+  },
+  {
+    "id": "evt-192",
+    "title": "Birch Lane Apartments - Unit 25C",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-18",
+    "startTime": "09:30",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-193",
+    "title": "Callback: Oak Street - Unit 11F",
+    "type": "callback-job",
+    "assigneeId": "tm-2",
+    "date": "2026-02-18",
+    "startTime": "12:00",
+    "endTime": "13:00",
+    "status": "closed-no-invoice"
+  },
+  {
+    "id": "evt-194",
+    "title": "Training Session",
+    "type": "meeting",
+    "assigneeId": "tm-2",
+    "date": "2026-02-18",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-195",
+    "title": "Elm Court Plaza - Unit 17D",
+    "type": "job-vacant",
+    "assigneeId": "tm-3",
+    "date": "2026-02-18",
+    "startTime": "08:00",
+    "endTime": "09:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-196",
+    "title": "Pine Valley Condos - Unit 23B",
+    "type": "job-occupied",
+    "assigneeId": "tm-3",
+    "date": "2026-02-18",
+    "startTime": "10:00",
+    "endTime": "11:45",
+    "status": "open"
+  },
+  {
+    "id": "evt-197",
+    "title": "Training Session",
+    "type": "meeting",
+    "assigneeId": "tm-3",
+    "date": "2026-02-18",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-198",
+    "title": "Central Properties",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-18",
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-199",
+    "title": "Uptown Realty Group",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-18",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-200",
+    "title": "Deal Structure Review",
+    "type": "meeting",
+    "assigneeId": "tm-4",
+    "date": "2026-02-18",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-201",
+    "title": "Midland Ventures",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-18",
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-202",
+    "title": "Crossroads Development",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-18",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-203",
+    "title": "Performance Metrics",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-18",
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-204",
+    "title": "System Updates",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-18",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-205",
+    "title": "Silverlake Manor - Unit 10D",
+    "type": "job-occupied",
+    "assigneeId": "tm-1",
+    "date": "2026-02-19",
+    "startTime": "08:00",
+    "endTime": "09:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-206",
+    "title": "Crystal Springs - Unit 16A",
+    "type": "job-vacant",
+    "assigneeId": "tm-1",
+    "date": "2026-02-19",
+    "startTime": "10:00",
+    "endTime": "11:15",
+    "status": "closed-invoiced"
+  },
+  {
+    "id": "evt-207",
+    "title": "Callback: Emerald Bay - Unit 22C",
+    "type": "callback-job",
+    "assigneeId": "tm-1",
+    "date": "2026-02-19",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-208",
+    "title": "Diamond Point - Unit 7E",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-19",
+    "startTime": "07:30",
+    "endTime": "09:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-209",
+    "title": "Ruby Ridge Apartments - Unit 13B",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-19",
+    "startTime": "09:30",
+    "endTime": "11:00",
+    "status": "closed-no-invoice"
+  },
+  {
+    "id": "evt-210",
+    "title": "Sapphire Heights - Unit 19F",
+    "type": "job-vacant",
+    "assigneeId": "tm-2",
+    "date": "2026-02-19",
+    "startTime": "12:00",
+    "endTime": "13:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-211",
+    "title": "Amber Court - Unit 24A",
+    "type": "job-occupied",
+    "assigneeId": "tm-3",
+    "date": "2026-02-19",
+    "startTime": "08:00",
+    "endTime": "09:45",
+    "status": "open"
+  },
+  {
+    "id": "evt-212",
+    "title": "Pearl Plaza - Unit 30D",
+    "type": "job-occupied",
+    "assigneeId": "tm-3",
+    "date": "2026-02-19",
+    "startTime": "10:30",
+    "endTime": "12:00",
+    "status": "closed-no-invoice"
+  },
+  {
+    "id": "evt-213",
+    "title": "Equipment Check",
+    "type": "meeting",
+    "assigneeId": "tm-3",
+    "date": "2026-02-19",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-214",
+    "title": "Platinum Properties",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-19",
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-215",
+    "title": "Gold Star Realty",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-19",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-216",
+    "title": "Proposal Development",
+    "type": "meeting",
+    "assigneeId": "tm-4",
+    "date": "2026-02-19",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-217",
+    "title": "Silver Creek Investments",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-19",
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-218",
+    "title": "Bronze Shield Developers",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-19",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-219",
+    "title": "Proposal Development",
+    "type": "meeting",
+    "assigneeId": "tm-5",
+    "date": "2026-02-19",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-220",
+    "title": "Policy Review",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-19",
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-221",
+    "title": "Risk Assessment",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-19",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-222",
+    "title": "Riverside Gardens - Unit 5C",
+    "type": "job-occupied",
+    "assigneeId": "tm-1",
+    "date": "2026-02-20",
+    "startTime": "08:00",
+    "endTime": "09:45",
+    "status": "open"
+  },
+  {
+    "id": "evt-223",
+    "title": "Parkview Meadows - Unit 11E",
+    "type": "job-vacant",
+    "assigneeId": "tm-1",
+    "date": "2026-02-20",
+    "startTime": "10:30",
+    "endTime": "12:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-224",
+    "title": "Week Planning",
+    "type": "meeting",
+    "assigneeId": "tm-1",
+    "date": "2026-02-20",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-225",
+    "title": "Lakeshore Village - Unit 17D",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-20",
+    "startTime": "07:30",
+    "endTime": "09:00",
+    "status": "closed-invoiced"
+  },
+  {
+    "id": "evt-226",
+    "title": "Waterfront Commons - Unit 23A",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-20",
+    "startTime": "09:30",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-227",
+    "title": "Callback: Beachside - Unit 29B",
+    "type": "callback-job",
+    "assigneeId": "tm-2",
+    "date": "2026-02-20",
+    "startTime": "12:00",
+    "endTime": "13:00",
+    "status": "closed-no-invoice"
+  },
+  {
+    "id": "evt-228",
+    "title": "Week Planning",
+    "type": "meeting",
+    "assigneeId": "tm-2",
+    "date": "2026-02-20",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-229",
+    "title": "Shoreline Towers - Unit 15F",
+    "type": "job-vacant",
+    "assigneeId": "tm-3",
+    "date": "2026-02-20",
+    "startTime": "08:00",
+    "endTime": "09:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-230",
+    "title": "Marina Bay Apartments - Unit 21C",
+    "type": "job-occupied",
+    "assigneeId": "tm-3",
+    "date": "2026-02-20",
+    "startTime": "10:00",
+    "endTime": "11:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-231",
+    "title": "Week Planning",
+    "type": "meeting",
+    "assigneeId": "tm-3",
+    "date": "2026-02-20",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-232",
+    "title": "Harbor Properties",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-20",
+    "startTime": "09:00",
+    "endTime": "10:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-233",
+    "title": "Dockside Management",
+    "type": "sales-stop",
+    "assigneeId": "tm-4",
+    "date": "2026-02-20",
+    "startTime": "11:00",
+    "endTime": "12:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-234",
+    "title": "Week Wrap-up",
+    "type": "meeting",
+    "assigneeId": "tm-4",
+    "date": "2026-02-20",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-235",
+    "title": "Wharf Investments",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-20",
+    "startTime": "10:00",
+    "endTime": "11:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-236",
+    "title": "Pier Development",
+    "type": "sales-stop",
+    "assigneeId": "tm-5",
+    "date": "2026-02-20",
+    "startTime": "13:00",
+    "endTime": "14:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-237",
+    "title": "Week Wrap-up",
+    "type": "meeting",
+    "assigneeId": "tm-5",
+    "date": "2026-02-20",
+    "startTime": "15:00",
+    "endTime": "16:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-238",
+    "title": "End of Week Summary",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-20",
+    "startTime": "14:00",
+    "endTime": "15:00",
+    "status": "open"
+  },
+  {
+    "id": "evt-239",
+    "title": "Next Week Preview",
+    "type": "meeting",
+    "assigneeId": "tm-6",
+    "date": "2026-02-20",
+    "startTime": "16:00",
+    "endTime": "17:00",
+    "status": "open"
   }
 ]

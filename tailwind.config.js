@@ -32,7 +32,6 @@ export default {
         'status-closed-invoiced': '#8B5CF6',
       },
       fontFamily: {
-        heading: ['"Bebas Neue"', 'sans-serif'],
         body: ['"Open Sans"', 'sans-serif'],
       },
       keyframes: {

@@ -47,7 +47,7 @@ function HamburgerDrawer({ isOpen, onClose }) {
 
         {/* Logo */}
         <div className="px-6 pb-6 border-b border-secondary">
-          <div className="font-heading text-2xl text-accent uppercase tracking-wider">
+          <div className="font-body text-2xl text-accent uppercase tracking-wider font-bold">
             SE Schedule
           </div>
         </div>

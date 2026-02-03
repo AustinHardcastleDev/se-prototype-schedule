@@ -2,31 +2,12 @@ import { useState, useEffect } from 'react'
 import PropTypes from 'prop-types'
 import { format } from 'date-fns'
 import { getEventTypes, getAllMembers } from '../../utils/dataAccess'
+import CustomDropdown from '../ui/CustomDropdown'
+import TimePicker from '../ui/TimePicker'
 
 export default function EditEventModal({ isOpen, onClose, onSave, onDelete, event }) {
   const eventTypes = getEventTypes()
   const allMembers = getAllMembers()
-
-  // Generate time options (6:00 AM - 8:00 PM in 15-minute increments)
-  const generateTimeOptions = () => {
-    const options = []
-    for (let hour = 6; hour <= 20; hour++) {
-      for (let minute = 0; minute < 60; minute += 15) {
-        // Don't include times after 8:00 PM
-        if (hour === 20 && minute > 0) break
-
-        const timeStr = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`
-        const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour
-        const period = hour >= 12 ? 'PM' : 'AM'
-        const displayStr = `${displayHour}:${minute.toString().padStart(2, '0')} ${period}`
-
-        options.push({ value: timeStr, label: displayStr })
-      }
-    }
-    return options
-  }
-
-  const timeOptions = generateTimeOptions()
 
   // Form state - will be pre-populated from event prop
   const [eventType, setEventType] = useState(event?.type || eventTypes[0].key)
@@ -114,60 +95,31 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
 
   if (!isOpen || !event) return null
 
-  const selectedEventType = eventTypes.find(et => et.key === eventType)
-
   // Shared form fields component
   const FormFields = ({ idPrefix = '' }) => (
     <>
       {/* Event Type Dropdown */}
-      <div className="mb-4">
-        <label htmlFor={`eventType${idPrefix}`} className="block text-sm font-body text-text-dark font-semibold mb-2">
-          Event Type
-        </label>
-        <div className="relative">
-          <select
-            id={`eventType${idPrefix}`}
-            value={eventType}
-            onChange={(e) => setEventType(e.target.value)}
-            className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg appearance-none font-body text-sm pr-10"
-          >
-            {eventTypes.map((et) => (
-              <option key={et.key} value={et.key}>
-                {et.label}
-              </option>
-            ))}
-          </select>
-          {/* Color Indicator */}
-          <div
-            className="absolute left-4 top-1/2 transform -translate-y-1/2 w-3 h-3 rounded-full pointer-events-none"
-            style={{ backgroundColor: selectedEventType?.borderColor }}
-          />
-          <div className="absolute right-4 top-1/2 transform -translate-y-1/2 pointer-events-none">
-            <svg className="w-4 h-4 text-text-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-            </svg>
-          </div>
-        </div>
-      </div>
+      <CustomDropdown
+        id={`eventType${idPrefix}`}
+        label="Event Type"
+        value={eventType}
+        onChange={(value) => setEventType(value)}
+        options={eventTypes.map((et) => ({ value: et.key, label: et.label }))}
+        showColorDots={true}
+        getColorForOption={(key) => {
+          const et = eventTypes.find(t => t.key === key)
+          return et?.borderColor
+        }}
+      />
 
       {/* Person Dropdown */}
-      <div className="mb-4">
-        <label htmlFor={`assignee${idPrefix}`} className="block text-sm font-body text-text-dark font-semibold mb-2">
-          Person
-        </label>
-        <select
-          id={`assignee${idPrefix}`}
-          value={assigneeId}
-          onChange={(e) => setAssigneeId(e.target.value)}
-          className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg appearance-none font-body text-sm"
-        >
-          {allMembers.map((member) => (
-            <option key={member.id} value={member.id}>
-              {member.name}
-            </option>
-          ))}
-        </select>
-      </div>
+      <CustomDropdown
+        id={`assignee${idPrefix}`}
+        label="Person"
+        value={assigneeId}
+        onChange={(value) => setAssigneeId(value)}
+        options={allMembers.map((member) => ({ value: member.id, label: member.name }))}
+      />
 
       {/* Date Picker */}
       <div className="mb-4">
@@ -184,48 +136,26 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
       </div>
 
       {/* Start Time */}
-      <div className="mb-4">
-        <label htmlFor={`startTime${idPrefix}`} className="block text-sm font-body text-text-dark font-semibold mb-2">
-          Start Time
-        </label>
-        <select
-          id={`startTime${idPrefix}`}
-          value={startTime}
-          onChange={(e) => {
-            setStartTime(e.target.value)
-            setValidationError('')
-          }}
-          className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg appearance-none font-body text-sm"
-        >
-          {timeOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </div>
+      <TimePicker
+        id={`startTime${idPrefix}`}
+        label="Start Time"
+        value={startTime}
+        onChange={(value) => {
+          setStartTime(value)
+          setValidationError('')
+        }}
+      />
 
       {/* End Time */}
-      <div className="mb-4">
-        <label htmlFor={`endTime${idPrefix}`} className="block text-sm font-body text-text-dark font-semibold mb-2">
-          End Time
-        </label>
-        <select
-          id={`endTime${idPrefix}`}
-          value={endTime}
-          onChange={(e) => {
-            setEndTime(e.target.value)
-            setValidationError('')
-          }}
-          className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg appearance-none font-body text-sm"
-        >
-          {timeOptions.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
-      </div>
+      <TimePicker
+        id={`endTime${idPrefix}`}
+        label="End Time"
+        value={endTime}
+        onChange={(value) => {
+          setEndTime(value)
+          setValidationError('')
+        }}
+      />
 
       {/* Validation Error */}
       {validationError && (
@@ -328,7 +258,7 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
 
         {/* Modal Header */}
         <div className="px-6 pb-4 border-b border-secondary">
-          <h2 className="font-heading text-2xl text-text-dark uppercase">Edit Event</h2>
+          <h2 className="font-body text-2xl text-text-dark uppercase font-bold">Edit Event</h2>
         </div>
 
         {/* Delete Confirmation or Form */}
@@ -349,7 +279,7 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
       >
         {/* Modal Header */}
         <div className="px-6 py-4 border-b border-secondary">
-          <h2 className="font-heading text-2xl text-text-dark uppercase">Edit Event</h2>
+          <h2 className="font-body text-2xl text-text-dark uppercase font-bold">Edit Event</h2>
         </div>
 
         {/* Delete Confirmation or Form */}

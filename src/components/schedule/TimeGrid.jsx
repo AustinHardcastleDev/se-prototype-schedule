@@ -101,8 +101,10 @@ export default function TimeGrid({ selectedDate, selectedMember, events: allEven
       // Long press detected - trigger callback
       const startTime = calculateTimeFromY(yPosition)
       const [startHour, startMin] = startTime.split(':').map(Number)
-      const endHour = startHour + 1
-      const endTime = `${endHour.toString().padStart(2, '0')}:${startMin.toString().padStart(2, '0')}`
+      const endMinutes = startMin + 15
+      const endHour = startHour + Math.floor(endMinutes / 60)
+      const endMin = endMinutes % 60
+      const endTime = `${endHour.toString().padStart(2, '0')}:${endMin.toString().padStart(2, '0')}`
 
       if (onLongPressSlot) {
         onLongPressSlot({ startTime, endTime })
@@ -414,7 +416,7 @@ export default function TimeGrid({ selectedDate, selectedMember, events: allEven
 
         {/* Event rendering area */}
         <div
-          className="absolute left-16 right-0 top-0 bottom-0 px-1 touch-none"
+          className="absolute left-16 right-0 top-0 bottom-0 px-1"
           onPointerDown={handlePointerDown}
           onPointerUp={handlePointerUp}
           onPointerLeave={handlePointerLeave}

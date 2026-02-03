@@ -294,6 +294,7 @@ while [ $STORIES_COMPLETED -lt $MAX_STORIES ]; do
     
     echo ""
     echo -e "${GREEN}🎯 Next: ${NEXT_ID} - ${NEXT_TITLE}${NC}"
+    echo "$(date +%s) $NEXT_ID" > .ralph-heartbeat
     log_debug "Starting story: $NEXT_ID - $NEXT_TITLE"
     
     # Retry loop for this story

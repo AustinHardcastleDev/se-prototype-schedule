@@ -45,7 +45,8 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
 
   const durationMinutes = calculateDurationMinutes(event.startTime, event.endTime)
   const cardHeight = calculateHeight()
-  const isShortEvent = durationMinutes < 30 // Condensed layout for events under 30 min
+  const isTinyEvent = durationMinutes === 15 // 15-min events: title only
+  const isShortEvent = durationMinutes < 45 // Events under 45 min: condensed layout
   const isJobType = JOB_TYPES.includes(event.type)
   const statusColor = isJobType ? STATUS_COLORS[event.status] : null
 
@@ -129,7 +130,7 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
       } ${isLongPressing ? 'brightness-90' : ''}`}
       style={{
         height: `${cardHeight}px`,
-        borderLeft: `4px solid ${eventType.borderColor}`,
+        borderLeft: `6px solid ${eventType.borderColor}`,
         minHeight: `${SLOT_HEIGHT}px`, // Minimum 15 minutes
       }}
       {...pointerHandlers}
@@ -138,19 +139,33 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
         {/* Status indicator dot (top-right) */}
         {statusColor && (
           <div
-            className="absolute top-1 right-1 w-2 h-2 rounded-full"
-            style={{ backgroundColor: statusColor }}
+            className="absolute top-1 right-1 rounded-full"
+            style={{
+              backgroundColor: statusColor,
+              width: '10px',
+              height: '10px'
+            }}
           />
         )}
 
         {/* Content */}
-        {isShortEvent ? (
-          // Condensed layout for events < 30 min: title only
+        {isTinyEvent ? (
+          // 15-min events: title only, single line
           <div className="text-xs font-body text-text-dark font-semibold truncate pr-3">
             {event.title}
           </div>
+        ) : isShortEvent ? (
+          // Events < 45 min: condensed layout (title + time)
+          <div className="flex flex-col gap-0.5 h-full">
+            <div className="text-xs font-body text-text-dark font-semibold truncate pr-3">
+              {event.title}
+            </div>
+            <div className="text-xs font-body text-muted truncate">
+              {formatTime(event.startTime)} – {formatTime(event.endTime)}
+            </div>
+          </div>
         ) : (
-          // Full layout for events >= 30 min
+          // Full layout for events >= 45 min (title, time, type)
           <div className="flex flex-col gap-0.5 h-full">
             <div className="text-xs font-body text-text-dark font-semibold truncate pr-3">
               {event.title}

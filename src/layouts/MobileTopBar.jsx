@@ -8,12 +8,12 @@ function MobileTopBar({ onMenuOpen }) {
   return (
     <header className="md:hidden bg-charcoal text-text-light px-4 py-3 flex items-center justify-between fixed top-0 left-0 right-0 z-50">
       {/* Logo on left */}
-      <div className="font-heading text-xl text-accent uppercase tracking-wider">
+      <div className="font-body text-xl text-accent uppercase tracking-wider font-bold">
         SE
       </div>
 
       {/* Current month/year in center */}
-      <div className="font-heading text-lg uppercase tracking-wide">
+      <div className="font-body text-lg uppercase tracking-wide font-bold">
         {monthYear}
       </div>
 

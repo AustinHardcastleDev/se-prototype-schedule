@@ -9,7 +9,7 @@ export default function Sidebar() {
     <aside className="hidden md:flex md:flex-col md:w-64 bg-charcoal text-text-light fixed left-0 top-0 h-screen">
       {/* Logo placeholder at top */}
       <div className="p-6 border-b border-secondary">
-        <div className="font-heading text-2xl text-accent uppercase tracking-wider">
+        <div className="font-body text-2xl text-accent uppercase tracking-wider font-bold">
           SE Schedule
         </div>
       </div>
