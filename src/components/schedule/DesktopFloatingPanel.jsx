@@ -96,9 +96,10 @@ export default function DesktopFloatingPanel({ onEventTypeSelect, roleFilter, on
         />
       )}
 
-      {/* Earlier Opening Toggle - Left panel */}
-      {earlierOpeningEvents.length > 0 && (
-        <div className="hidden md:block fixed bottom-6 z-50" style={{ right: 'calc(50% + 140px)' }}>
+      {/* Floating Bottom Bar - Desktop Only */}
+      <div className="hidden md:flex fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 items-center gap-3">
+        {/* Earlier Opening Toggle */}
+        {earlierOpeningEvents.length > 0 && (
           <button
             onClick={() => {
               if (onEarlierHighlightToggle) onEarlierHighlightToggle()
@@ -112,87 +113,84 @@ export default function DesktopFloatingPanel({ onEventTypeSelect, roleFilter, on
             <svg className="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
             </svg>
-            <span className="font-body text-xs text-amber-400 font-semibold whitespace-nowrap">Earlier</span>
+            <span className="font-body text-xs text-white font-semibold whitespace-nowrap">Earlier</span>
             <span className={`font-body text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold ${
               earlierHighlightMode ? 'text-charcoal bg-amber-400' : 'text-charcoal bg-amber-400'
             }`}>
               {earlierOpeningEvents.length}
             </span>
           </button>
-        </div>
-      )}
+        )}
 
-      {/* Center Floating Panel - Desktop Only */}
-      <div className="hidden md:flex fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 items-center gap-2 bg-charcoal/95 backdrop-blur-sm border border-secondary rounded-full px-3 py-2 shadow-2xl">
-        {/* Role Filter Pills */}
-        <div className="flex items-center gap-1 mr-1">
-          {[
-            { value: 'all', label: 'All' },
-            { value: 'tech', label: 'Tech' },
-            { value: 'sales', label: 'Sales' },
-          ].map((filter) => (
+        {/* Center Panel */}
+        <div className="flex items-center gap-2 bg-charcoal/95 backdrop-blur-sm border border-secondary rounded-full px-3 py-2 shadow-2xl">
+          {/* Role Filter Pills */}
+          <div className="flex items-center gap-1 mr-1">
+            {[
+              { value: 'all', label: 'All' },
+              { value: 'tech', label: 'Tech' },
+              { value: 'sales', label: 'Sales' },
+            ].map((filter) => (
+              <button
+                key={filter.value}
+                onClick={() => onRoleFilterChange(filter.value)}
+                className={`px-3 py-1.5 rounded-full font-body text-xs font-semibold transition-all ${
+                  roleFilter === filter.value
+                    ? 'bg-accent text-white'
+                    : 'bg-secondary text-muted hover:text-text-light hover:brightness-110'
+                }`}
+              >
+                {filter.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Divider */}
+          <div className="w-px h-6 bg-secondary" />
+
+          {/* Create Event Button */}
+          <div className="relative ml-1">
+            {/* Event Type Menu - shown above button */}
+            {isCreateOpen && (
+              <div className="absolute bottom-full mb-3 left-1/2 transform -translate-x-1/2 flex flex-col gap-2 animate-fadeIn">
+                {eventTypes.map((eventType) => (
+                  <button
+                    key={eventType.key}
+                    onClick={() => handleEventTypeClick(eventType)}
+                    className="flex items-center gap-3 bg-white rounded-full px-4 py-2.5 shadow-lg hover:brightness-95 transition-all whitespace-nowrap"
+                    style={{ minWidth: '200px' }}
+                  >
+                    <div
+                      className="w-3.5 h-3.5 rounded-full flex-shrink-0"
+                      style={{ backgroundColor: eventType.color }}
+                    />
+                    <span className="text-sm font-body text-text-dark font-semibold">
+                      {eventType.label}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
             <button
-              key={filter.value}
-              onClick={() => onRoleFilterChange(filter.value)}
-              className={`px-3 py-1.5 rounded-full font-body text-xs font-semibold transition-all ${
-                roleFilter === filter.value
-                  ? 'bg-accent text-white'
-                  : 'bg-secondary text-muted hover:text-text-light hover:brightness-110'
+              onClick={() => {
+                setIsCreateOpen(!isCreateOpen)
+                setIsUnassignedOpen(false)
+              }}
+              className={`w-10 h-10 bg-accent rounded-full flex items-center justify-center text-white hover:brightness-110 transition-all ${
+                isCreateOpen ? 'rotate-45 scale-110' : 'rotate-0 scale-100'
               }`}
+              aria-label={isCreateOpen ? 'Close menu' : 'Create event'}
             >
-              {filter.label}
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+              </svg>
             </button>
-          ))}
+          </div>
         </div>
 
-        {/* Divider */}
-        <div className="w-px h-6 bg-secondary" />
-
-        {/* Create Event Button */}
-        <div className="relative ml-1">
-          {/* Event Type Menu - shown above button */}
-          {isCreateOpen && (
-            <div className="absolute bottom-full mb-3 left-1/2 transform -translate-x-1/2 flex flex-col gap-2 animate-fadeIn">
-              {eventTypes.map((eventType) => (
-                <button
-                  key={eventType.key}
-                  onClick={() => handleEventTypeClick(eventType)}
-                  className="flex items-center gap-3 bg-white rounded-full px-4 py-2.5 shadow-lg hover:brightness-95 transition-all whitespace-nowrap"
-                  style={{ minWidth: '200px' }}
-                >
-                  <div
-                    className="w-3.5 h-3.5 rounded-full flex-shrink-0"
-                    style={{ backgroundColor: eventType.color }}
-                  />
-                  <span className="text-sm font-body text-text-dark font-semibold">
-                    {eventType.label}
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
-
-          <button
-            onClick={() => {
-              setIsCreateOpen(!isCreateOpen)
-              setIsEarlierOpen(false)
-              setIsUnassignedOpen(false)
-            }}
-            className={`w-10 h-10 bg-accent rounded-full flex items-center justify-center text-white hover:brightness-110 transition-all ${
-              isCreateOpen ? 'rotate-45 scale-110' : 'rotate-0 scale-100'
-            }`}
-            aria-label={isCreateOpen ? 'Close menu' : 'Create event'}
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-            </svg>
-          </button>
-        </div>
-      </div>
-
-      {/* Unassigned Jobs - Right panel */}
-      {(unassignedEvents.length > 0 || isAnyDragActive) && (
-        <div className="hidden md:block fixed bottom-6 z-50" style={{ left: 'calc(50% + 140px)' }}>
+        {/* Unassigned Jobs */}
+        {(unassignedEvents.length > 0 || isAnyDragActive) && (
           <div className="relative">
             {/* Expanded card list */}
             {isUnassignedOpen && unassignedEvents.length > 0 && (
@@ -232,7 +230,6 @@ export default function DesktopFloatingPanel({ onEventTypeSelect, roleFilter, on
               ref={setUnassignedDropRef}
               onClick={() => {
                 setIsUnassignedOpen(!isUnassignedOpen)
-                setIsEarlierOpen(false)
                 setIsCreateOpen(false)
               }}
               className={`flex items-center gap-2 bg-charcoal/95 backdrop-blur-sm border rounded-full shadow-2xl hover:brightness-110 transition-all duration-300 ease-out ${
@@ -248,14 +245,14 @@ export default function DesktopFloatingPanel({ onEventTypeSelect, roleFilter, on
               <svg className="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
               </svg>
-              <span className="font-body text-xs text-rose-400 font-semibold whitespace-nowrap">Unassigned</span>
+              <span className="font-body text-xs text-white font-semibold whitespace-nowrap">Unassigned</span>
               <span className="font-body text-xs text-charcoal bg-rose-400 rounded-full w-5 h-5 flex items-center justify-center font-bold">
                 {unassignedEvents.length}
               </span>
             </button>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </>
   )
 }

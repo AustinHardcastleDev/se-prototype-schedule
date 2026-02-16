@@ -89,17 +89,18 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
 
   const durationMinutes = calculateDurationMinutes(event.startTime, event.endTime)
   const cardHeight = calculateHeight()
-  const isVeryTinyEvent = durationMinutes === 15 // 15 min: centered title only
-  const isTinyEvent = durationMinutes <= 30 // 15-30 min events: title only
-  const isShortEvent = durationMinutes < 60 // 45 min events: title + time only
+  const isTiny = durationMinutes <= 15 // title only, centered
+  const showAddress = durationMinutes >= 45
+  const showTime = durationMinutes >= 60
+  const showType = durationMinutes >= 75
   const isJobType = JOB_TYPES.includes(event.type)
   const statusColor = isJobType ? STATUS_COLORS[event.status] : null
-  const showIcon = durationMinutes >= 60 // Only show icon when there's enough room
 
-  // Determine if this is a present/future job with no photos
+  // Determine if this is a past job missing photos
   const today = new Date().toISOString().split('T')[0]
+  const isPast = event.date < today
   const isFutureOrPresent = event.date >= today
-  const needsPhotos = isJobType && isFutureOrPresent && event.status !== 'closed-invoiced'
+  const missingPhotos = isJobType && isPast && !event.photos
 
   // Determine if this event has notes to review
   const hasNotes = !!event.notes && isFutureOrPresent
@@ -184,14 +185,15 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
 
   return (
     <div
-      className={`absolute left-0 right-0 bg-white rounded-md cursor-pointer hover:brightness-95 transition-all ${
+      className={`absolute left-0 right-0 rounded-md cursor-pointer hover:brightness-95 transition-all ${
         disableInteraction ? '' : 'touch-none'
       } ${isLongPressing ? 'brightness-90' : ''} ${
-        needsPhotos && !isEarlier ? 'ring-1 ring-amber-400/60 ring-inset' : ''
+        missingPhotos && !isEarlier ? 'ring-1 ring-amber-400/60 ring-inset' : ''
       }`}
       style={{
         height: `${cardHeight}px`,
-        borderLeft: `6px solid ${eventType.borderColor}`,
+        backgroundColor: eventType.color,
+        borderLeft: `6px solid ${statusColor || eventType.borderColor}`,
         minHeight: `${SLOT_HEIGHT}px`, // Minimum 15 minutes
         opacity: dimmed ? 0.4 : undefined,
         // Earlier opening: dotted amber outline by default, solid glowing when highlight active
@@ -207,39 +209,27 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
       }}
       {...pointerHandlers}
     >
-      <div className={`relative h-full ${isVeryTinyEvent ? 'px-1.5 flex items-center' : 'p-1.5'}`}>
-        {/* Status indicator dot (top-right) */}
-        {statusColor && (
+      <div className={`relative h-full ${isTiny ? 'px-1.5 flex items-center' : 'p-1.5'}`}>
+        {/* Missing photos indicator (top-right) */}
+        {missingPhotos && !isTiny && (
           <div
-            className="absolute top-1 right-1 rounded-full"
-            style={{
-              backgroundColor: statusColor,
-              width: '10px',
-              height: '10px'
-            }}
-          />
-        )}
-
-        {/* No-photos indicator (top-right, below status dot) */}
-        {needsPhotos && !isTinyEvent && (
-          <div
-            className={`absolute ${statusColor ? 'top-4' : 'top-1'} right-1`}
-            title="No photos"
+            className="absolute top-0.5 right-0.5"
+            title="Missing photos"
           >
-            <svg className="w-2.5 h-2.5 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg className="w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="6" width="18" height="14" rx="2"/>
               <circle cx="12" cy="13" r="3"/>
             </svg>
           </div>
         )}
 
-        {/* Has-notes indicator (top-right, below other indicators) */}
-        {hasNotes && !isTinyEvent && (
+        {/* Has-notes indicator (top-right, below photos indicator) */}
+        {hasNotes && !isTiny && (
           <div
-            className={`absolute ${statusColor && needsPhotos ? 'top-7' : statusColor || needsPhotos ? 'top-4' : 'top-1'} right-1`}
+            className={`absolute ${missingPhotos ? 'top-5' : 'top-0.5'} right-0.5`}
             title="Has prep notes"
           >
-            <svg className="w-2.5 h-2.5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg className="w-4 h-4 text-blue-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
               <rect x="9" y="3" width="6" height="4" rx="1"/>
             </svg>
@@ -247,44 +237,42 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
         )}
 
         {/* Content */}
-        {isTinyEvent ? (
-          // 15-30 min events: title only (centered for 15 min)
-          <div className="text-xs font-body text-text-dark font-semibold truncate pr-3 leading-none flex items-center gap-1">
-            {needsPhotos && (
-              <div className="w-1.5 h-1.5 rounded-full bg-amber-400 flex-shrink-0" />
+        {isTiny ? (
+          // 15 min: title only, centered
+          <div className="text-xs font-body text-white font-semibold truncate pr-3 leading-none flex items-center gap-1">
+            {missingPhotos && (
+              <div className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0" />
             )}
             {hasNotes && (
-              <div className="w-1.5 h-1.5 rounded-full bg-blue-500 flex-shrink-0" />
+              <div className="w-1.5 h-1.5 rounded-full bg-blue-200 flex-shrink-0" />
             )}
             <span className="truncate">{event.title}</span>
           </div>
-        ) : isShortEvent ? (
-          // 45 min events: title + time
-          <div className="flex flex-col gap-0.5 h-full">
-            <div className="text-xs font-body text-text-dark font-semibold truncate pr-3">
-              {event.title}
-            </div>
-            <div className="text-xs font-body text-muted truncate">
-              {formatTime(event.startTime)} – {formatTime(event.endTime)}
-            </div>
-          </div>
         ) : (
-          // 60+ min events: title, time, type with icon
           <div className="flex flex-col gap-0.5 h-full">
-            <div className="text-xs font-body text-text-dark font-semibold truncate pr-3">
+            <div className="text-xs font-body text-white font-semibold truncate pr-3">
               {event.title}
             </div>
-            <div className="text-xs font-body text-muted truncate">
-              {formatTime(event.startTime)} – {formatTime(event.endTime)}
-            </div>
-            <div className="text-xs font-body text-muted truncate flex items-center gap-1">
-              {showIcon && TYPE_ICONS[event.type] && (
-                <span style={{ color: eventType.borderColor }}>
-                  {TYPE_ICONS[event.type]}
-                </span>
-              )}
-              {eventType.label}
-            </div>
+            {showAddress && event.address && (
+              <div className="text-xs font-body text-white/70 truncate">
+                {event.address}
+              </div>
+            )}
+            {showTime && (
+              <div className="text-xs font-body text-white/70 truncate">
+                {formatTime(event.startTime)} – {formatTime(event.endTime)}
+              </div>
+            )}
+            {showType && (
+              <div className="text-xs font-body text-white/70 truncate flex items-center gap-1">
+                {TYPE_ICONS[event.type] && (
+                  <span className="text-white/80">
+                    {TYPE_ICONS[event.type]}
+                  </span>
+                )}
+                {eventType.label}
+              </div>
+            )}
           </div>
         )}
       </div>

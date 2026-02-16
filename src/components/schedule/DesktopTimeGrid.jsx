@@ -49,7 +49,7 @@ function DroppableEventColumn({
       }`}
       style={{
         minWidth: '150px',
-        borderLeft: memberIndex === 0 ? 'none' : '1px solid #2A2A2A'
+        borderLeft: memberIndex === 0 ? 'none' : '1px solid #D1D5DB'
       }}
       onClick={onColumnClick}
     >
@@ -819,7 +819,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
       <div
         ref={scrollContainerRef}
         tabIndex={-1}
-        className="hidden md:flex md:flex-col flex-1 min-h-0 overflow-auto bg-charcoal relative focus:outline-none"
+        className="hidden md:flex md:flex-col flex-1 min-h-0 overflow-auto bg-gray-200 relative focus:outline-none"
       >
       {/* Content wrapper with min-width to enable horizontal scrolling */}
       <div style={{ minWidth: `${64 + filteredMembers.length * 150}px` }}>
@@ -868,18 +868,18 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
             <div
               ref={(el) => (dayRefs.current[dateKey] = el)}
               data-date={dateKey}
-              className="sticky top-14 z-30 bg-charcoal border-b-2 border-accent px-4 py-2"
+              className="sticky top-14 z-30 bg-gray-100 border-b-2 border-accent px-4 py-2"
             >
               <div className="flex items-center gap-3">
                 {/* Calendar Icon Button */}
                 <div className="relative" ref={calendarOpenForDate === dateKey ? calendarButtonRef : null}>
                   <button
                     onClick={() => handleCalendarClick(dateKey)}
-                    className="flex items-center justify-center w-8 h-8 rounded hover:bg-secondary transition-colors"
+                    className="flex items-center justify-center w-8 h-8 rounded hover:bg-gray-300 transition-colors"
                     aria-label="Open calendar"
                   >
                     <svg
-                      className="w-5 h-5 text-text-light"
+                      className="w-5 h-5 text-gray-700"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -904,7 +904,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
                 </div>
 
                 {/* Date Text */}
-                <h2 className="font-body text-xl uppercase text-text-light font-bold">
+                <h2 className="font-body text-xl uppercase text-gray-800 font-bold">
                   {format(dayDate, 'EEEE, MMMM d, yyyy')}
                 </h2>
 
@@ -914,7 +914,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
                 ) : (
                   <button
                     onClick={handleTodayClick}
-                    className="px-3 py-1 bg-secondary text-text-light rounded-full font-body text-xs font-semibold hover:brightness-110 transition-all"
+                    className="px-3 py-1 bg-gray-300 text-gray-700 rounded-full font-body text-xs font-semibold hover:bg-gray-400 transition-all"
                   >
                     Today
                   </button>
@@ -925,7 +925,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
             {/* Grid Body for this day */}
             <div className="flex relative" style={{ height: `${TOTAL_SLOTS * SLOT_HEIGHT}px` }}>
               {/* Time labels column - Sticky on left */}
-              <div className="w-16 flex-shrink-0 bg-charcoal relative sticky left-0 z-10">
+              <div className="w-16 flex-shrink-0 bg-gray-200 relative sticky left-0 z-10">
                 {timeLabels.map((time, index) => {
                   const topPosition = index * SLOTS_PER_HOUR * SLOT_HEIGHT
                   return (
@@ -934,7 +934,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
                       className="absolute left-0 w-16 text-right pr-2 -translate-y-2"
                       style={{ top: `${topPosition}px` }}
                     >
-                      <span className="text-xs font-body text-muted uppercase">{time.label}</span>
+                      <span className="text-xs font-body text-gray-500 uppercase">{time.label}</span>
                     </div>
                   )
                 })}
@@ -950,7 +950,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
                       className="relative flex-shrink-0 flex-1"
                       style={{
                         minWidth: '150px',
-                        borderLeft: memberIndex === 0 ? 'none' : '1px solid #2A2A2A',
+                        borderLeft: memberIndex === 0 ? 'none' : '1px solid #D1D5DB',
                         height: `${TOTAL_SLOTS * SLOT_HEIGHT}px`,
                       }}
                     >
@@ -961,22 +961,22 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
                           <div key={time.hour}>
                             {/* Hour line (heavier) */}
                             <div
-                              className="absolute left-0 right-0 border-t border-secondary"
+                              className="absolute left-0 right-0 border-t border-gray-300"
                               style={{ top: `${topPosition}px` }}
                             />
                             {/* 15-minute grid lines (lighter) */}
                             {index < timeLabels.length - 1 && (
                               <>
                                 <div
-                                  className="absolute left-0 right-0 border-t border-secondary/30"
+                                  className="absolute left-0 right-0 border-t border-gray-300/40"
                                   style={{ top: `${topPosition + SLOT_HEIGHT}px` }}
                                 />
                                 <div
-                                  className="absolute left-0 right-0 border-t border-secondary/30"
+                                  className="absolute left-0 right-0 border-t border-gray-300/40"
                                   style={{ top: `${topPosition + SLOT_HEIGHT * 2}px` }}
                                 />
                                 <div
-                                  className="absolute left-0 right-0 border-t border-secondary/30"
+                                  className="absolute left-0 right-0 border-t border-gray-300/40"
                                   style={{ top: `${topPosition + SLOT_HEIGHT * 3}px` }}
                                 />
                               </>

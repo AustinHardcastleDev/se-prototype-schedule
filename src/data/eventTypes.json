@@ -2,15 +2,15 @@
   {
     "key": "job-occupied",
     "label": "Job (Occupied)",
-    "color": "#3B82F6",
-    "borderColor": "#2563EB",
+    "color": "#8B9C3E",
+    "borderColor": "#6B7A2E",
     "defaultDuration": 90
   },
   {
     "key": "job-vacant",
     "label": "Job (Vacant)",
-    "color": "#14B8A6",
-    "borderColor": "#0D9488",
+    "color": "#4CAF50",
+    "borderColor": "#388E3C",
     "defaultDuration": 75
   },
   {
@@ -23,8 +23,8 @@
   {
     "key": "sales-stop",
     "label": "Sales Stop",
-    "color": "#8B5CF6",
-    "borderColor": "#7C3AED",
+    "color": "#C4A96A",
+    "borderColor": "#A68B4B",
     "defaultDuration": 60
   },
   {

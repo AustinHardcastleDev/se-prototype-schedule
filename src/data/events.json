@@ -2,16 +2,19 @@
   {
     "id": "evt-test-15min",
     "title": "Quick Check - Unit 1A",
+    "address": "1423 Oak Street",
     "type": "job-occupied",
     "assigneeId": "tm-1",
     "date": "2026-02-03",
     "startTime": "06:00",
     "endTime": "06:15",
-    "status": "closed-invoiced"
+    "status": "closed-invoiced",
+    "photos": true
   },
   {
     "id": "evt-test-30min",
     "title": "Brief Inspection - Unit 2B",
+    "address": "287 Riverside Drive",
     "type": "callback-job",
     "assigneeId": "tm-1",
     "date": "2026-02-03",
@@ -22,6 +25,7 @@
   {
     "id": "evt-test-45min",
     "title": "Medium Job - Unit 3C",
+    "address": "5610 Maple Avenue",
     "type": "job-vacant",
     "assigneeId": "tm-1",
     "date": "2026-02-03",
@@ -32,16 +36,19 @@
   {
     "id": "evt-1",
     "title": "Oakwood Apartments - Unit 12B",
+    "address": "834 Elm Boulevard",
     "type": "job-occupied",
     "assigneeId": "tm-1",
     "date": "2026-02-03",
     "startTime": "08:00",
     "endTime": "09:30",
-    "status": "open"
+    "status": "open",
+    "photos": true
   },
   {
     "id": "evt-2",
     "title": "Riverside Condos - Unit 405",
+    "address": "1952 Cedar Lane",
     "type": "job-vacant",
     "assigneeId": "tm-1",
     "date": "2026-02-03",
@@ -62,16 +69,19 @@
   {
     "id": "evt-4",
     "title": "Harbor View Towers - Unit 8C",
+    "address": "4201 Willow Way",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-03",
     "startTime": "07:30",
     "endTime": "09:00",
-    "status": "open"
+    "status": "open",
+    "photos": true
   },
   {
     "id": "evt-5",
     "title": "Sunset Plaza - Unit 201",
+    "address": "672 Birch Court",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-03",
@@ -82,6 +92,7 @@
   {
     "id": "evt-6",
     "title": "Callback: Parkside Apartments - Unit 3A",
+    "address": "3318 Pine Street",
     "type": "callback-job",
     "assigneeId": "tm-2",
     "date": "2026-02-03",
@@ -102,22 +113,26 @@
   {
     "id": "evt-8",
     "title": "Maple Grove - Unit 15D",
+    "address": "915 Chestnut Drive",
     "type": "job-vacant",
     "assigneeId": "tm-3",
     "date": "2026-02-03",
     "startTime": "08:00",
     "endTime": "09:30",
-    "status": "closed-invoiced"
+    "status": "closed-invoiced",
+    "photos": true
   },
   {
     "id": "evt-9",
     "title": "Crystal Lake Estates - Unit 7B",
+    "address": "2740 Spruce Avenue",
     "type": "job-occupied",
     "assigneeId": "tm-3",
     "date": "2026-02-03",
     "startTime": "10:00",
     "endTime": "11:45",
-    "status": "open"
+    "status": "open",
+    "photos": true
   },
   {
     "id": "evt-10",
@@ -132,6 +147,7 @@
   {
     "id": "evt-11",
     "title": "Johnson & Sons Construction",
+    "address": "2100 Commerce Boulevard, Suite 400",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-03",
@@ -142,6 +158,7 @@
   {
     "id": "evt-12",
     "title": "Premier Property Management",
+    "address": "875 Industrial Parkway",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-03",
@@ -162,6 +179,7 @@
   {
     "id": "evt-14",
     "title": "Urban Living Realty",
+    "address": "1550 Corporate Center Drive, Suite 200",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-03",
@@ -172,6 +190,7 @@
   {
     "id": "evt-15",
     "title": "Greenfield Apartment Group",
+    "address": "3200 Executive Plaza Way",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-03",
@@ -212,16 +231,19 @@
   {
     "id": "evt-19",
     "title": "Pinewood Heights - Unit 9A",
+    "address": "1087 Walnut Circle",
     "type": "job-occupied",
     "assigneeId": "tm-1",
     "date": "2026-02-04",
     "startTime": "08:00",
     "endTime": "09:45",
-    "status": "open"
+    "status": "open",
+    "photos": true
   },
   {
     "id": "evt-20",
     "title": "Bridgewater Commons - Unit 22C",
+    "address": "4533 Hickory Lane",
     "type": "job-vacant",
     "assigneeId": "tm-1",
     "date": "2026-02-04",
@@ -232,6 +254,7 @@
   {
     "id": "evt-21",
     "title": "Valley View Apartments - Unit 6B",
+    "address": "608 Magnolia Boulevard",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-04",
@@ -242,6 +265,7 @@
   {
     "id": "evt-22",
     "title": "Eastside Towers - Unit 14D",
+    "address": "2195 Poplar Drive",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-04",
@@ -252,6 +276,7 @@
   {
     "id": "evt-23",
     "title": "Hilltop Residences - Unit 18A",
+    "address": "3761 Sycamore Way",
     "type": "job-vacant",
     "assigneeId": "tm-3",
     "date": "2026-02-04",
@@ -262,6 +287,7 @@
   {
     "id": "evt-24",
     "title": "Callback: Lakefront Plaza - Unit 5C",
+    "address": "1544 Juniper Court",
     "type": "callback-job",
     "assigneeId": "tm-3",
     "date": "2026-02-04",
@@ -272,6 +298,7 @@
   {
     "id": "evt-25",
     "title": "ABC Property Developers",
+    "address": "4720 Meridian Avenue, Suite 115",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-04",
@@ -282,6 +309,7 @@
   {
     "id": "evt-26",
     "title": "Skyline Management Co.",
+    "address": "610 Westfield Boulevard",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-04",
@@ -292,6 +320,7 @@
   {
     "id": "evt-27",
     "title": "Metropolitan Builders",
+    "address": "1385 Venture Drive, Suite 300",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-04",
@@ -302,6 +331,7 @@
   {
     "id": "evt-28",
     "title": "Summit Properties",
+    "address": "2950 Commerce Way",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-04",
@@ -312,16 +342,19 @@
   {
     "id": "evt-29",
     "title": "Westgate Apartments - Unit 11B",
+    "address": "890 Aspen Place",
     "type": "job-occupied",
     "assigneeId": "tm-1",
     "date": "2026-02-05",
     "startTime": "08:30",
     "endTime": "10:00",
-    "status": "closed-invoiced"
+    "status": "closed-invoiced",
+    "photos": true
   },
   {
     "id": "evt-30",
     "title": "Northbrook Estates - Unit 4D",
+    "address": "4012 Dogwood Avenue",
     "type": "job-vacant",
     "assigneeId": "tm-2",
     "date": "2026-02-05",
@@ -332,16 +365,19 @@
   {
     "id": "evt-31",
     "title": "Crown Plaza - Unit 20A",
+    "address": "2367 Hawthorn Street",
     "type": "job-occupied",
     "assigneeId": "tm-1",
     "date": "2026-02-06",
     "startTime": "08:00",
     "endTime": "09:30",
-    "status": "open"
+    "status": "open",
+    "photos": true
   },
   {
     "id": "evt-32",
     "title": "Riverside Manor - Unit 13C",
+    "address": "517 Laurel Lane",
     "type": "job-vacant",
     "assigneeId": "tm-1",
     "date": "2026-02-06",
@@ -352,6 +388,7 @@
   {
     "id": "evt-33",
     "title": "Callback: Harbor Lights - Unit 7D",
+    "address": "3689 Beech Drive",
     "type": "callback-job",
     "assigneeId": "tm-1",
     "date": "2026-02-06",
@@ -372,6 +409,7 @@
   {
     "id": "evt-35",
     "title": "Lakeview Towers - Unit 9B",
+    "address": "1276 Cypress Boulevard",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-06",
@@ -382,16 +420,19 @@
   {
     "id": "evt-36",
     "title": "Mountain View - Unit 16A",
+    "address": "4845 Redwood Circle",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-06",
     "startTime": "09:30",
     "endTime": "11:00",
-    "status": "closed-invoiced"
+    "status": "closed-invoiced",
+    "photos": true
   },
   {
     "id": "evt-37",
     "title": "Silverstone Apartments - Unit 4E",
+    "address": "753 Alder Way",
     "type": "job-vacant",
     "assigneeId": "tm-2",
     "date": "2026-02-06",
@@ -402,16 +443,19 @@
   {
     "id": "evt-38",
     "title": "Garden Court - Unit 10C",
+    "address": "2081 Hemlock Court",
     "type": "job-occupied",
     "assigneeId": "tm-3",
     "date": "2026-02-06",
     "startTime": "08:00",
     "endTime": "09:45",
-    "status": "open"
+    "status": "open",
+    "photos": true
   },
   {
     "id": "evt-39",
     "title": "Parkside Plaza - Unit 22B",
+    "address": "3425 Sequoia Place",
     "type": "job-occupied",
     "assigneeId": "tm-3",
     "date": "2026-02-06",
@@ -432,6 +476,7 @@
   {
     "id": "evt-41",
     "title": "Coastal Realty Group",
+    "address": "5100 Harbor Parkway, Suite 250",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-06",
@@ -442,6 +487,7 @@
   {
     "id": "evt-42",
     "title": "Downtown Properties Inc",
+    "address": "320 Capital Avenue",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-06",
@@ -462,6 +508,7 @@
   {
     "id": "evt-44",
     "title": "Pacific Northwest Builders",
+    "address": "7800 Cascade Boulevard",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-06",
@@ -472,6 +519,7 @@
   {
     "id": "evt-45",
     "title": "Highland Management",
+    "address": "1920 Summit Drive, Suite 510",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-06",
@@ -522,16 +570,19 @@
   {
     "id": "evt-50",
     "title": "Sunset Ridge - Unit 8F",
+    "address": "1198 Acacia Street",
     "type": "job-occupied",
     "assigneeId": "tm-1",
     "date": "2026-02-07",
     "startTime": "08:00",
     "endTime": "09:30",
-    "status": "open"
+    "status": "open",
+    "photos": true
   },
   {
     "id": "evt-51",
     "title": "Brookside Village - Unit 19D",
+    "address": "4667 Basswood Avenue",
     "type": "job-vacant",
     "assigneeId": "tm-1",
     "date": "2026-02-07",
@@ -552,6 +603,7 @@
   {
     "id": "evt-53",
     "title": "Meadowbrook Apartments - Unit 3C",
+    "address": "562 Cottonwood Drive",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-07",
@@ -562,16 +614,19 @@
   {
     "id": "evt-54",
     "title": "Heritage Square - Unit 12B",
+    "address": "2914 Ironwood Lane",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-07",
     "startTime": "09:30",
     "endTime": "11:00",
-    "status": "closed-invoiced"
+    "status": "closed-invoiced",
+    "photos": true
   },
   {
     "id": "evt-55",
     "title": "Callback: Willow Creek - Unit 6A",
+    "address": "1735 Buckeye Boulevard",
     "type": "callback-job",
     "assigneeId": "tm-2",
     "date": "2026-02-07",
@@ -592,16 +647,19 @@
   {
     "id": "evt-57",
     "title": "Evergreen Commons - Unit 15E",
+    "address": "3052 Locust Way",
     "type": "job-vacant",
     "assigneeId": "tm-3",
     "date": "2026-02-07",
     "startTime": "08:00",
     "endTime": "09:30",
-    "status": "open"
+    "status": "open",
+    "photos": true
   },
   {
     "id": "evt-58",
     "title": "Stonebridge Towers - Unit 21A",
+    "address": "489 Mulberry Circle",
     "type": "job-occupied",
     "assigneeId": "tm-3",
     "date": "2026-02-07",
@@ -622,6 +680,7 @@
   {
     "id": "evt-60",
     "title": "Redwood Properties",
+    "address": "4450 Timberline Parkway",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-07",
@@ -632,6 +691,7 @@
   {
     "id": "evt-61",
     "title": "Crown Commercial Real Estate",
+    "address": "2675 Regency Plaza, Suite 180",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-07",
@@ -652,6 +712,7 @@
   {
     "id": "evt-63",
     "title": "Pinnacle Developers",
+    "address": "960 Enterprise Way",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-07",
@@ -662,6 +723,7 @@
   {
     "id": "evt-64",
     "title": "Riverside Investments",
+    "address": "3310 Waterfront Drive, Suite 600",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-07",
@@ -702,16 +764,19 @@
   {
     "id": "evt-68",
     "title": "Oakmont Village - Unit 5D",
+    "address": "2603 Pecan Court",
     "type": "job-occupied",
     "assigneeId": "tm-1",
     "date": "2026-02-09",
     "startTime": "08:00",
     "endTime": "09:45",
-    "status": "open"
+    "status": "open",
+    "photos": true
   },
   {
     "id": "evt-69",
     "title": "Cedar Hills - Unit 11B",
+    "address": "4178 Sassafras Place",
     "type": "job-vacant",
     "assigneeId": "tm-1",
     "date": "2026-02-09",
@@ -732,6 +797,7 @@
   {
     "id": "evt-71",
     "title": "Ashwood Estates - Unit 17C",
+    "address": "1361 Sumac Street",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-09",
@@ -742,6 +808,7 @@
   {
     "id": "evt-72",
     "title": "Elmwood Towers - Unit 23A",
+    "address": "876 Tamarack Avenue",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-09",
@@ -752,6 +819,7 @@
   {
     "id": "evt-73",
     "title": "Callback: Birchwood - Unit 8F",
+    "address": "3596 Tupelo Drive",
     "type": "callback-job",
     "assigneeId": "tm-2",
     "date": "2026-02-09",
@@ -772,16 +840,19 @@
   {
     "id": "evt-75",
     "title": "Magnolia Place - Unit 14D",
+    "address": "2248 Catalpa Lane",
     "type": "job-vacant",
     "assigneeId": "tm-3",
     "date": "2026-02-09",
     "startTime": "08:00",
     "endTime": "09:30",
-    "status": "closed-invoiced"
+    "status": "closed-invoiced",
+    "photos": true
   },
   {
     "id": "evt-76",
     "title": "Springdale Apartments - Unit 9E",
+    "address": "4490 Linden Boulevard",
     "type": "job-occupied",
     "assigneeId": "tm-3",
     "date": "2026-02-09",
@@ -802,6 +873,7 @@
   {
     "id": "evt-78",
     "title": "Horizon Property Management",
+    "address": "6200 Skyview Avenue",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-09",
@@ -812,6 +884,7 @@
   {
     "id": "evt-79",
     "title": "Northstar Realty",
+    "address": "1475 Gateway Boulevard, Suite 320",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-09",
@@ -832,6 +905,7 @@
   {
     "id": "evt-81",
     "title": "Gateway Properties",
+    "address": "8350 Founders Parkway",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-09",
@@ -842,6 +916,7 @@
   {
     "id": "evt-82",
     "title": "Landmark Commercial",
+    "address": "525 Monument Plaza, Suite 100",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-09",
@@ -872,16 +947,19 @@
   {
     "id": "evt-85",
     "title": "Clearwater Condos - Unit 19B",
+    "address": "701 Mimosa Way",
     "type": "job-occupied",
     "assigneeId": "tm-1",
     "date": "2026-02-10",
     "startTime": "08:00",
     "endTime": "09:30",
-    "status": "open"
+    "status": "open",
+    "photos": true
   },
   {
     "id": "evt-86",
     "title": "Fairview Heights - Unit 6C",
+    "address": "1839 Palmetto Court",
     "type": "job-vacant",
     "assigneeId": "tm-1",
     "date": "2026-02-10",
@@ -892,6 +970,7 @@
   {
     "id": "evt-87",
     "title": "Callback: Summit Point - Unit 12A",
+    "address": "3114 Buttonwood Circle",
     "type": "callback-job",
     "assigneeId": "tm-1",
     "date": "2026-02-10",
@@ -902,6 +981,7 @@
   {
     "id": "evt-88",
     "title": "Bayshore Apartments - Unit 4F",
+    "address": "4752 Fir Place",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-10",
@@ -912,16 +992,19 @@
   {
     "id": "evt-89",
     "title": "Woodlands Village - Unit 15D",
+    "address": "548 Hackberry Street",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-10",
     "startTime": "09:30",
     "endTime": "11:00",
-    "status": "closed-invoiced"
+    "status": "closed-invoiced",
+    "photos": true
   },
   {
     "id": "evt-90",
     "title": "Highlands Estates - Unit 21B",
+    "address": "2476 Persimmon Avenue",
     "type": "job-vacant",
     "assigneeId": "tm-2",
     "date": "2026-02-10",
@@ -932,16 +1015,19 @@
   {
     "id": "evt-91",
     "title": "Rosewood Plaza - Unit 7E",
+    "address": "1623 Serviceberry Drive",
     "type": "job-occupied",
     "assigneeId": "tm-3",
     "date": "2026-02-10",
     "startTime": "08:00",
     "endTime": "09:45",
-    "status": "open"
+    "status": "open",
+    "photos": true
   },
   {
     "id": "evt-92",
     "title": "Linden Court - Unit 18C",
+    "address": "3890 Silverbell Lane",
     "type": "job-occupied",
     "assigneeId": "tm-3",
     "date": "2026-02-10",
@@ -962,6 +1048,7 @@
   {
     "id": "evt-94",
     "title": "Eastgate Development",
+    "address": "3780 Crossroads Drive",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-10",
@@ -972,6 +1059,7 @@
   {
     "id": "evt-95",
     "title": "Lakeside Properties",
+    "address": "1200 Lakeview Boulevard, Suite 450",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-10",
@@ -992,6 +1080,7 @@
   {
     "id": "evt-97",
     "title": "Vista Management Group",
+    "address": "5625 Overlook Parkway",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-10",
@@ -1002,6 +1091,7 @@
   {
     "id": "evt-98",
     "title": "Central Park Developers",
+    "address": "410 Greenway Avenue, Suite 275",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-10",
@@ -1052,16 +1142,19 @@
   {
     "id": "evt-103",
     "title": "Grandview Apartments - Unit 10A",
+    "address": "942 Sweetgum Boulevard",
     "type": "job-occupied",
     "assigneeId": "tm-1",
     "date": "2026-02-11",
     "startTime": "08:00",
     "endTime": "09:30",
-    "status": "open"
+    "status": "open",
+    "photos": true
   },
   {
     "id": "evt-104",
     "title": "Riverstone Commons - Unit 16D",
+    "address": "2165 Yellowwood Way",
     "type": "job-vacant",
     "assigneeId": "tm-1",
     "date": "2026-02-11",
@@ -1082,16 +1175,19 @@
   {
     "id": "evt-106",
     "title": "Chestnut Ridge - Unit 5B",
+    "address": "4301 Bayberry Court",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-11",
     "startTime": "07:30",
     "endTime": "09:00",
-    "status": "closed-invoiced"
+    "status": "closed-invoiced",
+    "photos": true
   },
   {
     "id": "evt-107",
     "title": "Sycamore Heights - Unit 13E",
+    "address": "783 Boxelder Circle",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-11",
@@ -1102,6 +1198,7 @@
   {
     "id": "evt-108",
     "title": "Callback: Maple Ridge - Unit 9C",
+    "address": "1507 Chinkapin Place",
     "type": "callback-job",
     "assigneeId": "tm-2",
     "date": "2026-02-11",
@@ -1112,16 +1209,19 @@
   {
     "id": "evt-109",
     "title": "Pinebrook Village - Unit 20F",
+    "address": "3248 Crabapple Street",
     "type": "job-vacant",
     "assigneeId": "tm-3",
     "date": "2026-02-11",
     "startTime": "08:00",
     "endTime": "09:30",
-    "status": "open"
+    "status": "open",
+    "photos": true
   },
   {
     "id": "evt-110",
     "title": "Hickory Pointe - Unit 24A",
+    "address": "4619 Elderberry Avenue",
     "type": "job-occupied",
     "assigneeId": "tm-3",
     "date": "2026-02-11",
@@ -1132,6 +1232,7 @@
   {
     "id": "evt-111",
     "title": "Westwood Properties",
+    "address": "7100 Pacific Boulevard",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-11",
@@ -1142,6 +1243,7 @@
   {
     "id": "evt-112",
     "title": "Sterling Estates",
+    "address": "2840 Heritage Drive, Suite 150",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-11",
@@ -1162,6 +1264,7 @@
   {
     "id": "evt-114",
     "title": "Silverleaf Realty",
+    "address": "990 Silverstone Avenue",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-11",
@@ -1172,6 +1275,7 @@
   {
     "id": "evt-115",
     "title": "Brookfield Management",
+    "address": "4080 Brookside Parkway, Suite 225",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-11",
@@ -1212,16 +1316,19 @@
   {
     "id": "evt-119",
     "title": "Timberline Estates - Unit 3D",
+    "address": "618 Filbert Drive",
     "type": "job-occupied",
     "assigneeId": "tm-1",
     "date": "2026-02-12",
     "startTime": "08:00",
     "endTime": "09:45",
-    "status": "open"
+    "status": "open",
+    "photos": true
   },
   {
     "id": "evt-120",
     "title": "Creekside Manor - Unit 11F",
+    "address": "2832 Ginkgo Lane",
     "type": "job-vacant",
     "assigneeId": "tm-1",
     "date": "2026-02-12",
@@ -1242,6 +1349,7 @@
   {
     "id": "evt-122",
     "title": "Aspen Grove - Unit 17A",
+    "address": "1094 Hornbeam Boulevard",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-12",
@@ -1252,16 +1360,19 @@
   {
     "id": "evt-123",
     "title": "Cottonwood Apartments - Unit 22C",
+    "address": "3475 Katsura Way",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-12",
     "startTime": "09:30",
     "endTime": "11:00",
-    "status": "closed-invoiced"
+    "status": "closed-invoiced",
+    "photos": true
   },
   {
     "id": "evt-124",
     "title": "Cedarwood Village - Unit 8D",
+    "address": "4183 Larch Court",
     "type": "job-vacant",
     "assigneeId": "tm-2",
     "date": "2026-02-12",
@@ -1272,16 +1383,19 @@
   {
     "id": "evt-125",
     "title": "Redwood Terrace - Unit 14B",
+    "address": "529 Madrone Circle",
     "type": "job-occupied",
     "assigneeId": "tm-3",
     "date": "2026-02-12",
     "startTime": "08:00",
     "endTime": "09:45",
-    "status": "open"
+    "status": "open",
+    "photos": true
   },
   {
     "id": "evt-126",
     "title": "Callback: Juniper Hills - Unit 19E",
+    "address": "2701 Nutmeg Place",
     "type": "callback-job",
     "assigneeId": "tm-3",
     "date": "2026-02-12",
@@ -1292,6 +1406,7 @@
   {
     "id": "evt-127",
     "title": "Sequoia Heights - Unit 23F",
+    "address": "1446 Osage Street",
     "type": "job-occupied",
     "assigneeId": "tm-3",
     "date": "2026-02-12",
@@ -1302,6 +1417,7 @@
   {
     "id": "evt-128",
     "title": "Midtown Realty Partners",
+    "address": "1650 Central Plaza Way",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-12",
@@ -1312,6 +1428,7 @@
   {
     "id": "evt-129",
     "title": "Urban Core Properties",
+    "address": "255 Metropolitan Avenue, Suite 700",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-12",
@@ -1332,6 +1449,7 @@
   {
     "id": "evt-131",
     "title": "Keystone Development",
+    "address": "6500 Keystone Drive",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-12",
@@ -1342,6 +1460,7 @@
   {
     "id": "evt-132",
     "title": "Foundation Builders",
+    "address": "3125 Cornerstone Boulevard, Suite 50",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-12",
@@ -1372,27 +1491,32 @@
   {
     "id": "evt-135",
     "title": "Shadowbrook Place - Unit 6E",
+    "address": "3862 Pawpaw Avenue",
     "type": "job-occupied",
     "assigneeId": "tm-1",
     "date": "2026-02-13",
     "startTime": "08:00",
     "endTime": "09:30",
     "status": "open",
-    "notes": "Check ant traps in kitchen. Customer reports increased activity near dishwasher."
+    "notes": "Check ant traps in kitchen. Customer reports increased activity near dishwasher.",
+    "photos": true
   },
   {
     "id": "evt-136",
     "title": "Foxwood Commons - Unit 12C",
+    "address": "760 Quince Drive",
     "type": "job-vacant",
     "assigneeId": "tm-1",
     "date": "2026-02-13",
     "startTime": "10:00",
     "endTime": "11:15",
-    "status": "closed-invoiced"
+    "status": "closed-invoiced",
+    "photos": true
   },
   {
     "id": "evt-137",
     "title": "Callback: Deerfield - Unit 18B",
+    "address": "2053 Redbud Lane",
     "type": "callback-job",
     "assigneeId": "tm-1",
     "date": "2026-02-13",
@@ -1403,6 +1527,7 @@
   {
     "id": "evt-138",
     "title": "Hawthorne Village - Unit 4A",
+    "address": "4537 Sourwood Boulevard",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-13",
@@ -1413,6 +1538,7 @@
   {
     "id": "evt-139",
     "title": "Thornbury Estates - Unit 15F",
+    "address": "1278 Teak Way",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-13",
@@ -1433,6 +1559,7 @@
   {
     "id": "evt-141",
     "title": "Ferndale Apartments - Unit 21D",
+    "address": "3694 Viburnum Court",
     "type": "job-vacant",
     "assigneeId": "tm-3",
     "date": "2026-02-13",
@@ -1443,6 +1570,7 @@
   {
     "id": "evt-142",
     "title": "Millbrook Plaza - Unit 25A",
+    "address": "481 Witchhazel Circle",
     "type": "job-occupied",
     "assigneeId": "tm-3",
     "date": "2026-02-13",
@@ -1463,6 +1591,7 @@
   {
     "id": "evt-144",
     "title": "Cornerstone Investments",
+    "address": "8900 Financial Parkway, Suite 410",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-13",
@@ -1473,6 +1602,7 @@
   {
     "id": "evt-145",
     "title": "Prestige Property Group",
+    "address": "1775 Prestige Way",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-13",
@@ -1493,6 +1623,7 @@
   {
     "id": "evt-147",
     "title": "Parkland Developers",
+    "address": "4400 Greenfield Boulevard, Suite 330",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-13",
@@ -1503,6 +1634,7 @@
   {
     "id": "evt-148",
     "title": "Fairfield Management",
+    "address": "720 Fairview Drive",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-13",
@@ -1543,6 +1675,7 @@
   {
     "id": "evt-152",
     "title": "Mountainside Condos - Unit 7C",
+    "address": "2319 Zelkova Place",
     "type": "job-occupied",
     "assigneeId": "tm-1",
     "date": "2026-02-16",
@@ -1555,6 +1688,7 @@
   {
     "id": "evt-153",
     "title": "Valleybrook Apartments - Unit 13E",
+    "address": "4051 Ailanthus Street",
     "type": "job-vacant",
     "assigneeId": "tm-1",
     "date": "2026-02-16",
@@ -1576,6 +1710,7 @@
   {
     "id": "evt-155",
     "title": "Harborview Estates - Unit 9D",
+    "address": "1162 Bottlebrush Avenue",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-16",
@@ -1586,6 +1721,7 @@
   {
     "id": "evt-156",
     "title": "Oceanside Towers - Unit 16B",
+    "address": "3587 Chinaberry Drive",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-16",
@@ -1597,6 +1733,7 @@
   {
     "id": "evt-157",
     "title": "Callback: Seaside Plaza - Unit 22F",
+    "address": "845 Eucalyptus Lane",
     "type": "callback-job",
     "assigneeId": "tm-2",
     "date": "2026-02-16",
@@ -1617,6 +1754,7 @@
   {
     "id": "evt-159",
     "title": "Bayside Village - Unit 5A",
+    "address": "2478 Franklinia Boulevard",
     "type": "job-vacant",
     "assigneeId": "tm-3",
     "date": "2026-02-16",
@@ -1627,6 +1765,7 @@
   {
     "id": "evt-160",
     "title": "Portside Apartments - Unit 11C",
+    "address": "4713 Goldenrain Way",
     "type": "job-occupied",
     "assigneeId": "tm-3",
     "date": "2026-02-16",
@@ -1647,6 +1786,7 @@
   {
     "id": "evt-162",
     "title": "Beacon Hill Properties",
+    "address": "2250 Beacon Avenue, Suite 175",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-16",
@@ -1657,6 +1797,7 @@
   {
     "id": "evt-163",
     "title": "Capitol Management",
+    "address": "1100 Capitol Parkway",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-16",
@@ -1677,6 +1818,7 @@
   {
     "id": "evt-165",
     "title": "Summit Real Estate",
+    "address": "5500 Pinnacle Drive, Suite 800",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-16",
@@ -1687,6 +1829,7 @@
   {
     "id": "evt-166",
     "title": "Highland Ventures",
+    "address": "3690 Highland Avenue",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-16",
@@ -1737,6 +1880,7 @@
   {
     "id": "evt-171",
     "title": "Cliffside Condos - Unit 14F",
+    "address": "693 Hophornbeam Court",
     "type": "job-occupied",
     "assigneeId": "tm-1",
     "date": "2026-02-17",
@@ -1748,6 +1892,7 @@
   {
     "id": "evt-172",
     "title": "Ridgemont Apartments - Unit 20D",
+    "address": "1934 Jacaranda Circle",
     "type": "job-vacant",
     "assigneeId": "tm-1",
     "date": "2026-02-17",
@@ -1768,6 +1913,7 @@
   {
     "id": "evt-174",
     "title": "Bluffside Village - Unit 6C",
+    "address": "3246 Kumquat Place",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-17",
@@ -1779,6 +1925,7 @@
   {
     "id": "evt-175",
     "title": "Crestview Estates - Unit 12E",
+    "address": "4508 Lilac Street",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-17",
@@ -1789,6 +1936,7 @@
   {
     "id": "evt-176",
     "title": "Peakview Heights - Unit 18A",
+    "address": "577 Myrtle Avenue",
     "type": "job-vacant",
     "assigneeId": "tm-2",
     "date": "2026-02-17",
@@ -1799,6 +1947,7 @@
   {
     "id": "evt-177",
     "title": "Summitview Plaza - Unit 23B",
+    "address": "2165 Nectarine Drive",
     "type": "job-occupied",
     "assigneeId": "tm-3",
     "date": "2026-02-17",
@@ -1810,6 +1959,7 @@
   {
     "id": "evt-178",
     "title": "Callback: Hillcrest Towers - Unit 29C",
+    "address": "1308 Olive Lane",
     "type": "callback-job",
     "assigneeId": "tm-3",
     "date": "2026-02-17",
@@ -1820,6 +1970,7 @@
   {
     "id": "evt-179",
     "title": "Skyline Ridge - Unit 15D",
+    "address": "3791 Papaya Boulevard",
     "type": "job-occupied",
     "assigneeId": "tm-3",
     "date": "2026-02-17",
@@ -1830,6 +1981,7 @@
   {
     "id": "evt-180",
     "title": "Eastside Ventures",
+    "address": "1825 Commerce Plaza, Suite 550",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-17",
@@ -1840,6 +1992,7 @@
   {
     "id": "evt-181",
     "title": "Northside Properties",
+    "address": "4250 Northgate Boulevard",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-17",
@@ -1860,6 +2013,7 @@
   {
     "id": "evt-183",
     "title": "Westside Realty",
+    "address": "780 Westpark Drive, Suite 120",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-17",
@@ -1870,6 +2024,7 @@
   {
     "id": "evt-184",
     "title": "Southpoint Development",
+    "address": "6100 Southfield Parkway",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-17",
@@ -1910,6 +2065,7 @@
   {
     "id": "evt-188",
     "title": "Woodland Park - Unit 8B",
+    "address": "908 Quassia Way",
     "type": "job-occupied",
     "assigneeId": "tm-1",
     "date": "2026-02-18",
@@ -1921,6 +2077,7 @@
   {
     "id": "evt-189",
     "title": "Forest Glen - Unit 14A",
+    "address": "2547 Rowan Court",
     "type": "job-vacant",
     "assigneeId": "tm-1",
     "date": "2026-02-18",
@@ -1942,6 +2099,7 @@
   {
     "id": "evt-191",
     "title": "Grove Park Estates - Unit 19E",
+    "address": "4262 Sapodilla Circle",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-18",
@@ -1952,6 +2110,7 @@
   {
     "id": "evt-192",
     "title": "Birch Lane Apartments - Unit 25C",
+    "address": "1685 Tangerine Place",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-18",
@@ -1962,6 +2121,7 @@
   {
     "id": "evt-193",
     "title": "Callback: Oak Street - Unit 11F",
+    "address": "3019 Umbrella Street",
     "type": "callback-job",
     "assigneeId": "tm-2",
     "date": "2026-02-18",
@@ -1982,6 +2142,7 @@
   {
     "id": "evt-195",
     "title": "Elm Court Plaza - Unit 17D",
+    "address": "4437 Vitex Avenue",
     "type": "job-vacant",
     "assigneeId": "tm-3",
     "date": "2026-02-18",
@@ -1992,6 +2153,7 @@
   {
     "id": "evt-196",
     "title": "Pine Valley Condos - Unit 23B",
+    "address": "762 Wisteria Drive",
     "type": "job-occupied",
     "assigneeId": "tm-3",
     "date": "2026-02-18",
@@ -2012,6 +2174,7 @@
   {
     "id": "evt-198",
     "title": "Central Properties",
+    "address": "350 Midtown Avenue, Suite 900",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-18",
@@ -2022,6 +2185,7 @@
   {
     "id": "evt-199",
     "title": "Uptown Realty Group",
+    "address": "2475 Uptown Plaza Way",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-18",
@@ -2042,6 +2206,7 @@
   {
     "id": "evt-201",
     "title": "Midland Ventures",
+    "address": "9200 Prosperity Boulevard, Suite 350",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-18",
@@ -2052,6 +2217,7 @@
   {
     "id": "evt-202",
     "title": "Crossroads Development",
+    "address": "1440 Junction Parkway",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-18",
@@ -2082,6 +2248,7 @@
   {
     "id": "evt-205",
     "title": "Silverlake Manor - Unit 10D",
+    "address": "2193 Yaupon Lane",
     "type": "job-occupied",
     "assigneeId": "tm-1",
     "date": "2026-02-19",
@@ -2093,6 +2260,7 @@
   {
     "id": "evt-206",
     "title": "Crystal Springs - Unit 16A",
+    "address": "1847 Zenobia Boulevard",
     "type": "job-vacant",
     "assigneeId": "tm-1",
     "date": "2026-02-19",
@@ -2103,6 +2271,7 @@
   {
     "id": "evt-207",
     "title": "Callback: Emerald Bay - Unit 22C",
+    "address": "3564 Abelia Way",
     "type": "callback-job",
     "assigneeId": "tm-1",
     "date": "2026-02-19",
@@ -2113,6 +2282,7 @@
   {
     "id": "evt-208",
     "title": "Diamond Point - Unit 7E",
+    "address": "4109 Balsam Court",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-19",
@@ -2124,6 +2294,7 @@
   {
     "id": "evt-209",
     "title": "Ruby Ridge Apartments - Unit 13B",
+    "address": "581 Camphor Circle",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-19",
@@ -2134,6 +2305,7 @@
   {
     "id": "evt-210",
     "title": "Sapphire Heights - Unit 19F",
+    "address": "2736 Daphne Place",
     "type": "job-vacant",
     "assigneeId": "tm-2",
     "date": "2026-02-19",
@@ -2144,6 +2316,7 @@
   {
     "id": "evt-211",
     "title": "Amber Court - Unit 24A",
+    "address": "1453 Epaulet Street",
     "type": "job-occupied",
     "assigneeId": "tm-3",
     "date": "2026-02-19",
@@ -2155,6 +2328,7 @@
   {
     "id": "evt-212",
     "title": "Pearl Plaza - Unit 30D",
+    "address": "3918 Fringe Avenue",
     "type": "job-occupied",
     "assigneeId": "tm-3",
     "date": "2026-02-19",
@@ -2175,6 +2349,7 @@
   {
     "id": "evt-214",
     "title": "Platinum Properties",
+    "address": "3050 Platinum Drive, Suite 625",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-19",
@@ -2185,6 +2360,7 @@
   {
     "id": "evt-215",
     "title": "Gold Star Realty",
+    "address": "815 Sovereign Avenue",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-19",
@@ -2205,6 +2381,7 @@
   {
     "id": "evt-217",
     "title": "Silver Creek Investments",
+    "address": "4675 Sterling Parkway, Suite 210",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-19",
@@ -2215,6 +2392,7 @@
   {
     "id": "evt-218",
     "title": "Bronze Shield Developers",
+    "address": "2380 Ironworks Boulevard",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-19",
@@ -2255,6 +2433,7 @@
   {
     "id": "evt-222",
     "title": "Riverside Gardens - Unit 5C",
+    "address": "824 Gardenia Drive",
     "type": "job-occupied",
     "assigneeId": "tm-1",
     "date": "2026-02-20",
@@ -2265,6 +2444,7 @@
   {
     "id": "evt-223",
     "title": "Parkview Meadows - Unit 11E",
+    "address": "2381 Honeysuckle Lane",
     "type": "job-vacant",
     "assigneeId": "tm-1",
     "date": "2026-02-20",
@@ -2285,6 +2465,7 @@
   {
     "id": "evt-225",
     "title": "Lakeshore Village - Unit 17D",
+    "address": "4652 Inkberry Boulevard",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-20",
@@ -2295,6 +2476,7 @@
   {
     "id": "evt-226",
     "title": "Waterfront Commons - Unit 23A",
+    "address": "1019 Jasmine Way",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-20",
@@ -2305,6 +2487,7 @@
   {
     "id": "evt-227",
     "title": "Callback: Beachside - Unit 29B",
+    "address": "3357 Kerria Court",
     "type": "callback-job",
     "assigneeId": "tm-2",
     "date": "2026-02-20",
@@ -2325,6 +2508,7 @@
   {
     "id": "evt-229",
     "title": "Shoreline Towers - Unit 15F",
+    "address": "4893 Leucothoe Circle",
     "type": "job-vacant",
     "assigneeId": "tm-3",
     "date": "2026-02-20",
@@ -2335,6 +2519,7 @@
   {
     "id": "evt-230",
     "title": "Marina Bay Apartments - Unit 21C",
+    "address": "547 Mahonia Place",
     "type": "job-occupied",
     "assigneeId": "tm-3",
     "date": "2026-02-20",
@@ -2355,6 +2540,7 @@
   {
     "id": "evt-232",
     "title": "Harbor Properties",
+    "address": "5850 Marina Drive, Suite 475",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-20",
@@ -2365,6 +2551,7 @@
   {
     "id": "evt-233",
     "title": "Dockside Management",
+    "address": "1300 Wharf Avenue",
     "type": "sales-stop",
     "assigneeId": "tm-4",
     "date": "2026-02-20",
@@ -2385,6 +2572,7 @@
   {
     "id": "evt-235",
     "title": "Wharf Investments",
+    "address": "7425 Portside Parkway, Suite 160",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-20",
@@ -2395,6 +2583,7 @@
   {
     "id": "evt-236",
     "title": "Pier Development",
+    "address": "460 Anchorage Boulevard",
     "type": "sales-stop",
     "assigneeId": "tm-5",
     "date": "2026-02-20",
@@ -2435,6 +2624,7 @@
   {
     "id": "evt-unassigned-1",
     "title": "Greenway Apartments - Unit 4A",
+    "address": "2604 Nandina Street",
     "type": "job-occupied",
     "assigneeId": null,
     "date": "2026-02-13",
@@ -2445,6 +2635,7 @@
   {
     "id": "evt-unassigned-2",
     "title": "Sunset Terrace - Unit 8C",
+    "address": "1782 Oleander Avenue",
     "type": "job-vacant",
     "assigneeId": null,
     "date": "2026-02-16",
@@ -2455,6 +2646,7 @@
   {
     "id": "evt-unassigned-3",
     "title": "Callback: Riverside Walk - Unit 3B",
+    "address": "3125 Privet Drive",
     "type": "callback-job",
     "assigneeId": null,
     "date": "2026-02-17",
@@ -2466,6 +2658,7 @@
   {
     "id": "evt-unassigned-4",
     "title": "Willow Heights - Unit 12D",
+    "address": "4471 Rhododendron Lane",
     "type": "job-occupied",
     "assigneeId": null,
     "date": "2026-02-18",
@@ -2476,6 +2669,7 @@
   {
     "id": "evt-earlier-1",
     "title": "Thornberry Estates - Unit 9F",
+    "address": "698 Spirea Boulevard",
     "type": "job-occupied",
     "assigneeId": "tm-1",
     "date": "2026-02-16",
@@ -2488,6 +2682,7 @@
   {
     "id": "evt-earlier-2",
     "title": "Maple Leaf Plaza - Unit 15B",
+    "address": "2056 Thyme Way",
     "type": "job-occupied",
     "assigneeId": "tm-2",
     "date": "2026-02-17",
@@ -2500,6 +2695,7 @@
   {
     "id": "evt-earlier-3",
     "title": "Oakridge Condos - Unit 22A",
+    "address": "1393 Verbena Court",
     "type": "job-vacant",
     "assigneeId": "tm-3",
     "date": "2026-02-18",
