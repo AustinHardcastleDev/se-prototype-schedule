@@ -1,7 +1,7 @@
 import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { format, addDays, isSameDay } from 'date-fns'
-import { DndContext, DragOverlay, rectIntersection, useDroppable, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core'
+import { DndContext, DragOverlay, pointerWithin, useDroppable, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { toast } from 'react-hot-toast'
 import { getAllMembers } from '../../utils/dataAccess'
 import EventCard from './EventCard'
@@ -44,6 +44,9 @@ function DroppableEventColumn({
   return (
     <div
       ref={setNodeRef}
+      data-droppable-id={`${memberId}-${date}`}
+      data-member-id={memberId}
+      data-date={date}
       className={`relative px-1 cursor-pointer transition-colors flex-shrink-0 flex-1 ${
         isColumnOver ? 'bg-accent/10' : ''
       }`}
@@ -536,47 +539,47 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     }
   }
 
+  // Helper: find the droppable column under a viewport point using live DOM rects.
+  // This bypasses dnd-kit's cached rects which become stale when the container scrolls.
+  const findDroppableAtPoint = (clientX, clientY) => {
+    const elements = document.elementsFromPoint(clientX, clientY)
+    const col = elements.find(el => el.dataset.droppableId)
+    if (!col) return null
+    return {
+      memberId: col.dataset.memberId,
+      date: col.dataset.date,
+      rect: col.getBoundingClientRect(),
+    }
+  }
+
   const handleDragMove = (event) => {
     // Ignore if this drag started from resize handle
     if (ignoreDragRef.current) return
 
-    const { delta, over, activatorEvent } = event
+    const { delta, activatorEvent } = event
 
     if (!activeId) return
 
-    // Find the dragged event from all events
-    const draggedEvent = events.find((e) => e.id === activeId)
-    if (!draggedEvent) return
+    // Current pointer position in viewport coordinates
+    const currentPointerX = activatorEvent.clientX + delta.x
+    const currentPointerY = activatorEvent.clientY + delta.y
 
-    // Detect which column and date we're over
-    if (over && over.data.current) {
-      const { memberId, date } = over.data.current
-      setDragOverColumn(memberId)
-      setDragOverDate(date)
+    // Find which droppable column the pointer is actually over using live DOM hit-testing
+    const target = findDroppableAtPoint(currentPointerX, currentPointerY)
 
-      // Calculate slot based on where the card's top edge would land (not raw pointer)
-      const droppableRect = over.rect
-      if (droppableRect && activatorEvent) {
-        // Current pointer Y = activator start Y + delta.y
-        const currentPointerY = activatorEvent.clientY + delta.y
-        // Subtract grab offset so preview aligns with card top, not pointer
-        const cardTopY = currentPointerY - grabOffsetRef.current.y
-        // Y position of card top within the droppable grid
-        const yInGrid = cardTopY - droppableRect.top
-        const newSlot = Math.floor(yInGrid / SLOT_HEIGHT)
-        const clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
-        setDragOverSlot(clampedSlot)
-      }
-    } else {
-      setDragOverColumn(null)
-      setDragOverDate(null)
-      // Fallback: calculate slot based on delta from original position (same-day drag)
-      const originalOffset = calculateEventOffset(draggedEvent.startTime)
-      const newOffset = originalOffset + delta.y
-      const newSlot = Math.floor(newOffset / SLOT_HEIGHT)
+    if (target) {
+      setDragOverColumn(target.memberId)
+      setDragOverDate(target.date)
+
+      // Calculate slot based on where the card's top edge would land
+      const cardTopY = currentPointerY - grabOffsetRef.current.y
+      const yInGrid = cardTopY - target.rect.top
+      const newSlot = Math.floor(yInGrid / SLOT_HEIGHT)
       const clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
       setDragOverSlot(clampedSlot)
     }
+    // When pointer is not over any droppable (e.g. day header gap),
+    // keep the last valid preview state so the ghost doesn't disappear
   }
 
   const handleDragEnd = (event) => {
@@ -623,43 +626,36 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
       return
     }
 
-    // Determine target column and date
+    // Determine target column, date, and slot.
+    // Use our manually-tracked state (from handleDragMove's live DOM detection) as primary
+    // source so the drop always matches where the preview ghost was showing.
     let targetAssigneeId = draggedEvent.assigneeId
     let targetDate = draggedEvent.date
     let clampedSlot
 
-    // Check if dropped on a different column/date
-    if (over && over.data.current) {
-      targetAssigneeId = over.data.current.memberId
-      targetDate = over.data.current.date
-
-      // Use the previously tracked slot which was calculated during drag move
-      // This slot is already calculated relative to the target droppable
-      if (prevDragOverSlot !== null) {
-        clampedSlot = prevDragOverSlot
-      } else {
-        // Fallback: try to calculate from rect
-        const droppableRect = over.rect
-        if (droppableRect && activatorEvent) {
-          const currentPointerY = activatorEvent.clientY + delta.y
-          const cardTopY = currentPointerY - grabOffsetRef.current.y
-          const yInGrid = cardTopY - droppableRect.top
-          const newSlot = Math.floor(yInGrid / SLOT_HEIGHT)
-          clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
-        } else {
-          clampedSlot = 0
-        }
-      }
-    } else if (prevDragOverColumn && prevDragOverDate) {
+    if (prevDragOverColumn && prevDragOverDate) {
       targetAssigneeId = prevDragOverColumn
       targetDate = prevDragOverDate
       clampedSlot = prevDragOverSlot !== null ? prevDragOverSlot : 0
     } else {
-      // Same day, same column - use delta-based calculation
-      const originalOffset = calculateEventOffset(draggedEvent.startTime)
-      const newOffset = originalOffset + delta.y
-      const newSlot = Math.floor(newOffset / SLOT_HEIGHT)
-      clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
+      // No tracked column (e.g. very short drag) - try live DOM detection at drop point
+      const currentPointerX = activatorEvent.clientX + delta.x
+      const currentPointerY = activatorEvent.clientY + delta.y
+      const target = findDroppableAtPoint(currentPointerX, currentPointerY)
+      if (target) {
+        targetAssigneeId = target.memberId
+        targetDate = target.date
+        const cardTopY = currentPointerY - grabOffsetRef.current.y
+        const yInGrid = cardTopY - target.rect.top
+        const newSlot = Math.floor(yInGrid / SLOT_HEIGHT)
+        clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
+      } else {
+        // Last resort: same day, same column, delta-based calculation
+        const originalOffset = calculateEventOffset(draggedEvent.startTime)
+        const newOffset = originalOffset + delta.y
+        const newSlot = Math.floor(newOffset / SLOT_HEIGHT)
+        clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
+      }
     }
 
     // Calculate new start time
@@ -814,7 +810,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
       onDragMove={handleDragMove}
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
-      collisionDetection={rectIntersection}
+      collisionDetection={pointerWithin}
     >
       <div
         ref={scrollContainerRef}
