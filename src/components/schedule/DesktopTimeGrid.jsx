@@ -1,7 +1,7 @@
 import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { format, addDays, isSameDay } from 'date-fns'
-import { DndContext, DragOverlay, rectIntersection, useDroppable, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core'
+import { DndContext, DragOverlay, pointerWithin, useDroppable, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { toast } from 'react-hot-toast'
 import { getAllMembers } from '../../utils/dataAccess'
 import EventCard from './EventCard'
@@ -31,7 +31,8 @@ function DroppableEventColumn({
   onResizeStart,
   resizingEvent,
   resizePreviewEndTime,
-  calculateEventOffset
+  calculateEventOffset,
+  earlierHighlightMode
 }) {
   const { setNodeRef } = useDroppable({
     id: `${memberId}-${date}`,
@@ -43,12 +44,15 @@ function DroppableEventColumn({
   return (
     <div
       ref={setNodeRef}
+      data-droppable-id={`${memberId}-${date}`}
+      data-member-id={memberId}
+      data-date={date}
       className={`relative px-1 cursor-pointer transition-colors flex-shrink-0 flex-1 ${
         isColumnOver ? 'bg-accent/10' : ''
       }`}
       style={{
         minWidth: '150px',
-        borderLeft: memberIndex === 0 ? 'none' : '1px solid #2A2A2A'
+        borderLeft: memberIndex === 0 ? 'none' : '1px solid #D1D5DB'
       }}
       onClick={onColumnClick}
     >
@@ -65,7 +69,7 @@ function DroppableEventColumn({
             className="absolute left-0 right-0"
             style={{
               top: `${topOffset}px`,
-              opacity: isResizing ? 0.3 : 1,
+              opacity: isResizing ? 0 : 1,
             }}
           >
             <DraggableEvent
@@ -73,6 +77,7 @@ function DroppableEventColumn({
               onEventClick={onEventClick}
               onResizeStart={onResizeStart}
               isDragging={isDragging}
+              earlierHighlightMode={earlierHighlightMode}
             />
           </div>
         )
@@ -134,9 +139,10 @@ DroppableEventColumn.propTypes = {
   resizingEvent: PropTypes.object,
   resizePreviewEndTime: PropTypes.string,
   calculateEventOffset: PropTypes.func.isRequired,
+  earlierHighlightMode: PropTypes.bool,
 }
 
-export default function DesktopTimeGrid({ selectedDate, events, onDateChange, onSlotClick, onEventClick, onEventUpdate }) {
+export default function DesktopTimeGrid({ selectedDate, events, onDateChange, onSlotClick, onEventClick, onEventUpdate, roleFilter = 'all', earlierHighlightMode = false, children }) {
   const [currentTime, setCurrentTime] = useState(new Date())
   const dayRefs = useRef({}) // Store refs to each day section
   const scrollContainerRef = useRef(null) // Ref to the scrollable container
@@ -155,6 +161,8 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
   const resizePreviewEndTimeRef = useRef(null)
   const justFinishedResizingRef = useRef(false)
   const ignoreDragRef = useRef(false) // Track if current drag should be ignored (started from resize handle)
+  const holdingPinEventRef = useRef(null) // Persist holding-pin event id across draggable unmount
+  const grabOffsetRef = useRef({ x: 0, y: 0 }) // Offset from pointer to top-left of dragged card
 
   // Configure sensors for both mouse and touch - require movement before drag starts
   const mouseSensor = useSensor(MouseSensor, {
@@ -172,6 +180,9 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
 
   // Get all team members for columns
   const teamMembers = getAllMembers()
+  const filteredMembers = roleFilter === 'all'
+    ? teamMembers
+    : teamMembers.filter(m => m.role === roleFilter)
 
   // Generate array of dates to render (10 days before + selected date + 10 days after = 21 days total)
   const daysToRender = []
@@ -503,55 +514,79 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
       return
     }
     ignoreDragRef.current = false
-    setActiveId(event.active.id)
+
+    // Capture grab offset (distance from pointer to top-left of the dragged card)
+    // so the drag preview aligns with the card, not the pointer
+    const activeNode = event.active.node?.current
+    if (activeNode && event.activatorEvent) {
+      const rect = activeNode.getBoundingClientRect()
+      grabOffsetRef.current = {
+        x: event.activatorEvent.clientX - rect.left,
+        y: event.activatorEvent.clientY - rect.top,
+      }
+    } else {
+      grabOffsetRef.current = { x: 0, y: 0 }
+    }
+
+    // Handle holding pin cards (prefixed id) vs grid cards (event id directly)
+    const data = event.active.data.current
+    if (data?.source === 'holding-pin') {
+      holdingPinEventRef.current = data.event.id
+      setActiveId(data.event.id)
+    } else {
+      holdingPinEventRef.current = null
+      setActiveId(event.active.id)
+    }
+  }
+
+  // Helper: find the droppable column under a viewport point using live DOM rects.
+  // This bypasses dnd-kit's cached rects which become stale when the container scrolls.
+  const findDroppableAtPoint = (clientX, clientY) => {
+    const elements = document.elementsFromPoint(clientX, clientY)
+    const col = elements.find(el => el.dataset.droppableId)
+    if (!col) return null
+    return {
+      memberId: col.dataset.memberId,
+      date: col.dataset.date,
+      rect: col.getBoundingClientRect(),
+    }
   }
 
   const handleDragMove = (event) => {
     // Ignore if this drag started from resize handle
     if (ignoreDragRef.current) return
 
-    const { delta, over, activatorEvent } = event
+    const { delta, activatorEvent } = event
 
     if (!activeId) return
 
-    // Find the dragged event from all events
-    const draggedEvent = events.find((e) => e.id === activeId)
-    if (!draggedEvent) return
+    // Current pointer position in viewport coordinates
+    const currentPointerX = activatorEvent.clientX + delta.x
+    const currentPointerY = activatorEvent.clientY + delta.y
 
-    // Detect which column and date we're over
-    if (over && over.data.current) {
-      const { memberId, date } = over.data.current
-      setDragOverColumn(memberId)
-      setDragOverDate(date)
+    // Find which droppable column the pointer is actually over using live DOM hit-testing
+    const target = findDroppableAtPoint(currentPointerX, currentPointerY)
 
-      // Calculate slot based on pointer position within the target droppable
-      // Get the droppable element's rect
-      const droppableRect = over.rect
-      if (droppableRect && activatorEvent) {
-        // Current pointer Y = activator start Y + delta.y
-        const currentPointerY = activatorEvent.clientY + delta.y
-        // Y position within the droppable grid
-        const yInGrid = currentPointerY - droppableRect.top
-        const newSlot = Math.floor(yInGrid / SLOT_HEIGHT)
-        const clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
-        setDragOverSlot(clampedSlot)
-      }
-    } else {
-      setDragOverColumn(null)
-      setDragOverDate(null)
-      // Fallback: calculate slot based on delta from original position (same-day drag)
-      const originalOffset = calculateEventOffset(draggedEvent.startTime)
-      const newOffset = originalOffset + delta.y
-      const newSlot = Math.floor(newOffset / SLOT_HEIGHT)
+    if (target) {
+      setDragOverColumn(target.memberId)
+      setDragOverDate(target.date)
+
+      // Calculate slot based on where the card's top edge would land
+      const cardTopY = currentPointerY - grabOffsetRef.current.y
+      const yInGrid = cardTopY - target.rect.top
+      const newSlot = Math.floor(yInGrid / SLOT_HEIGHT)
       const clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
       setDragOverSlot(clampedSlot)
     }
+    // When pointer is not over any droppable (e.g. day header gap),
+    // keep the last valid preview state so the ghost doesn't disappear
   }
 
   const handleDragEnd = (event) => {
     // If this drag was from resize handle, just reset and ignore
     if (ignoreDragRef.current) {
       ignoreDragRef.current = false
+      holdingPinEventRef.current = null
       setActiveId(null)
       setDragOverSlot(null)
       setDragOverColumn(null)
@@ -570,45 +605,57 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     setDragOverColumn(null)
     setDragOverDate(null)
 
-    const draggedEvent = events.find((e) => e.id === active.id)
+    // Use ref for holding-pin detection since the draggable may have unmounted mid-drag
+    const isHoldingPin = holdingPinEventRef.current !== null
+    const eventId = isHoldingPin ? holdingPinEventRef.current : active.id
+    holdingPinEventRef.current = null
+    const draggedEvent = events.find((e) => e.id === eventId)
     if (!draggedEvent) return
 
-    // Determine target column and date
+    // Check if dropped on a holding pin target (Unassigned pill)
+    const dropTarget = over?.data?.current?.target
+    if (dropTarget === 'unassigned') {
+      const updatedEvent = { ...draggedEvent, assigneeId: null }
+      if (onEventUpdate) onEventUpdate(updatedEvent)
+      toast.success('Event moved to unassigned jobs')
+      return
+    }
+
+    // For holding pin drags without a valid drop target, cancel
+    if (isHoldingPin && !over && !prevDragOverColumn) {
+      return
+    }
+
+    // Determine target column, date, and slot.
+    // Use our manually-tracked state (from handleDragMove's live DOM detection) as primary
+    // source so the drop always matches where the preview ghost was showing.
     let targetAssigneeId = draggedEvent.assigneeId
     let targetDate = draggedEvent.date
     let clampedSlot
 
-    // Check if dropped on a different column/date
-    if (over && over.data.current) {
-      targetAssigneeId = over.data.current.memberId
-      targetDate = over.data.current.date
-
-      // Use the previously tracked slot which was calculated during drag move
-      // This slot is already calculated relative to the target droppable
-      if (prevDragOverSlot !== null) {
-        clampedSlot = prevDragOverSlot
-      } else {
-        // Fallback: try to calculate from rect
-        const droppableRect = over.rect
-        if (droppableRect && activatorEvent) {
-          const currentPointerY = activatorEvent.clientY + delta.y
-          const yInGrid = currentPointerY - droppableRect.top
-          const newSlot = Math.floor(yInGrid / SLOT_HEIGHT)
-          clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
-        } else {
-          clampedSlot = 0
-        }
-      }
-    } else if (prevDragOverColumn && prevDragOverDate) {
+    if (prevDragOverColumn && prevDragOverDate) {
       targetAssigneeId = prevDragOverColumn
       targetDate = prevDragOverDate
       clampedSlot = prevDragOverSlot !== null ? prevDragOverSlot : 0
     } else {
-      // Same day, same column - use delta-based calculation
-      const originalOffset = calculateEventOffset(draggedEvent.startTime)
-      const newOffset = originalOffset + delta.y
-      const newSlot = Math.floor(newOffset / SLOT_HEIGHT)
-      clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
+      // No tracked column (e.g. very short drag) - try live DOM detection at drop point
+      const currentPointerX = activatorEvent.clientX + delta.x
+      const currentPointerY = activatorEvent.clientY + delta.y
+      const target = findDroppableAtPoint(currentPointerX, currentPointerY)
+      if (target) {
+        targetAssigneeId = target.memberId
+        targetDate = target.date
+        const cardTopY = currentPointerY - grabOffsetRef.current.y
+        const yInGrid = cardTopY - target.rect.top
+        const newSlot = Math.floor(yInGrid / SLOT_HEIGHT)
+        clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
+      } else {
+        // Last resort: same day, same column, delta-based calculation
+        const originalOffset = calculateEventOffset(draggedEvent.startTime)
+        const newOffset = originalOffset + delta.y
+        const newSlot = Math.floor(newOffset / SLOT_HEIGHT)
+        clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
+      }
     }
 
     // Calculate new start time
@@ -654,11 +701,12 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
       endTime: newEndTime,
     }
 
-    // Show success message if reassigned to different person
+    // Show success message if assigned/reassigned to different person
     if (targetAssigneeId !== draggedEvent.assigneeId) {
       const targetMember = teamMembers.find(m => m.id === targetAssigneeId)
       const memberName = targetMember ? targetMember.name : 'team member'
-      toast.success(`Event reassigned to ${memberName}`)
+      const verb = draggedEvent.assigneeId === null ? 'assigned' : 'reassigned'
+      toast.success(`Event ${verb} to ${memberName}`)
     }
 
     if (onEventUpdate) {
@@ -668,6 +716,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
 
   const handleDragCancel = () => {
     ignoreDragRef.current = false
+    holdingPinEventRef.current = null
     setActiveId(null)
     setDragOverSlot(null)
     setDragOverColumn(null)
@@ -761,15 +810,16 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
       onDragMove={handleDragMove}
       onDragEnd={handleDragEnd}
       onDragCancel={handleDragCancel}
-      collisionDetection={rectIntersection}
+      collisionDetection={pointerWithin}
     >
       <div
         ref={scrollContainerRef}
         tabIndex={-1}
-        className="hidden md:flex md:flex-col flex-1 min-h-0 overflow-auto bg-charcoal relative focus:outline-none"
+        className="hidden md:flex md:flex-col flex-1 min-h-0 overflow-auto bg-gray-200 relative focus:outline-none"
       >
       {/* Content wrapper with min-width to enable horizontal scrolling */}
-      <div style={{ minWidth: `${64 + teamMembers.length * 150}px` }}>
+      <div style={{ minWidth: `${64 + filteredMembers.length * 150}px` }}>
+
       {/* Column Headers - Sticky at very top */}
       <div className="sticky top-0 z-40 bg-charcoal border-b border-secondary">
         <div className="flex">
@@ -778,7 +828,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
 
           {/* Team member column headers */}
           <div className="flex flex-1">
-            {teamMembers.map((member) => (
+            {filteredMembers.map((member) => (
               <div
                 key={member.id}
                 className="px-4 py-3 border-l border-secondary flex-shrink-0 flex-1"
@@ -814,18 +864,18 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
             <div
               ref={(el) => (dayRefs.current[dateKey] = el)}
               data-date={dateKey}
-              className="sticky top-14 z-30 bg-charcoal border-b-2 border-accent px-4 py-2"
+              className="sticky top-14 z-30 bg-gray-100 border-b-2 border-accent px-4 py-2"
             >
               <div className="flex items-center gap-3">
                 {/* Calendar Icon Button */}
                 <div className="relative" ref={calendarOpenForDate === dateKey ? calendarButtonRef : null}>
                   <button
                     onClick={() => handleCalendarClick(dateKey)}
-                    className="flex items-center justify-center w-8 h-8 rounded hover:bg-secondary transition-colors"
+                    className="flex items-center justify-center w-8 h-8 rounded hover:bg-gray-300 transition-colors"
                     aria-label="Open calendar"
                   >
                     <svg
-                      className="w-5 h-5 text-text-light"
+                      className="w-5 h-5 text-gray-700"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -850,7 +900,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
                 </div>
 
                 {/* Date Text */}
-                <h2 className="font-body text-xl uppercase text-text-light font-bold">
+                <h2 className="font-body text-xl uppercase text-gray-800 font-bold">
                   {format(dayDate, 'EEEE, MMMM d, yyyy')}
                 </h2>
 
@@ -860,7 +910,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
                 ) : (
                   <button
                     onClick={handleTodayClick}
-                    className="px-3 py-1 bg-secondary text-text-light rounded-full font-body text-xs font-semibold hover:brightness-110 transition-all"
+                    className="px-3 py-1 bg-gray-300 text-gray-700 rounded-full font-body text-xs font-semibold hover:bg-gray-400 transition-all"
                   >
                     Today
                   </button>
@@ -871,7 +921,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
             {/* Grid Body for this day */}
             <div className="flex relative" style={{ height: `${TOTAL_SLOTS * SLOT_HEIGHT}px` }}>
               {/* Time labels column - Sticky on left */}
-              <div className="w-16 flex-shrink-0 bg-charcoal relative sticky left-0 z-10">
+              <div className="w-16 flex-shrink-0 bg-gray-200 relative sticky left-0 z-10">
                 {timeLabels.map((time, index) => {
                   const topPosition = index * SLOTS_PER_HOUR * SLOT_HEIGHT
                   return (
@@ -880,7 +930,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
                       className="absolute left-0 w-16 text-right pr-2 -translate-y-2"
                       style={{ top: `${topPosition}px` }}
                     >
-                      <span className="text-xs font-body text-muted uppercase">{time.label}</span>
+                      <span className="text-xs font-body text-gray-500 uppercase">{time.label}</span>
                     </div>
                   )
                 })}
@@ -890,13 +940,13 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
               <div className="flex-1 relative">
                 <div className="flex">
                   {/* Grid lines for each column */}
-                  {teamMembers.map((member, memberIndex) => (
+                  {filteredMembers.map((member, memberIndex) => (
                     <div
                       key={`grid-${member.id}`}
                       className="relative flex-shrink-0 flex-1"
                       style={{
                         minWidth: '150px',
-                        borderLeft: memberIndex === 0 ? 'none' : '1px solid #2A2A2A',
+                        borderLeft: memberIndex === 0 ? 'none' : '1px solid #D1D5DB',
                         height: `${TOTAL_SLOTS * SLOT_HEIGHT}px`,
                       }}
                     >
@@ -907,22 +957,22 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
                           <div key={time.hour}>
                             {/* Hour line (heavier) */}
                             <div
-                              className="absolute left-0 right-0 border-t border-secondary"
+                              className="absolute left-0 right-0 border-t border-gray-300"
                               style={{ top: `${topPosition}px` }}
                             />
                             {/* 15-minute grid lines (lighter) */}
                             {index < timeLabels.length - 1 && (
                               <>
                                 <div
-                                  className="absolute left-0 right-0 border-t border-secondary/30"
+                                  className="absolute left-0 right-0 border-t border-gray-300/40"
                                   style={{ top: `${topPosition + SLOT_HEIGHT}px` }}
                                 />
                                 <div
-                                  className="absolute left-0 right-0 border-t border-secondary/30"
+                                  className="absolute left-0 right-0 border-t border-gray-300/40"
                                   style={{ top: `${topPosition + SLOT_HEIGHT * 2}px` }}
                                 />
                                 <div
-                                  className="absolute left-0 right-0 border-t border-secondary/30"
+                                  className="absolute left-0 right-0 border-t border-gray-300/40"
                                   style={{ top: `${topPosition + SLOT_HEIGHT * 3}px` }}
                                 />
                               </>
@@ -949,7 +999,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
 
                 {/* Event rendering areas - one per column */}
                 <div className="absolute left-0 right-0 top-0 bottom-0 flex">
-                  {teamMembers.map((member, memberIndex) => {
+                  {filteredMembers.map((member, memberIndex) => {
                     const memberEvents = getEventsForMember(member.id, dayDate)
 
                     return (
@@ -970,6 +1020,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
                         resizingEvent={resizingEvent}
                         resizePreviewEndTime={resizePreviewEndTime}
                         calculateEventOffset={calculateEventOffset}
+                        earlierHighlightMode={earlierHighlightMode}
                       />
                     )
                   })}
@@ -981,6 +1032,8 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
       })}
       </div> {/* End content wrapper */}
       </div> {/* End scroll container */}
+
+      {children}
 
       {/* Drag overlay - shows dragged event following cursor */}
       <DragOverlay dropAnimation={null}>
@@ -997,15 +1050,20 @@ DesktopTimeGrid.propTypes = {
       id: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
-      assigneeId: PropTypes.string.isRequired,
+      assigneeId: PropTypes.string,
       date: PropTypes.string.isRequired,
       startTime: PropTypes.string.isRequired,
       endTime: PropTypes.string.isRequired,
       status: PropTypes.string,
+      notes: PropTypes.string,
+      earlierOpening: PropTypes.bool,
     })
   ).isRequired,
   onDateChange: PropTypes.func,
   onSlotClick: PropTypes.func,
   onEventClick: PropTypes.func,
   onEventUpdate: PropTypes.func,
+  roleFilter: PropTypes.oneOf(['all', 'tech', 'sales']),
+  earlierHighlightMode: PropTypes.bool,
+  children: PropTypes.node,
 }

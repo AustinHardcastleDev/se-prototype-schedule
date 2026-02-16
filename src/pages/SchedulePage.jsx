@@ -2,13 +2,15 @@ import { useState } from 'react'
 import { format } from 'date-fns'
 import WeekStrip from '../components/schedule/WeekStrip'
 import TimeGrid from '../components/schedule/TimeGrid'
+import SplitTimeGrid from '../components/schedule/SplitTimeGrid'
 import DesktopTimeGrid from '../components/schedule/DesktopTimeGrid'
 import FloatingActionButton from '../components/schedule/FloatingActionButton'
+import DesktopFloatingPanel from '../components/schedule/DesktopFloatingPanel'
 import TeamMemberSwitcher from '../components/schedule/TeamMemberSwitcher'
 import CreateEventModal from '../components/schedule/CreateEventModal'
 import EditEventModal from '../components/schedule/EditEventModal'
 import EventDetailsModal from '../components/schedule/EventDetailsModal'
-import { getAllMembers, getAllEvents } from '../utils/dataAccess'
+import { getAllMembers, getAllEvents, getEventTypes } from '../utils/dataAccess'
 
 export default function SchedulePage() {
   const [selectedDate, setSelectedDate] = useState(new Date())
@@ -28,24 +30,65 @@ export default function SchedulePage() {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState(null)
 
+  // Desktop role filter state
+  const [roleFilter, setRoleFilter] = useState('all')
+
+  // Earlier highlight toggle state
+  const [earlierHighlightMode, setEarlierHighlightMode] = useState(false)
+
+  // Split view state
+  const [splitMember, setSplitMember] = useState(null)
+  const isSplitView = splitMember !== null
+
+  // Track whether the team member switcher is open (to hide FAB)
+  const [switcherOpen, setSwitcherOpen] = useState(false)
+
+  const eventTypes = getEventTypes()
+
   const handleDateSelect = (date) => {
     setSelectedDate(date)
   }
 
   const handleEventTypeSelect = (eventType) => {
+    // Calculate end time based on event type's default duration
+    const startTime = '09:00'
+    const type = eventTypes.find(t => t.key === eventType.key)
+    const duration = type?.defaultDuration || 15
+    const [startHour, startMin] = startTime.split(':').map(Number)
+    const totalMinutes = startHour * 60 + startMin + duration
+    const endHour = Math.min(Math.floor(totalMinutes / 60), 20)
+    const endMin = totalMinutes % 60
+    const endTime = `${endHour.toString().padStart(2, '0')}:${endMin.toString().padStart(2, '0')}`
+
     // Open create event modal with pre-selected event type
     setCreateModalDefaults({
       eventType: eventType.key,
       assigneeId: selectedMember.id,
       date: format(selectedDate, 'yyyy-MM-dd'),
-      startTime: '09:00',
-      endTime: '09:15',
+      startTime,
+      endTime,
     })
     setIsCreateModalOpen(true)
   }
 
   const handleMemberSelect = (member) => {
     setSelectedMember(member)
+  }
+
+  const handleEnterSplitView = (member) => {
+    setSplitMember(member)
+  }
+
+  const handleExitSplitView = () => {
+    setSplitMember(null)
+  }
+
+  const handleSwapSplitMember = (side, member) => {
+    if (side === 'left') {
+      setSelectedMember(member)
+    } else {
+      setSplitMember(member)
+    }
   }
 
   const handleCreateEvent = (newEvent) => {
@@ -74,10 +117,10 @@ export default function SchedulePage() {
     setSelectedEvent(null)
   }
 
-  const handleLongPressSlot = ({ startTime, endTime }) => {
+  const handleLongPressSlot = ({ startTime, endTime, memberId }) => {
     // Open create modal with pre-filled time from long-pressed slot
     setCreateModalDefaults({
-      assigneeId: selectedMember.id,
+      assigneeId: memberId || selectedMember.id,
       date: format(selectedDate, 'yyyy-MM-dd'),
       startTime,
       endTime,
@@ -119,14 +162,27 @@ export default function SchedulePage() {
 
       {/* Time Grid - Mobile Day Agenda View - Mobile Only */}
       <div className="md:hidden flex flex-col flex-1">
-        <TimeGrid
-          selectedDate={selectedDate}
-          selectedMember={selectedMember}
-          events={events}
-          onEventClick={handleEventClick}
-          onLongPressSlot={handleLongPressSlot}
-          onEventUpdate={handleUpdateEvent}
-        />
+        {isSplitView ? (
+          <SplitTimeGrid
+            selectedDate={selectedDate}
+            leftMember={selectedMember}
+            rightMember={splitMember}
+            events={events}
+            onEventClick={handleEventClick}
+            onLongPressSlot={handleLongPressSlot}
+            onEventUpdate={handleUpdateEvent}
+            onHeaderTap={() => setSwitcherOpen(true)}
+          />
+        ) : (
+          <TimeGrid
+            selectedDate={selectedDate}
+            selectedMember={selectedMember}
+            events={events}
+            onEventClick={handleEventClick}
+            onLongPressSlot={handleLongPressSlot}
+            onEventUpdate={handleUpdateEvent}
+          />
+        )}
       </div>
 
       {/* Desktop Time Grid - Multi-Column View - Desktop Only */}
@@ -137,13 +193,35 @@ export default function SchedulePage() {
         onSlotClick={handleDesktopSlotClick}
         onEventClick={handleEventClick}
         onEventUpdate={handleUpdateEvent}
-      />
+        roleFilter={roleFilter}
+        earlierHighlightMode={earlierHighlightMode}
+      >
+        {/* Desktop Floating Panel - rendered inside DndContext for drag support */}
+        <DesktopFloatingPanel
+          onEventTypeSelect={handleEventTypeSelect}
+          roleFilter={roleFilter}
+          onRoleFilterChange={setRoleFilter}
+          events={events}
+          onEventClick={handleEventClick}
+          earlierHighlightMode={earlierHighlightMode}
+          onEarlierHighlightToggle={() => setEarlierHighlightMode(prev => !prev)}
+        />
+      </DesktopTimeGrid>
 
       {/* Team Member Switcher - Mobile Only - Bottom Left */}
-      <TeamMemberSwitcher selectedMember={selectedMember} onMemberSelect={handleMemberSelect} />
+      <TeamMemberSwitcher
+        selectedMember={selectedMember}
+        onMemberSelect={handleMemberSelect}
+        splitMember={splitMember}
+        onEnterSplitView={handleEnterSplitView}
+        onExitSplitView={handleExitSplitView}
+        onSwapSplitMember={handleSwapSplitMember}
+        isOpen={switcherOpen}
+        onOpenChange={setSwitcherOpen}
+      />
 
       {/* Floating Action Button - Mobile Only - Bottom Right */}
-      <FloatingActionButton onEventTypeSelect={handleEventTypeSelect} />
+      <FloatingActionButton onEventTypeSelect={handleEventTypeSelect} hidden={switcherOpen} />
 
       {/* Create Event Modal - Mobile Only */}
       <CreateEventModal

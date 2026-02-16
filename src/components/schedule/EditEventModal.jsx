@@ -12,11 +12,13 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
 
   // Form state - will be pre-populated from event prop
   const [eventType, setEventType] = useState(event?.type || eventTypes[0].key)
-  const [assigneeId, setAssigneeId] = useState(event?.assigneeId || allMembers[0].id)
+  const [assigneeId, setAssigneeId] = useState(event?.assigneeId || '')
   const [date, setDate] = useState(event?.date || format(new Date(), 'yyyy-MM-dd'))
   const [startTime, setStartTime] = useState(event?.startTime || '09:00')
   const [endTime, setEndTime] = useState(event?.endTime || '10:00')
   const [title, setTitle] = useState(event?.title || '')
+  const [notes, setNotes] = useState(event?.notes || '')
+  const [earlierOpening, setEarlierOpening] = useState(event?.earlierOpening || false)
   const [validationError, setValidationError] = useState('')
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [showCalendar, setShowCalendar] = useState(false)
@@ -25,11 +27,13 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
   useEffect(() => {
     if (isOpen && event) {
       setEventType(event.type)
-      setAssigneeId(event.assigneeId)
+      setAssigneeId(event.assigneeId || '')
       setDate(event.date)
       setStartTime(event.startTime)
       setEndTime(event.endTime)
       setTitle(event.title)
+      setNotes(event.notes || '')
+      setEarlierOpening(event.earlierOpening || false)
       setValidationError('')
       setShowDeleteConfirm(false)
       setShowCalendar(false)
@@ -61,10 +65,12 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
       ...event,
       title,
       type: eventType,
-      assigneeId,
+      assigneeId: assigneeId || null,
       date,
       startTime,
       endTime,
+      notes: notes.trim() || undefined,
+      earlierOpening,
     }
 
     onSave(updatedEvent)
@@ -121,7 +127,10 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
         label="Person"
         value={assigneeId}
         onChange={(value) => setAssigneeId(value)}
-        options={allMembers.map((member) => ({ value: member.id, label: member.name }))}
+        options={[
+          { value: '', label: 'Unassigned' },
+          ...allMembers.map((member) => ({ value: member.id, label: member.name })),
+        ]}
       />
 
       {/* Date Picker */}
@@ -181,7 +190,7 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
       )}
 
       {/* Title Input */}
-      <div className="mb-6">
+      <div className="mb-4">
         <label htmlFor={`title${idPrefix}`} className="block text-sm font-body text-text-dark font-semibold mb-2">
           Title
         </label>
@@ -194,6 +203,40 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
           className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg font-body text-sm placeholder-muted"
           required
         />
+      </div>
+
+      {/* Notes Input */}
+      <div className="mb-6">
+        <label htmlFor={`notes${idPrefix}`} className="block text-sm font-body text-text-dark font-semibold mb-2 flex items-center gap-1.5">
+          <svg className="w-3.5 h-3.5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+            <rect x="9" y="3" width="6" height="4" rx="1"/>
+          </svg>
+          Prep Notes
+          <span className="text-muted font-normal">(optional)</span>
+        </label>
+        <textarea
+          id={`notes${idPrefix}`}
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          placeholder="Add prep notes, special instructions, or details for the tech..."
+          rows={3}
+          className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg font-body text-sm placeholder-muted resize-none"
+        />
+      </div>
+
+      {/* Earlier Opening Checkbox */}
+      <div className="mb-6 flex items-center gap-2.5">
+        <input
+          type="checkbox"
+          id={`earlierOpening${idPrefix}`}
+          checked={earlierOpening}
+          onChange={(e) => setEarlierOpening(e.target.checked)}
+          className="w-4 h-4 rounded border-gray-300 text-accent focus:ring-accent cursor-pointer"
+        />
+        <label htmlFor={`earlierOpening${idPrefix}`} className="text-sm font-body text-text-dark cursor-pointer">
+          Do earlier if possible
+        </label>
       </div>
 
       {/* Action Buttons */}
@@ -316,10 +359,12 @@ EditEventModal.propTypes = {
     id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
-    assigneeId: PropTypes.string.isRequired,
+    assigneeId: PropTypes.string,
     date: PropTypes.string.isRequired,
     startTime: PropTypes.string.isRequired,
     endTime: PropTypes.string.isRequired,
     status: PropTypes.string,
+    notes: PropTypes.string,
+    earlierOpening: PropTypes.bool,
   }),
 }

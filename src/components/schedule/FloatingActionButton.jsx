@@ -2,7 +2,7 @@ import { useState } from 'react'
 import PropTypes from 'prop-types'
 import { getEventTypes } from '../../utils/dataAccess'
 
-export default function FloatingActionButton({ onEventTypeSelect }) {
+export default function FloatingActionButton({ onEventTypeSelect, hidden = false }) {
   const [isOpen, setIsOpen] = useState(false)
   const eventTypes = getEventTypes()
 
@@ -30,7 +30,7 @@ export default function FloatingActionButton({ onEventTypeSelect }) {
       )}
 
       {/* FAB Container */}
-      <div className="fixed bottom-6 right-6 z-50 md:hidden">
+      <div className={`fixed bottom-6 right-6 z-50 md:hidden transition-opacity ${hidden ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}>
         {/* Action buttons - shown when open */}
         {isOpen && (
           <div className="absolute bottom-16 right-0 flex flex-col gap-3 mb-2 animate-fadeIn">
@@ -75,4 +75,5 @@ export default function FloatingActionButton({ onEventTypeSelect }) {
 
 FloatingActionButton.propTypes = {
   onEventTypeSelect: PropTypes.func.isRequired,
+  hidden: PropTypes.bool,
 }
