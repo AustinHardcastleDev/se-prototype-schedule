@@ -235,8 +235,14 @@ export default function DesktopFloatingPanel({ onEventTypeSelect, roleFilter, on
                 setIsEarlierOpen(false)
                 setIsCreateOpen(false)
               }}
-              className={`flex items-center gap-2 bg-charcoal/95 backdrop-blur-sm border border-secondary rounded-full px-3 py-2 shadow-2xl hover:brightness-110 transition-all ${
-                isOverUnassigned ? 'ring-2 ring-rose-400 scale-110 brightness-125' : isUnassignedOpen ? 'ring-1 ring-rose-400/50' : ''
+              className={`flex items-center gap-2 bg-charcoal/95 backdrop-blur-sm border rounded-full shadow-2xl hover:brightness-110 transition-all duration-300 ease-out ${
+                isOverUnassigned
+                  ? 'ring-2 ring-rose-400 scale-125 brightness-125 border-rose-400 px-5 py-3'
+                  : isAnyDragActive
+                    ? 'ring-2 ring-rose-400/60 scale-110 border-rose-400/60 px-4 py-2.5'
+                    : isUnassignedOpen
+                      ? 'ring-1 ring-rose-400/50 border-secondary px-3 py-2'
+                      : 'border-secondary px-3 py-2'
               }`}
             >
               <svg className="w-4 h-4 text-rose-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

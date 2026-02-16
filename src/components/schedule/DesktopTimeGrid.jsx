@@ -159,6 +159,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
   const justFinishedResizingRef = useRef(false)
   const ignoreDragRef = useRef(false) // Track if current drag should be ignored (started from resize handle)
   const holdingPinEventRef = useRef(null) // Persist holding-pin event id across draggable unmount
+  const grabOffsetRef = useRef({ x: 0, y: 0 }) // Offset from pointer to top-left of dragged card
 
   // Configure sensors for both mouse and touch - require movement before drag starts
   const mouseSensor = useSensor(MouseSensor, {
@@ -511,6 +512,19 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     }
     ignoreDragRef.current = false
 
+    // Capture grab offset (distance from pointer to top-left of the dragged card)
+    // so the drag preview aligns with the card, not the pointer
+    const activeNode = event.active.node?.current
+    if (activeNode && event.activatorEvent) {
+      const rect = activeNode.getBoundingClientRect()
+      grabOffsetRef.current = {
+        x: event.activatorEvent.clientX - rect.left,
+        y: event.activatorEvent.clientY - rect.top,
+      }
+    } else {
+      grabOffsetRef.current = { x: 0, y: 0 }
+    }
+
     // Handle holding pin cards (prefixed id) vs grid cards (event id directly)
     const data = event.active.data.current
     if (data?.source === 'holding-pin') {
@@ -540,14 +554,15 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
       setDragOverColumn(memberId)
       setDragOverDate(date)
 
-      // Calculate slot based on pointer position within the target droppable
-      // Get the droppable element's rect
+      // Calculate slot based on where the card's top edge would land (not raw pointer)
       const droppableRect = over.rect
       if (droppableRect && activatorEvent) {
         // Current pointer Y = activator start Y + delta.y
         const currentPointerY = activatorEvent.clientY + delta.y
-        // Y position within the droppable grid
-        const yInGrid = currentPointerY - droppableRect.top
+        // Subtract grab offset so preview aligns with card top, not pointer
+        const cardTopY = currentPointerY - grabOffsetRef.current.y
+        // Y position of card top within the droppable grid
+        const yInGrid = cardTopY - droppableRect.top
         const newSlot = Math.floor(yInGrid / SLOT_HEIGHT)
         const clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
         setDragOverSlot(clampedSlot)
@@ -627,7 +642,8 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
         const droppableRect = over.rect
         if (droppableRect && activatorEvent) {
           const currentPointerY = activatorEvent.clientY + delta.y
-          const yInGrid = currentPointerY - droppableRect.top
+          const cardTopY = currentPointerY - grabOffsetRef.current.y
+          const yInGrid = cardTopY - droppableRect.top
           const newSlot = Math.floor(yInGrid / SLOT_HEIGHT)
           clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
         } else {
