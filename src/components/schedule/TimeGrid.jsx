@@ -379,7 +379,7 @@ export default function TimeGrid({ selectedDate, selectedMember, events: allEven
         onDragCancel={handleDragCancel}
         collisionDetection={pointerWithin}
       >
-        <div className="flex-1 overflow-y-auto bg-charcoal relative">
+        <div className="flex-1 overflow-y-auto bg-gray-200 relative">
           <div className="relative" style={{ height: `${TOTAL_SLOTS * SLOT_HEIGHT}px` }}>
         {/* Time labels and grid lines */}
         {timeLabels.map((time, index) => {
@@ -389,25 +389,25 @@ export default function TimeGrid({ selectedDate, selectedMember, events: allEven
             <div key={time.hour} className="absolute left-0 right-0" style={{ top: `${topPosition}px` }}>
               {/* Hour label */}
               <div className="absolute left-0 w-16 text-right pr-2 -translate-y-2">
-                <span className="text-xs font-body text-muted uppercase">{time.label}</span>
+                <span className="text-xs font-body text-gray-500 uppercase">{time.label}</span>
               </div>
 
               {/* Hour line (heavier) */}
-              <div className="absolute left-16 right-0 border-t border-secondary" />
+              <div className="absolute left-16 right-0 border-t border-gray-300" />
 
               {/* 15-minute grid lines (lighter) */}
               {index < timeLabels.length - 1 && (
                 <>
                   <div
-                    className="absolute left-16 right-0 border-t border-secondary/30"
+                    className="absolute left-16 right-0 border-t border-gray-300/40"
                     style={{ top: `${SLOT_HEIGHT}px` }}
                   />
                   <div
-                    className="absolute left-16 right-0 border-t border-secondary/30"
+                    className="absolute left-16 right-0 border-t border-gray-300/40"
                     style={{ top: `${SLOT_HEIGHT * 2}px` }}
                   />
                   <div
-                    className="absolute left-16 right-0 border-t border-secondary/30"
+                    className="absolute left-16 right-0 border-t border-gray-300/40"
                     style={{ top: `${SLOT_HEIGHT * 3}px` }}
                   />
                 </>
@@ -495,7 +495,7 @@ export default function TimeGrid({ selectedDate, selectedMember, events: allEven
             // Empty state
             <div className="flex items-center justify-center h-full pointer-events-none">
               <div className="text-center px-4">
-                <p className="text-muted font-body text-sm">
+                <p className="text-gray-500 font-body text-sm">
                   No events scheduled for {selectedMember.name} on{' '}
                   {format(selectedDate, 'MMM d, yyyy')}
                 </p>
@@ -509,6 +509,7 @@ export default function TimeGrid({ selectedDate, selectedMember, events: allEven
                 className="absolute left-0 right-0"
                 style={{
                   top: `${calculateEventOffset(event.startTime)}px`,
+                  height: `${calculateEventOffset(event.endTime) - calculateEventOffset(event.startTime)}px`,
                   opacity: resizingEvent && resizingEvent.id === event.id ? 0.3 : 1,
                 }}
                 data-event-card

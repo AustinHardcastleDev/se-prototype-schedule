@@ -66,7 +66,7 @@ const STATUS_LABELS = {
   'closed-invoiced': 'Closed - Invoiced',
 }
 
-export default function EventCard({ event, onClick, onLongPress, onResizeStart, disableInteraction = false, disableResize = false, earlierHighlightMode = false }) {
+export default function EventCard({ event, onClick, onLongPress, onResizeStart, disableInteraction = false, disableResize = false, earlierHighlightMode = false, compact = false }) {
   const eventType = getEventTypeByKey(event.type)
   const [longPressTimer, setLongPressTimer] = useState(null)
   const [isLongPressing, setIsLongPressing] = useState(false)
@@ -104,9 +104,9 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
   const durationMinutes = calculateDurationMinutes(event.startTime, event.endTime)
   const cardHeight = calculateHeight()
   const isTiny = durationMinutes <= 15 // title only, centered
-  const showAddress = durationMinutes >= 45
-  const showTime = durationMinutes >= 60
-  const showType = durationMinutes >= 75
+  const showAddress = compact ? false : durationMinutes >= 45
+  const showTime = compact ? durationMinutes >= 90 : durationMinutes >= 60
+  const showType = compact ? false : durationMinutes >= 75
   const isJobType = JOB_TYPES.includes(event.type)
   const statusColor = isJobType ? STATUS_COLORS[event.status] : null
 
@@ -288,15 +288,15 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
     )}
     <div
       ref={cardRef}
-      className={`absolute left-0 right-0 rounded-md cursor-pointer hover:brightness-95 transition-all ${
-        disableInteraction ? '' : 'touch-none'
-      } ${isLongPressing ? 'brightness-90' : ''} ${
+      className={`absolute left-0 right-0 rounded-md cursor-pointer hover:brightness-95 transition-all touch-none ${
+        isLongPressing ? 'brightness-90' : ''
+      } ${
         missingPhotos && !isEarlier ? 'ring-1 ring-amber-400/60 ring-inset' : ''
       }`}
       style={{
         height: `${cardHeight}px`,
         backgroundColor: eventType.color,
-        borderLeft: statusColor ? `10px solid ${statusColor}` : 'none',
+        borderLeft: statusColor ? `${compact ? 6 : 10}px solid ${statusColor}` : 'none',
         minHeight: `${SLOT_HEIGHT}px`, // Minimum 15 minutes
         opacity: dimmed ? 0.4 : undefined,
         // Earlier opening: dotted amber outline by default, solid glowing when highlight active
@@ -417,4 +417,5 @@ EventCard.propTypes = {
   disableInteraction: PropTypes.bool,
   disableResize: PropTypes.bool,
   earlierHighlightMode: PropTypes.bool,
+  compact: PropTypes.bool,
 }
