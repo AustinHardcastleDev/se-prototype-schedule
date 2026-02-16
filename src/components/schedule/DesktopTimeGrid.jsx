@@ -31,7 +31,8 @@ function DroppableEventColumn({
   onResizeStart,
   resizingEvent,
   resizePreviewEndTime,
-  calculateEventOffset
+  calculateEventOffset,
+  earlierHighlightMode
 }) {
   const { setNodeRef } = useDroppable({
     id: `${memberId}-${date}`,
@@ -73,6 +74,7 @@ function DroppableEventColumn({
               onEventClick={onEventClick}
               onResizeStart={onResizeStart}
               isDragging={isDragging}
+              earlierHighlightMode={earlierHighlightMode}
             />
           </div>
         )
@@ -134,9 +136,10 @@ DroppableEventColumn.propTypes = {
   resizingEvent: PropTypes.object,
   resizePreviewEndTime: PropTypes.string,
   calculateEventOffset: PropTypes.func.isRequired,
+  earlierHighlightMode: PropTypes.bool,
 }
 
-export default function DesktopTimeGrid({ selectedDate, events, onDateChange, onSlotClick, onEventClick, onEventUpdate }) {
+export default function DesktopTimeGrid({ selectedDate, events, onDateChange, onSlotClick, onEventClick, onEventUpdate, roleFilter = 'all', earlierHighlightMode = false, children }) {
   const [currentTime, setCurrentTime] = useState(new Date())
   const dayRefs = useRef({}) // Store refs to each day section
   const scrollContainerRef = useRef(null) // Ref to the scrollable container
@@ -155,6 +158,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
   const resizePreviewEndTimeRef = useRef(null)
   const justFinishedResizingRef = useRef(false)
   const ignoreDragRef = useRef(false) // Track if current drag should be ignored (started from resize handle)
+  const holdingPinEventRef = useRef(null) // Persist holding-pin event id across draggable unmount
 
   // Configure sensors for both mouse and touch - require movement before drag starts
   const mouseSensor = useSensor(MouseSensor, {
@@ -172,6 +176,9 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
 
   // Get all team members for columns
   const teamMembers = getAllMembers()
+  const filteredMembers = roleFilter === 'all'
+    ? teamMembers
+    : teamMembers.filter(m => m.role === roleFilter)
 
   // Generate array of dates to render (10 days before + selected date + 10 days after = 21 days total)
   const daysToRender = []
@@ -503,7 +510,16 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
       return
     }
     ignoreDragRef.current = false
-    setActiveId(event.active.id)
+
+    // Handle holding pin cards (prefixed id) vs grid cards (event id directly)
+    const data = event.active.data.current
+    if (data?.source === 'holding-pin') {
+      holdingPinEventRef.current = data.event.id
+      setActiveId(data.event.id)
+    } else {
+      holdingPinEventRef.current = null
+      setActiveId(event.active.id)
+    }
   }
 
   const handleDragMove = (event) => {
@@ -552,6 +568,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     // If this drag was from resize handle, just reset and ignore
     if (ignoreDragRef.current) {
       ignoreDragRef.current = false
+      holdingPinEventRef.current = null
       setActiveId(null)
       setDragOverSlot(null)
       setDragOverColumn(null)
@@ -570,8 +587,26 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     setDragOverColumn(null)
     setDragOverDate(null)
 
-    const draggedEvent = events.find((e) => e.id === active.id)
+    // Use ref for holding-pin detection since the draggable may have unmounted mid-drag
+    const isHoldingPin = holdingPinEventRef.current !== null
+    const eventId = isHoldingPin ? holdingPinEventRef.current : active.id
+    holdingPinEventRef.current = null
+    const draggedEvent = events.find((e) => e.id === eventId)
     if (!draggedEvent) return
+
+    // Check if dropped on a holding pin target (Unassigned pill)
+    const dropTarget = over?.data?.current?.target
+    if (dropTarget === 'unassigned') {
+      const updatedEvent = { ...draggedEvent, assigneeId: null }
+      if (onEventUpdate) onEventUpdate(updatedEvent)
+      toast.success('Event moved to unassigned jobs')
+      return
+    }
+
+    // For holding pin drags without a valid drop target, cancel
+    if (isHoldingPin && !over && !prevDragOverColumn) {
+      return
+    }
 
     // Determine target column and date
     let targetAssigneeId = draggedEvent.assigneeId
@@ -654,11 +689,12 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
       endTime: newEndTime,
     }
 
-    // Show success message if reassigned to different person
+    // Show success message if assigned/reassigned to different person
     if (targetAssigneeId !== draggedEvent.assigneeId) {
       const targetMember = teamMembers.find(m => m.id === targetAssigneeId)
       const memberName = targetMember ? targetMember.name : 'team member'
-      toast.success(`Event reassigned to ${memberName}`)
+      const verb = draggedEvent.assigneeId === null ? 'assigned' : 'reassigned'
+      toast.success(`Event ${verb} to ${memberName}`)
     }
 
     if (onEventUpdate) {
@@ -668,6 +704,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
 
   const handleDragCancel = () => {
     ignoreDragRef.current = false
+    holdingPinEventRef.current = null
     setActiveId(null)
     setDragOverSlot(null)
     setDragOverColumn(null)
@@ -769,7 +806,8 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
         className="hidden md:flex md:flex-col flex-1 min-h-0 overflow-auto bg-charcoal relative focus:outline-none"
       >
       {/* Content wrapper with min-width to enable horizontal scrolling */}
-      <div style={{ minWidth: `${64 + teamMembers.length * 150}px` }}>
+      <div style={{ minWidth: `${64 + filteredMembers.length * 150}px` }}>
+
       {/* Column Headers - Sticky at very top */}
       <div className="sticky top-0 z-40 bg-charcoal border-b border-secondary">
         <div className="flex">
@@ -778,7 +816,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
 
           {/* Team member column headers */}
           <div className="flex flex-1">
-            {teamMembers.map((member) => (
+            {filteredMembers.map((member) => (
               <div
                 key={member.id}
                 className="px-4 py-3 border-l border-secondary flex-shrink-0 flex-1"
@@ -890,7 +928,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
               <div className="flex-1 relative">
                 <div className="flex">
                   {/* Grid lines for each column */}
-                  {teamMembers.map((member, memberIndex) => (
+                  {filteredMembers.map((member, memberIndex) => (
                     <div
                       key={`grid-${member.id}`}
                       className="relative flex-shrink-0 flex-1"
@@ -949,7 +987,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
 
                 {/* Event rendering areas - one per column */}
                 <div className="absolute left-0 right-0 top-0 bottom-0 flex">
-                  {teamMembers.map((member, memberIndex) => {
+                  {filteredMembers.map((member, memberIndex) => {
                     const memberEvents = getEventsForMember(member.id, dayDate)
 
                     return (
@@ -970,6 +1008,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
                         resizingEvent={resizingEvent}
                         resizePreviewEndTime={resizePreviewEndTime}
                         calculateEventOffset={calculateEventOffset}
+                        earlierHighlightMode={earlierHighlightMode}
                       />
                     )
                   })}
@@ -981,6 +1020,8 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
       })}
       </div> {/* End content wrapper */}
       </div> {/* End scroll container */}
+
+      {children}
 
       {/* Drag overlay - shows dragged event following cursor */}
       <DragOverlay dropAnimation={null}>
@@ -997,15 +1038,20 @@ DesktopTimeGrid.propTypes = {
       id: PropTypes.string.isRequired,
       title: PropTypes.string.isRequired,
       type: PropTypes.string.isRequired,
-      assigneeId: PropTypes.string.isRequired,
+      assigneeId: PropTypes.string,
       date: PropTypes.string.isRequired,
       startTime: PropTypes.string.isRequired,
       endTime: PropTypes.string.isRequired,
       status: PropTypes.string,
+      notes: PropTypes.string,
+      earlierOpening: PropTypes.bool,
     })
   ).isRequired,
   onDateChange: PropTypes.func,
   onSlotClick: PropTypes.func,
   onEventClick: PropTypes.func,
   onEventUpdate: PropTypes.func,
+  roleFilter: PropTypes.oneOf(['all', 'tech', 'sales']),
+  earlierHighlightMode: PropTypes.bool,
+  children: PropTypes.node,
 }

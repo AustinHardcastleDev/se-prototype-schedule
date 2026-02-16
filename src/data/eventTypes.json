@@ -3,36 +3,42 @@
     "key": "job-occupied",
     "label": "Job (Occupied)",
     "color": "#3B82F6",
-    "borderColor": "#2563EB"
+    "borderColor": "#2563EB",
+    "defaultDuration": 90
   },
   {
     "key": "job-vacant",
     "label": "Job (Vacant)",
     "color": "#14B8A6",
-    "borderColor": "#0D9488"
+    "borderColor": "#0D9488",
+    "defaultDuration": 75
   },
   {
     "key": "callback-job",
     "label": "Callback Job",
     "color": "#F59E0B",
-    "borderColor": "#D97706"
+    "borderColor": "#D97706",
+    "defaultDuration": 60
   },
   {
     "key": "sales-stop",
     "label": "Sales Stop",
     "color": "#8B5CF6",
-    "borderColor": "#7C3AED"
+    "borderColor": "#7C3AED",
+    "defaultDuration": 60
   },
   {
     "key": "meeting",
     "label": "Meeting",
     "color": "#64748B",
-    "borderColor": "#475569"
+    "borderColor": "#475569",
+    "defaultDuration": 60
   },
   {
     "key": "time-off",
     "label": "Time Off",
     "color": "#F43F5E",
-    "borderColor": "#E11D48"
+    "borderColor": "#E11D48",
+    "defaultDuration": 480
   }
 ]

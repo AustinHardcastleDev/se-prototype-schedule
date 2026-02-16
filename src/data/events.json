@@ -1377,7 +1377,8 @@
     "date": "2026-02-13",
     "startTime": "08:00",
     "endTime": "09:30",
-    "status": "open"
+    "status": "open",
+    "notes": "Check ant traps in kitchen. Customer reports increased activity near dishwasher."
   },
   {
     "id": "evt-136",
@@ -1547,7 +1548,9 @@
     "date": "2026-02-16",
     "startTime": "08:00",
     "endTime": "09:45",
-    "status": "open"
+    "status": "open",
+    "notes": "Bring extra bait stations. Previous treatment showed heavy roach activity in units 7A-7F.",
+    "earlierOpening": true
   },
   {
     "id": "evt-153",
@@ -1557,7 +1560,8 @@
     "date": "2026-02-16",
     "startTime": "10:30",
     "endTime": "12:00",
-    "status": "open"
+    "status": "open",
+    "earlierOpening": true
   },
   {
     "id": "evt-154",
@@ -1587,7 +1591,8 @@
     "date": "2026-02-16",
     "startTime": "09:30",
     "endTime": "11:00",
-    "status": "open"
+    "status": "open",
+    "earlierOpening": true
   },
   {
     "id": "evt-157",
@@ -1737,7 +1742,8 @@
     "date": "2026-02-17",
     "startTime": "08:00",
     "endTime": "09:30",
-    "status": "open"
+    "status": "open",
+    "notes": "Customer requesting exterior-only treatment. Has indoor pets - do not spray inside."
   },
   {
     "id": "evt-172",
@@ -1767,7 +1773,8 @@
     "date": "2026-02-17",
     "startTime": "07:30",
     "endTime": "09:00",
-    "status": "open"
+    "status": "open",
+    "notes": "New account - first service. Get access code from property manager (555-0123)."
   },
   {
     "id": "evt-175",
@@ -1797,7 +1804,8 @@
     "date": "2026-02-17",
     "startTime": "08:00",
     "endTime": "09:45",
-    "status": "open"
+    "status": "open",
+    "notes": "Customer allergic to standard spray. Use hypoallergenic treatment option B."
   },
   {
     "id": "evt-178",
@@ -1907,7 +1915,8 @@
     "date": "2026-02-18",
     "startTime": "08:00",
     "endTime": "09:45",
-    "status": "open"
+    "status": "open",
+    "earlierOpening": true
   },
   {
     "id": "evt-189",
@@ -1917,7 +1926,8 @@
     "date": "2026-02-18",
     "startTime": "10:30",
     "endTime": "12:00",
-    "status": "open"
+    "status": "open",
+    "notes": "Full fumigation needed. Check structural damage from termite activity reported last month."
   },
   {
     "id": "evt-190",
@@ -2077,7 +2087,8 @@
     "date": "2026-02-19",
     "startTime": "08:00",
     "endTime": "09:30",
-    "status": "open"
+    "status": "open",
+    "notes": "Follow up on bed bug treatment from 2/5. Second application required per protocol."
   },
   {
     "id": "evt-206",
@@ -2107,7 +2118,8 @@
     "date": "2026-02-19",
     "startTime": "07:30",
     "endTime": "09:00",
-    "status": "open"
+    "status": "open",
+    "earlierOpening": true
   },
   {
     "id": "evt-209",
@@ -2137,7 +2149,8 @@
     "date": "2026-02-19",
     "startTime": "08:00",
     "endTime": "09:45",
-    "status": "open"
+    "status": "open",
+    "earlierOpening": true
   },
   {
     "id": "evt-212",
@@ -2418,5 +2431,81 @@
     "startTime": "16:00",
     "endTime": "17:00",
     "status": "open"
+  },
+  {
+    "id": "evt-unassigned-1",
+    "title": "Greenway Apartments - Unit 4A",
+    "type": "job-occupied",
+    "assigneeId": null,
+    "date": "2026-02-13",
+    "startTime": "09:00",
+    "endTime": "10:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-unassigned-2",
+    "title": "Sunset Terrace - Unit 8C",
+    "type": "job-vacant",
+    "assigneeId": null,
+    "date": "2026-02-16",
+    "startTime": "10:00",
+    "endTime": "11:15",
+    "status": "open"
+  },
+  {
+    "id": "evt-unassigned-3",
+    "title": "Callback: Riverside Walk - Unit 3B",
+    "type": "callback-job",
+    "assigneeId": null,
+    "date": "2026-02-17",
+    "startTime": "08:00",
+    "endTime": "09:00",
+    "status": "open",
+    "notes": "Third callback for same issue. Check crawl space ventilation."
+  },
+  {
+    "id": "evt-unassigned-4",
+    "title": "Willow Heights - Unit 12D",
+    "type": "job-occupied",
+    "assigneeId": null,
+    "date": "2026-02-18",
+    "startTime": "11:00",
+    "endTime": "12:30",
+    "status": "open"
+  },
+  {
+    "id": "evt-earlier-1",
+    "title": "Thornberry Estates - Unit 9F",
+    "type": "job-occupied",
+    "assigneeId": "tm-1",
+    "date": "2026-02-16",
+    "startTime": "10:00",
+    "endTime": "11:30",
+    "status": "open",
+    "earlierOpening": true,
+    "notes": "Customer wants morning slot. Elderly occupant prefers before 9 AM."
+  },
+  {
+    "id": "evt-earlier-2",
+    "title": "Maple Leaf Plaza - Unit 15B",
+    "type": "job-occupied",
+    "assigneeId": "tm-2",
+    "date": "2026-02-17",
+    "startTime": "13:00",
+    "endTime": "14:30",
+    "status": "open",
+    "earlierOpening": true,
+    "notes": "Requested AM slot. Customer works from home afternoons."
+  },
+  {
+    "id": "evt-earlier-3",
+    "title": "Oakridge Condos - Unit 22A",
+    "type": "job-vacant",
+    "assigneeId": "tm-3",
+    "date": "2026-02-18",
+    "startTime": "14:00",
+    "endTime": "15:15",
+    "status": "open",
+    "earlierOpening": true
   }
 ]

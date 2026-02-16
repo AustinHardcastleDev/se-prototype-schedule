@@ -63,7 +63,7 @@ export default function EventDetailsModal({ isOpen, onClose, onEdit, event }) {
       {/* Assignee */}
       <div className="mb-4">
         <div className="text-xs font-body text-muted uppercase mb-1">Assigned To</div>
-        <div className="text-base font-body text-text-dark">{assignee.name}</div>
+        <div className="text-base font-body text-text-dark">{assignee ? assignee.name : <span className="text-rose-500 font-semibold">Unassigned</span>}</div>
       </div>
 
       {/* Date */}
@@ -85,6 +85,20 @@ export default function EventDetailsModal({ isOpen, onClose, onEdit, event }) {
         <div className="mb-4">
           <div className="text-xs font-body text-muted uppercase mb-1">Status</div>
           <div className="text-base font-body text-text-dark">{STATUS_LABELS[event.status] || event.status}</div>
+        </div>
+      )}
+
+      {/* Notes */}
+      {event.notes && (
+        <div className="mb-4">
+          <div className="text-xs font-body text-muted uppercase mb-1 flex items-center gap-1">
+            <svg className="w-3 h-3 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+              <rect x="9" y="3" width="6" height="4" rx="1"/>
+            </svg>
+            Prep Notes
+          </div>
+          <div className="text-sm font-body text-text-dark bg-blue-50 rounded-lg px-3 py-2">{event.notes}</div>
         </div>
       )}
 
@@ -179,10 +193,12 @@ EventDetailsModal.propTypes = {
     id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
-    assigneeId: PropTypes.string.isRequired,
+    assigneeId: PropTypes.string,
     date: PropTypes.string.isRequired,
     startTime: PropTypes.string.isRequired,
     endTime: PropTypes.string.isRequired,
     status: PropTypes.string,
+    notes: PropTypes.string,
+    earlierOpening: PropTypes.bool,
   }),
 }
