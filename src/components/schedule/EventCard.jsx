@@ -11,7 +11,7 @@ const JOB_TYPES = ['job-occupied', 'job-vacant', 'callback-job']
 // Status indicator colors
 const STATUS_COLORS = {
   'open': null, // No indicator
-  'closed-no-invoice': '#EAB308', // Yellow
+  'closed-no-invoice': '#FACC15', // Bright yellow
   'closed-invoiced': '#8B5CF6', // Purple
 }
 
@@ -296,7 +296,7 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
       style={{
         height: `${cardHeight}px`,
         backgroundColor: eventType.color,
-        borderLeft: statusColor ? `6px solid ${statusColor}` : 'none',
+        borderLeft: statusColor ? `10px solid ${statusColor}` : 'none',
         minHeight: `${SLOT_HEIGHT}px`, // Minimum 15 minutes
         opacity: dimmed ? 0.4 : undefined,
         // Earlier opening: dotted amber outline by default, solid glowing when highlight active
