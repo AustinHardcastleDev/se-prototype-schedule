@@ -16,8 +16,8 @@
   {
     "key": "callback-job",
     "label": "Callback Job",
-    "color": "#F59E0B",
-    "borderColor": "#D97706",
+    "color": "#6B7280",
+    "borderColor": "#4B5563",
     "defaultDuration": 60
   },
   {
@@ -30,8 +30,8 @@
   {
     "key": "meeting",
     "label": "Meeting",
-    "color": "#64748B",
-    "borderColor": "#475569",
+    "color": "#3B82F6",
+    "borderColor": "#2563EB",
     "defaultDuration": 60
   },
   {

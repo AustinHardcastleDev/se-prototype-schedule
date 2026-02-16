@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
+import { createPortal } from 'react-dom'
 import PropTypes from 'prop-types'
-import { getEventTypeByKey } from '../../utils/dataAccess'
+import { getEventTypeByKey, getMemberById } from '../../utils/dataAccess'
 
 const SLOT_HEIGHT = 16 // pixels per 15-minute slot (must match TimeGrid.jsx)
 
@@ -58,10 +59,23 @@ const TYPE_ICONS = {
   ),
 }
 
+// Status labels for tooltip display
+const STATUS_LABELS = {
+  'open': 'Open',
+  'closed-no-invoice': 'Closed - No Invoice',
+  'closed-invoiced': 'Closed - Invoiced',
+}
+
 export default function EventCard({ event, onClick, onLongPress, onResizeStart, disableInteraction = false, disableResize = false, earlierHighlightMode = false }) {
   const eventType = getEventTypeByKey(event.type)
   const [longPressTimer, setLongPressTimer] = useState(null)
   const [isLongPressing, setIsLongPressing] = useState(false)
+
+  // Hover tooltip state (desktop only)
+  const [showTooltip, setShowTooltip] = useState(false)
+  const [tooltipPos, setTooltipPos] = useState({ top: 0, left: 0 })
+  const hoverTimerRef = useRef(null)
+  const cardRef = useRef(null)
 
   // Calculate event duration in minutes
   const calculateDurationMinutes = (startTime, endTime) => {
@@ -183,8 +197,97 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
   const highlightActive = earlierHighlightMode && isEarlier
   const dimmed = earlierHighlightMode && !isEarlier
 
+  // Hover tooltip handlers (desktop only)
+  const handleMouseEnter = useCallback(() => {
+    // Only show on desktop (md+)
+    if (window.innerWidth < 768) return
+    hoverTimerRef.current = setTimeout(() => {
+      if (cardRef.current) {
+        const rect = cardRef.current.getBoundingClientRect()
+        // Position to the right of the card, vertically centered
+        setTooltipPos({
+          top: rect.top,
+          left: rect.right + 8,
+          cardRight: rect.right,
+          cardLeft: rect.left,
+        })
+        setShowTooltip(true)
+      }
+    }, 400)
+  }, [])
+
+  const handleMouseLeave = useCallback(() => {
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current)
+      hoverTimerRef.current = null
+    }
+    setShowTooltip(false)
+  }, [])
+
+  // Cleanup hover timer on unmount
+  useEffect(() => {
+    return () => {
+      if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current)
+    }
+  }, [])
+
+  const assignee = getMemberById(event.assigneeId)
+
   return (
+    <>
+    {/* Hover tooltip (desktop only, rendered via portal) */}
+    {showTooltip && createPortal(
+      <div
+        className="fixed z-[100] bg-white rounded-lg shadow-xl border border-gray-200 p-3 w-64 pointer-events-none animate-fadeIn"
+        style={{
+          top: `${tooltipPos.top}px`,
+          // If tooltip would overflow right edge, show on left side instead
+          ...(tooltipPos.left + 256 > window.innerWidth
+            ? { right: `${window.innerWidth - tooltipPos.cardLeft + 8}px` }
+            : { left: `${tooltipPos.left}px` }),
+        }}
+      >
+        {/* Event type + title */}
+        <div className="flex items-center gap-2 mb-2">
+          <div className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: eventType.color }} />
+          <span className="text-xs font-body text-gray-500 uppercase">{eventType.label}</span>
+        </div>
+        <div className="text-sm font-body text-gray-900 font-semibold mb-2">{event.title}</div>
+
+        {/* Time */}
+        <div className="text-xs font-body text-gray-600 mb-1">
+          {formatTime(event.startTime)} – {formatTime(event.endTime)}
+        </div>
+
+        {/* Address */}
+        {event.address && (
+          <div className="text-xs font-body text-gray-500 mb-1">{event.address}</div>
+        )}
+
+        {/* Assignee */}
+        <div className="text-xs font-body text-gray-500 mb-1">
+          {assignee ? assignee.name : <span className="text-rose-500 font-semibold">Unassigned</span>}
+        </div>
+
+        {/* Status */}
+        {event.status && (
+          <div className="text-xs font-body text-gray-500 mb-1">
+            Status: {STATUS_LABELS[event.status] || event.status}
+          </div>
+        )}
+
+        {/* Notes */}
+        {event.notes && (
+          <div className="mt-2 pt-2 border-t border-gray-100">
+            <div className="text-xs font-body text-blue-600 font-semibold mb-0.5">Prep Notes</div>
+            <div className="text-xs font-body text-gray-600 line-clamp-3">{event.notes}</div>
+          </div>
+        )}
+      </div>,
+      document.body
+    )}
     <div
+      ref={cardRef}
       className={`absolute left-0 right-0 rounded-md cursor-pointer hover:brightness-95 transition-all ${
         disableInteraction ? '' : 'touch-none'
       } ${isLongPressing ? 'brightness-90' : ''} ${
@@ -193,7 +296,7 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
       style={{
         height: `${cardHeight}px`,
         backgroundColor: eventType.color,
-        borderLeft: `6px solid ${statusColor || eventType.borderColor}`,
+        borderLeft: statusColor ? `6px solid ${statusColor}` : 'none',
         minHeight: `${SLOT_HEIGHT}px`, // Minimum 15 minutes
         opacity: dimmed ? 0.4 : undefined,
         // Earlier opening: dotted amber outline by default, solid glowing when highlight active
@@ -207,6 +310,8 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
           boxShadow: '0 0 10px rgba(245, 158, 11, 0.5)',
         } : {}),
       }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
       {...pointerHandlers}
     >
       <div className={`relative h-full ${isTiny ? 'px-1.5 flex items-center' : 'p-1.5'}`}>
@@ -289,6 +394,7 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
         </div>
       )}
     </div>
+    </>
   )
 }
 

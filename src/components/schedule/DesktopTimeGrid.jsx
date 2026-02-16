@@ -69,7 +69,7 @@ function DroppableEventColumn({
             className="absolute left-0 right-0"
             style={{
               top: `${topOffset}px`,
-              opacity: isResizing ? 0.3 : 1,
+              opacity: isResizing ? 0 : 1,
             }}
           >
             <DraggableEvent

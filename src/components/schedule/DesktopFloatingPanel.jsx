@@ -202,7 +202,7 @@ export default function DesktopFloatingPanel({ onEventTypeSelect, roleFilter, on
                       <button
                         onClick={() => handleHoldingCardClick(event)}
                         className="bg-charcoal/95 backdrop-blur-sm border border-secondary rounded-xl px-4 py-3 hover:brightness-125 transition-all text-left shadow-lg w-full"
-                        style={{ borderLeft: `4px solid ${evtType?.borderColor || '#F43F5E'}` }}
+                        style={{}}
                       >
                         <div className="text-sm font-body text-text-light font-semibold truncate">{event.title}</div>
                         <div className="text-xs font-body text-muted mt-0.5">
