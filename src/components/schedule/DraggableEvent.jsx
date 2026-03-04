@@ -4,7 +4,7 @@ import { useDraggable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
 import EventCard from './EventCard'
 
-export default function DraggableEvent({ event, onEventClick, onResizeStart, isDragging, earlierHighlightMode = false, compact = false }) {
+export default function DraggableEvent({ event, onEventClick, onResizeStart, isDragging, compact = false }) {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: event.id,
     data: { event },
@@ -94,7 +94,6 @@ export default function DraggableEvent({ event, onEventClick, onResizeStart, isD
         disableInteraction={true}
         disableResize={false}
         onResizeStart={onResizeStart}
-        earlierHighlightMode={earlierHighlightMode}
         compact={compact}
       />
     </div>
@@ -115,6 +114,5 @@ DraggableEvent.propTypes = {
   onEventClick: PropTypes.func.isRequired,
   onResizeStart: PropTypes.func,
   isDragging: PropTypes.bool,
-  earlierHighlightMode: PropTypes.bool,
   compact: PropTypes.bool,
 }

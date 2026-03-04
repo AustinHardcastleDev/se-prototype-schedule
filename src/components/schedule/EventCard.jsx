@@ -66,7 +66,7 @@ const STATUS_LABELS = {
   'closed-invoiced': 'Closed - Invoiced',
 }
 
-export default function EventCard({ event, onClick, onLongPress, onResizeStart, disableInteraction = false, disableResize = false, earlierHighlightMode = false, compact = false }) {
+export default function EventCard({ event, onClick, onLongPress, onResizeStart, disableInteraction = false, disableResize = false, compact = false }) {
   const eventType = getEventTypeByKey(event.type)
   const [longPressTimer, setLongPressTimer] = useState(null)
   const [isLongPressing, setIsLongPressing] = useState(false)
@@ -192,10 +192,8 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
     }
   }
 
-  // Earlier highlight mode styling
+  // Earlier opening indicator
   const isEarlier = event.earlierOpening === true
-  const highlightActive = earlierHighlightMode && isEarlier
-  const dimmed = earlierHighlightMode && !isEarlier
 
   // Hover tooltip handlers (desktop only)
   const handleMouseEnter = useCallback(() => {
@@ -298,16 +296,10 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
         backgroundColor: eventType.color,
         borderLeft: statusColor ? `${compact ? 6 : 10}px solid ${statusColor}` : 'none',
         minHeight: `${SLOT_HEIGHT}px`, // Minimum 15 minutes
-        opacity: dimmed ? 0.4 : undefined,
-        // Earlier opening: dotted amber outline by default, solid glowing when highlight active
-        ...(isEarlier && !highlightActive ? {
+        // Earlier opening: amber outline indicator
+        ...(isEarlier ? {
           outline: '2px solid #F59E0B',
           outlineOffset: '-2px',
-        } : {}),
-        ...(highlightActive ? {
-          outline: '2px solid #F59E0B',
-          outlineOffset: '-2px',
-          boxShadow: '0 0 10px rgba(245, 158, 11, 0.5)',
         } : {}),
       }}
       onMouseEnter={handleMouseEnter}
@@ -416,6 +408,5 @@ EventCard.propTypes = {
   onResizeStart: PropTypes.func,
   disableInteraction: PropTypes.bool,
   disableResize: PropTypes.bool,
-  earlierHighlightMode: PropTypes.bool,
   compact: PropTypes.bool,
 }

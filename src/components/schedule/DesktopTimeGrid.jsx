@@ -32,7 +32,6 @@ function DroppableEventColumn({
   resizingEvent,
   resizePreviewEndTime,
   calculateEventOffset,
-  earlierHighlightMode
 }) {
   const { setNodeRef } = useDroppable({
     id: `${memberId}-${date}`,
@@ -47,12 +46,12 @@ function DroppableEventColumn({
       data-droppable-id={`${memberId}-${date}`}
       data-member-id={memberId}
       data-date={date}
-      className={`relative px-1 cursor-pointer transition-colors flex-shrink-0 flex-1 ${
+      className={`relative cursor-pointer transition-colors flex-shrink-0 flex-1 ${
         isColumnOver ? 'bg-accent/10' : ''
       }`}
       style={{
-        minWidth: '150px',
-        borderLeft: memberIndex === 0 ? 'none' : '1px solid #D1D5DB'
+        minWidth: '220px',
+        borderLeft: memberIndex === 0 ? 'none' : '1px solid #D1D5DB',
       }}
       onClick={onColumnClick}
     >
@@ -66,7 +65,7 @@ function DroppableEventColumn({
           <div
             key={event.id}
             data-event-card
-            className="absolute left-0 right-0"
+            className="absolute left-2 right-2"
             style={{
               top: `${topOffset}px`,
               opacity: isResizing ? 0 : 1,
@@ -77,7 +76,6 @@ function DroppableEventColumn({
               onEventClick={onEventClick}
               onResizeStart={onResizeStart}
               isDragging={isDragging}
-              earlierHighlightMode={earlierHighlightMode}
             />
           </div>
         )
@@ -86,7 +84,7 @@ function DroppableEventColumn({
       {/* Resize preview */}
       {resizingEvent && resizePreviewEndTime && resizingEvent.assigneeId === memberId && resizingEvent.date === date && (
         <div
-          className="absolute left-0 right-0 pointer-events-none z-20"
+          className="absolute left-2 right-2 pointer-events-none z-20"
           style={{
             top: `${calculateEventOffset(resizingEvent.startTime)}px`,
           }}
@@ -108,7 +106,7 @@ function DroppableEventColumn({
       {/* Drag preview ghost - show where event will land in TARGET column */}
       {dragOverSlot !== null && activeEvent && isColumnOver && (
         <div
-          className="absolute left-0 right-0 pointer-events-none z-20 border-2 border-dashed border-accent bg-accent/10"
+          className="absolute left-2 right-2 pointer-events-none z-20 border-2 border-dashed border-accent bg-accent/10"
           style={{
             top: `${dragOverSlot * SLOT_HEIGHT}px`,
             height: `${calculateEventOffset(activeEvent.endTime) - calculateEventOffset(activeEvent.startTime)}px`,
@@ -139,13 +137,14 @@ DroppableEventColumn.propTypes = {
   resizingEvent: PropTypes.object,
   resizePreviewEndTime: PropTypes.string,
   calculateEventOffset: PropTypes.func.isRequired,
-  earlierHighlightMode: PropTypes.bool,
 }
 
-export default function DesktopTimeGrid({ selectedDate, events, onDateChange, onSlotClick, onEventClick, onEventUpdate, roleFilter = 'all', earlierHighlightMode = false, children }) {
+export default function DesktopTimeGrid({ selectedDate, events, onDateChange, onSlotClick, onEventClick, onEventUpdate, roleFilter = 'all', children }) {
   const [currentTime, setCurrentTime] = useState(new Date())
   const dayRefs = useRef({}) // Store refs to each day section
   const scrollContainerRef = useRef(null) // Ref to the scrollable container
+  const selectedDateRef = useRef(selectedDate) // Stable ref for observer callback
+  const onDateChangeRef = useRef(onDateChange)
   const [activeId, setActiveId] = useState(null) // Track actively dragged event
   const [dragOverSlot, setDragOverSlot] = useState(null) // Track which slot is being dragged over
   const [dragOverColumn, setDragOverColumn] = useState(null) // Track which column (memberId) is being dragged over
@@ -161,7 +160,8 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
   const resizePreviewEndTimeRef = useRef(null)
   const justFinishedResizingRef = useRef(false)
   const ignoreDragRef = useRef(false) // Track if current drag should be ignored (started from resize handle)
-  const holdingPinEventRef = useRef(null) // Persist holding-pin event id across draggable unmount
+  const holdingPinEventRef = useRef(null) // Persist panel-drag event id across draggable unmount
+  const panelDragSourceRef = useRef(null) // Track source type ('holding-pin' or 'earlier-pin')
   const grabOffsetRef = useRef({ x: 0, y: 0 }) // Offset from pointer to top-left of dragged card
 
   // Configure sensors for both mouse and touch - require movement before drag starts
@@ -190,53 +190,54 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     daysToRender.push(addDays(selectedDate, i))
   }
 
-  // IntersectionObserver to detect which day is in view
+  // Keep refs in sync with latest props
   useEffect(() => {
-    if (!onDateChange) return
+    selectedDateRef.current = selectedDate
+  }, [selectedDate])
+  useEffect(() => {
+    onDateChangeRef.current = onDateChange
+  }, [onDateChange])
+
+  // Stable key for the rendered date range (used to re-observe when days shift)
+  const daysKey = daysToRender.map(d => format(d, 'yyyy-MM-dd')).join(',')
+
+  // IntersectionObserver to detect which day is in view.
+  // Uses refs for selectedDate/onDateChange so the callback is stable and
+  // doesn't cause a recreate→immediate-fire→date-change feedback loop.
+  useEffect(() => {
+    const container = scrollContainerRef.current
+    if (!container) return
+
+    // Suppress observer for 600ms after this effect runs to let any
+    // concurrent programmatic scroll settle before we start tracking.
+    ignoreObserverUntil.current = Math.max(ignoreObserverUntil.current, Date.now() + 600)
 
     const observer = new IntersectionObserver(
       (entries) => {
-        const now = Date.now()
-        const ignoreUntil = ignoreObserverUntil.current
+        if (Date.now() < ignoreObserverUntil.current) return
 
-        // Ignore observer updates briefly after programmatic scrolling
-        if (now < ignoreUntil) {
-          console.log('[IntersectionObserver] Ignoring - within ignore window. now:', now, 'ignoreUntil:', ignoreUntil, 'diff:', ignoreUntil - now)
-          return
-        }
-
-        console.log('[IntersectionObserver] NOT ignoring - processing entries. Entries count:', entries.length)
-
-        // Find the day header that is most visible at the top of the viewport
         const visibleEntry = entries.find(
           (entry) => entry.isIntersecting && entry.intersectionRatio > 0.5
         )
 
         if (visibleEntry) {
           const dateStr = visibleEntry.target.dataset.date
-          console.log('[IntersectionObserver] Visible entry date:', dateStr, 'ratio:', visibleEntry.intersectionRatio)
-
           if (dateStr) {
             const newDate = new Date(dateStr)
             const newDateStr = format(newDate, 'yyyy-MM-dd')
-            const currentDateStr = format(selectedDate, 'yyyy-MM-dd')
+            const currentDateStr = format(selectedDateRef.current, 'yyyy-MM-dd')
 
-            console.log('[IntersectionObserver] newDateStr:', newDateStr, 'currentDateStr:', currentDateStr)
-
-            // Only update if it's a different day
             if (newDateStr !== currentDateStr) {
-              console.log('[IntersectionObserver] UPDATING selectedDate from', currentDateStr, 'to', newDateStr)
-              // Mark this as scroll-initiated so we don't scroll back to it
               scrollChangeSource.current = 'scroll'
-              onDateChange(newDate)
+              if (onDateChangeRef.current) onDateChangeRef.current(newDate)
             }
           }
         }
       },
       {
-        root: scrollContainerRef.current,
+        root: container,
         threshold: [0, 0.5, 1],
-        rootMargin: '-10% 0px -80% 0px', // Trigger when day header is near top
+        rootMargin: '-10% 0px -80% 0px',
       }
     )
 
@@ -246,94 +247,36 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     })
 
     return () => observer.disconnect()
-  }, [selectedDate, onDateChange])
+  }, [daysKey]) // re-observe when rendered days change, but callback uses refs
 
   // Scroll to selected date when it changes from date picker (not from scrolling)
-  // Using useLayoutEffect to ensure scroll happens synchronously after DOM updates
   useLayoutEffect(() => {
     const dateKey = format(selectedDate, 'yyyy-MM-dd')
-    console.log('[useLayoutEffect] selectedDate changed to:', dateKey)
-    console.log('[useLayoutEffect] scrollChangeSource.current:', scrollChangeSource.current)
 
     // If this change came from scrolling, don't scroll back to it
     if (scrollChangeSource.current === 'scroll') {
-      console.log('[useLayoutEffect] Skipping scroll - change came from scrolling')
       scrollChangeSource.current = null
       return
     }
 
-    // Immediately ignore observer updates to prevent race conditions
-    ignoreObserverUntil.current = Date.now() + 500 // Increased to 500ms for debugging
-    console.log('[useLayoutEffect] Set ignoreObserverUntil to:', ignoreObserverUntil.current)
+    // Suppress observer while we programmatically scroll
+    ignoreObserverUntil.current = Date.now() + 800
 
-    // Use requestAnimationFrame to ensure layout is fully calculated
     requestAnimationFrame(() => {
-      console.log('[rAF] Calculating scroll position for date:', dateKey)
+      const dayEl = dayRefs.current[dateKey]
+      const container = scrollContainerRef.current
+      if (!dayEl || !container) return
 
-      if (scrollContainerRef.current) {
-        // Calculate scroll position based on known layout:
-        // - Team header: ~56px (sticky at top-0)
-        // - Each day section: dayHeader (~50px) + grid (896px) = 946px
-        // - Today is always at index 10 in daysToRender (center of -10 to +10 range)
-        const teamHeaderHeight = 56
-        const dayHeaderHeight = 50 // py-2 (16px) + content (~32px) + border-b-2 (2px)
-        const gridHeight = TOTAL_SLOTS * SLOT_HEIGHT // 56 * 16 = 896
-        const daySectionHeight = dayHeaderHeight + gridHeight // 936
-        const todayIndex = 10 // selectedDate is always at center
-
-        // Position of today's day header in scroll content
-        const todayHeaderPosition = teamHeaderHeight + (todayIndex * daySectionHeight)
-
-        // Position of today's 6 AM (start of grid, right after day header)
-        const today6AMPosition = todayHeaderPosition + dayHeaderHeight
-
-        // We want 6 AM to be visible right below the sticky day header
-        // Sticky team header: 0-56px, Sticky day header: 56-96px
-        // So visible content starts at ~96px
-        const visibleContentStart = teamHeaderHeight + dayHeaderHeight // 96
-
-        const targetScrollTop = today6AMPosition - visibleContentStart
-
-        console.log('[rAF] todayIndex:', todayIndex)
-        console.log('[rAF] todayHeaderPosition:', todayHeaderPosition)
-        console.log('[rAF] today6AMPosition:', today6AMPosition)
-        console.log('[rAF] visibleContentStart:', visibleContentStart)
-        console.log('[rAF] targetScrollTop:', targetScrollTop)
-        console.log('[rAF] scrollTopBefore:', scrollContainerRef.current.scrollTop)
-
-        scrollContainerRef.current.scrollTop = targetScrollTop
-
-        console.log('[rAF] scrollTopAfter:', scrollContainerRef.current.scrollTop)
-
-        // Debug: Check which day headers are near the top after scroll
-        setTimeout(() => {
-          console.log('[DEBUG 100ms after scroll] Checking visible day headers...')
-          const allDayHeaders = scrollContainerRef.current?.querySelectorAll('[data-date]')
-          if (allDayHeaders) {
-            const containerTop = scrollContainerRef.current.getBoundingClientRect().top
-            allDayHeaders.forEach(header => {
-              const rect = header.getBoundingClientRect()
-              const relativeTop = rect.top - containerTop
-              // Only log headers near the top of the viewport (within 200px)
-              if (relativeTop >= -50 && relativeTop <= 200) {
-                console.log('[DEBUG] Day header', header.dataset.date, 'is at relativeTop:', relativeTop)
-              }
-            })
-          }
-          console.log('[DEBUG] Current scrollTop:', scrollContainerRef.current?.scrollTop)
-        }, 100)
-      } else {
-        console.log('[rAF] scrollContainerRef not available')
-      }
+      // Scroll so the day header is at the top, below sticky headers
+      const containerRect = container.getBoundingClientRect()
+      const dayRect = dayEl.getBoundingClientRect()
+      const offset = dayRect.top - containerRect.top + container.scrollTop
+      // Account for sticky team-member header (~56px)
+      container.scrollTop = offset - 56
     })
 
     scrollChangeSource.current = null
   }, [selectedDate])
-
-  // Debug: Log selectedDate on every render
-  useEffect(() => {
-    console.log('[DEBUG RENDER] selectedDate is now:', format(selectedDate, 'yyyy-MM-dd'))
-  })
 
   // Update current time every minute
   useEffect(() => {
@@ -528,13 +471,15 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
       grabOffsetRef.current = { x: 0, y: 0 }
     }
 
-    // Handle holding pin cards (prefixed id) vs grid cards (event id directly)
+    // Handle panel cards (holding-pin / earlier-pin) vs grid cards (event id directly)
     const data = event.active.data.current
-    if (data?.source === 'holding-pin') {
+    if (data?.source === 'holding-pin' || data?.source === 'earlier-pin') {
       holdingPinEventRef.current = data.event.id
+      panelDragSourceRef.current = data.source
       setActiveId(data.event.id)
     } else {
       holdingPinEventRef.current = null
+      panelDragSourceRef.current = null
       setActiveId(event.active.id)
     }
   }
@@ -587,6 +532,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     if (ignoreDragRef.current) {
       ignoreDragRef.current = false
       holdingPinEventRef.current = null
+      panelDragSourceRef.current = null
       setActiveId(null)
       setDragOverSlot(null)
       setDragOverColumn(null)
@@ -605,17 +551,23 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     setDragOverColumn(null)
     setDragOverDate(null)
 
-    // Use ref for holding-pin detection since the draggable may have unmounted mid-drag
+    // Use ref for panel-drag detection since the draggable may have unmounted mid-drag
     const isHoldingPin = holdingPinEventRef.current !== null
+    const isFromEarlierPin = panelDragSourceRef.current === 'earlier-pin'
     const eventId = isHoldingPin ? holdingPinEventRef.current : active.id
     holdingPinEventRef.current = null
+    panelDragSourceRef.current = null
     const draggedEvent = events.find((e) => e.id === eventId)
     if (!draggedEvent) return
 
     // Check if dropped on a holding pin target (Unassigned pill)
     const dropTarget = over?.data?.current?.target
     if (dropTarget === 'unassigned') {
-      const updatedEvent = { ...draggedEvent, assigneeId: null }
+      const updatedEvent = {
+        ...draggedEvent,
+        assigneeId: null,
+        ...(isFromEarlierPin ? { earlierOpening: false } : {}),
+      }
       if (onEventUpdate) onEventUpdate(updatedEvent)
       toast.success('Event moved to unassigned jobs')
       return
@@ -699,6 +651,8 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
       date: targetDate,
       startTime: newStartTime,
       endTime: newEndTime,
+      // Clear earlier opening flag when dragged from the Earlier panel
+      ...(isFromEarlierPin ? { earlierOpening: false } : {}),
     }
 
     // Show success message if assigned/reassigned to different person
@@ -717,6 +671,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
   const handleDragCancel = () => {
     ignoreDragRef.current = false
     holdingPinEventRef.current = null
+    panelDragSourceRef.current = null
     setActiveId(null)
     setDragOverSlot(null)
     setDragOverColumn(null)
@@ -815,24 +770,24 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
       <div
         ref={scrollContainerRef}
         tabIndex={-1}
-        className="hidden md:flex md:flex-col flex-1 min-h-0 overflow-auto bg-gray-200 relative focus:outline-none"
+        className="flex flex-col flex-1 min-h-0 overflow-auto bg-white relative focus:outline-none"
       >
       {/* Content wrapper with min-width to enable horizontal scrolling */}
-      <div style={{ minWidth: `${64 + filteredMembers.length * 150}px` }}>
+      <div style={{ minWidth: `${64 + filteredMembers.length * 220}px` }}>
 
       {/* Column Headers - Sticky at very top */}
-      <div className="sticky top-0 z-40 bg-charcoal border-b border-secondary">
+      <div className="sticky top-0 z-40 bg-white border-b border-gray-300">
         <div className="flex">
           {/* Time label column header (spacer) - Sticky on left */}
-          <div className="w-16 flex-shrink-0 bg-charcoal sticky left-0 z-10" />
+          <div className="w-16 flex-shrink-0 bg-white sticky left-0 z-10" />
 
           {/* Team member column headers */}
           <div className="flex flex-1">
             {filteredMembers.map((member) => (
               <div
                 key={member.id}
-                className="px-4 py-3 border-l border-secondary flex-shrink-0 flex-1"
-                style={{ minWidth: '150px' }}
+                className="px-4 py-3 border-l border-gray-200 flex-shrink-0 flex-1"
+                style={{ minWidth: '220px' }}
               >
                 <div className="flex items-center gap-2">
                   {/* Avatar/Initials */}
@@ -843,7 +798,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
                     {member.avatar}
                   </div>
                   {/* Name */}
-                  <span className="font-body text-sm text-text-light font-semibold">
+                  <span className="font-body text-sm text-gray-700 font-semibold">
                     {member.name}
                   </span>
                 </div>
@@ -864,14 +819,14 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
             <div
               ref={(el) => (dayRefs.current[dateKey] = el)}
               data-date={dateKey}
-              className="sticky top-14 z-30 bg-gray-100 border-b-2 border-accent px-4 py-2"
+              className="sticky top-14 z-30 bg-white border-b border-gray-300 px-4 py-2"
             >
               <div className="flex items-center gap-3">
                 {/* Calendar Icon Button */}
                 <div className="relative" ref={calendarOpenForDate === dateKey ? calendarButtonRef : null}>
                   <button
                     onClick={() => handleCalendarClick(dateKey)}
-                    className="flex items-center justify-center w-8 h-8 rounded hover:bg-gray-300 transition-colors"
+                    className="flex items-center justify-center w-8 h-8 rounded hover:bg-gray-100 transition-colors"
                     aria-label="Open calendar"
                   >
                     <svg
@@ -900,7 +855,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
                 </div>
 
                 {/* Date Text */}
-                <h2 className="font-body text-xl uppercase text-gray-800 font-bold">
+                <h2 className="font-body text-lg uppercase text-gray-700 font-bold">
                   {format(dayDate, 'EEEE, MMMM d, yyyy')}
                 </h2>
 
@@ -910,7 +865,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
                 ) : (
                   <button
                     onClick={handleTodayClick}
-                    className="px-3 py-1 bg-gray-300 text-gray-700 rounded-full font-body text-xs font-semibold hover:bg-gray-400 transition-all"
+                    className="px-3 py-1 bg-white text-gray-600 border border-gray-300 rounded-full font-body text-xs font-semibold hover:border-accent hover:text-accent transition-all"
                   >
                     Today
                   </button>
@@ -921,7 +876,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
             {/* Grid Body for this day */}
             <div className="flex relative" style={{ height: `${TOTAL_SLOTS * SLOT_HEIGHT}px` }}>
               {/* Time labels column - Sticky on left */}
-              <div className="w-16 flex-shrink-0 bg-gray-200 relative sticky left-0 z-10">
+              <div className="w-16 flex-shrink-0 bg-gray-50 relative sticky left-0 z-10">
                 {timeLabels.map((time, index) => {
                   const topPosition = index * SLOTS_PER_HOUR * SLOT_HEIGHT
                   return (
@@ -945,7 +900,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
                       key={`grid-${member.id}`}
                       className="relative flex-shrink-0 flex-1"
                       style={{
-                        minWidth: '150px',
+                        minWidth: '220px',
                         borderLeft: memberIndex === 0 ? 'none' : '1px solid #D1D5DB',
                         height: `${TOTAL_SLOTS * SLOT_HEIGHT}px`,
                       }}
@@ -1020,7 +975,6 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
                         resizingEvent={resizingEvent}
                         resizePreviewEndTime={resizePreviewEndTime}
                         calculateEventOffset={calculateEventOffset}
-                        earlierHighlightMode={earlierHighlightMode}
                       />
                     )
                   })}
@@ -1064,6 +1018,5 @@ DesktopTimeGrid.propTypes = {
   onEventClick: PropTypes.func,
   onEventUpdate: PropTypes.func,
   roleFilter: PropTypes.oneOf(['all', 'tech', 'sales']),
-  earlierHighlightMode: PropTypes.bool,
   children: PropTypes.node,
 }
