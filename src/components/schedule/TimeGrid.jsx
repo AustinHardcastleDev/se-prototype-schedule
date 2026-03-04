@@ -450,7 +450,7 @@ export default function TimeGrid({ selectedDate, selectedMember, events: allEven
           {/* Drag-over preview (ghost) */}
           {dragOverSlot !== null && activeEvent && (
             <div
-              className="absolute left-0 right-0 pointer-events-none z-20"
+              className="absolute left-0 right-3 pointer-events-none z-20"
               style={{
                 top: `${dragOverSlot * SLOT_HEIGHT}px`,
               }}
@@ -472,7 +472,7 @@ export default function TimeGrid({ selectedDate, selectedMember, events: allEven
           {/* Resize preview */}
           {resizingEvent && resizePreviewEndTime && (
             <div
-              className="absolute left-0 right-0 pointer-events-none z-20"
+              className="absolute left-0 right-3 pointer-events-none z-20"
               style={{
                 top: `${calculateEventOffset(resizingEvent.startTime)}px`,
               }}
@@ -506,7 +506,7 @@ export default function TimeGrid({ selectedDate, selectedMember, events: allEven
             events.map((event) => (
               <div
                 key={event.id}
-                className="absolute left-0 right-0"
+                className="absolute left-0 right-3"
                 style={{
                   top: `${calculateEventOffset(event.startTime)}px`,
                   height: `${calculateEventOffset(event.endTime) - calculateEventOffset(event.startTime)}px`,

@@ -8,7 +8,7 @@ export default function AppLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false)
 
   return (
-    <div className="h-screen bg-charcoal flex flex-col md:flex-row overflow-hidden">
+    <div className="h-screen bg-white flex flex-col md:flex-row overflow-hidden">
       {/* Desktop Sidebar */}
       <Sidebar />
 
@@ -18,8 +18,8 @@ export default function AppLayout() {
       {/* Mobile Hamburger Drawer */}
       <HamburgerDrawer isOpen={drawerOpen} onClose={() => setDrawerOpen(false)} />
 
-      {/* Main Content Area */}
-      <main className="flex-1 flex flex-col md:ml-64 pt-14 md:pt-0 min-h-0 overflow-hidden">
+      {/* Main Content Area - white background */}
+      <main className="flex-1 flex flex-col md:ml-64 pt-14 md:pt-0 min-h-0 overflow-hidden bg-white">
         <Outlet />
       </main>
     </div>

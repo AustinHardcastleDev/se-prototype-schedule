@@ -10,6 +10,7 @@ import TeamMemberSwitcher from '../components/schedule/TeamMemberSwitcher'
 import CreateEventModal from '../components/schedule/CreateEventModal'
 import EditEventModal from '../components/schedule/EditEventModal'
 import EventDetailsModal from '../components/schedule/EventDetailsModal'
+import DesktopToolbar from '../components/schedule/DesktopToolbar'
 import { getAllMembers, getAllEvents, getEventTypes } from '../utils/dataAccess'
 
 export default function SchedulePage() {
@@ -32,9 +33,6 @@ export default function SchedulePage() {
 
   // Desktop role filter state
   const [roleFilter, setRoleFilter] = useState('all')
-
-  // Earlier highlight toggle state
-  const [earlierHighlightMode, setEarlierHighlightMode] = useState(false)
 
   // Split view state
   const [splitMember, setSplitMember] = useState(null)
@@ -160,6 +158,33 @@ export default function SchedulePage() {
       {/* Week Strip - Mobile Only */}
       <WeekStrip selectedDate={selectedDate} onDateSelect={handleDateSelect} />
 
+      {/* Desktop Page Title + Panel with Toolbar + Grid */}
+      <DesktopToolbar
+        roleFilter={roleFilter}
+        onRoleFilterChange={setRoleFilter}
+        selectedDate={selectedDate}
+        onDateChange={handleDateSelect}
+      >
+        {/* Desktop Time Grid - rendered inside the panel */}
+        <DesktopTimeGrid
+          selectedDate={selectedDate}
+          events={events}
+          onDateChange={handleDateSelect}
+          onSlotClick={handleDesktopSlotClick}
+          onEventClick={handleEventClick}
+          onEventUpdate={handleUpdateEvent}
+          roleFilter={roleFilter}
+        >
+          <DesktopFloatingPanel
+            onEventTypeSelect={handleEventTypeSelect}
+            roleFilter={roleFilter}
+            onRoleFilterChange={setRoleFilter}
+            events={events}
+            onEventClick={handleEventClick}
+          />
+        </DesktopTimeGrid>
+      </DesktopToolbar>
+
       {/* Time Grid - Mobile Day Agenda View - Mobile Only */}
       <div className="md:hidden flex flex-col flex-1">
         {isSplitView ? (
@@ -184,29 +209,6 @@ export default function SchedulePage() {
           />
         )}
       </div>
-
-      {/* Desktop Time Grid - Multi-Column View - Desktop Only */}
-      <DesktopTimeGrid
-        selectedDate={selectedDate}
-        events={events}
-        onDateChange={handleDateSelect}
-        onSlotClick={handleDesktopSlotClick}
-        onEventClick={handleEventClick}
-        onEventUpdate={handleUpdateEvent}
-        roleFilter={roleFilter}
-        earlierHighlightMode={earlierHighlightMode}
-      >
-        {/* Desktop Floating Panel - rendered inside DndContext for drag support */}
-        <DesktopFloatingPanel
-          onEventTypeSelect={handleEventTypeSelect}
-          roleFilter={roleFilter}
-          onRoleFilterChange={setRoleFilter}
-          events={events}
-          onEventClick={handleEventClick}
-          earlierHighlightMode={earlierHighlightMode}
-          onEarlierHighlightToggle={() => setEarlierHighlightMode(prev => !prev)}
-        />
-      </DesktopTimeGrid>
 
       {/* Team Member Switcher - Mobile Only - Bottom Left */}
       <TeamMemberSwitcher

@@ -1,11 +1,8 @@
 import { NavLink } from 'react-router-dom'
 import PropTypes from 'prop-types'
-import { getAllMembers } from '../utils/dataAccess'
+import SELogo from '../components/ui/SELogo'
 
 function HamburgerDrawer({ isOpen, onClose }) {
-  // Get current user (first team member) for display
-  const currentUser = getAllMembers()[0]
-
   return (
     <>
       {/* Backdrop overlay */}
@@ -29,93 +26,96 @@ function HamburgerDrawer({ isOpen, onClose }) {
             className="w-8 h-8 flex items-center justify-center text-text-light hover:text-accent transition-colors"
             aria-label="Close menu"
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         {/* Logo */}
-        <div className="px-6 pb-6 border-b border-secondary">
-          <div className="font-body text-2xl text-accent uppercase tracking-wider font-bold">
-            SE Schedule
+        <div className="px-6 pb-4">
+          <SELogo />
+        </div>
+
+        {/* Search bar */}
+        <div className="px-4 pb-4">
+          <div className="flex items-center gap-2 px-3 py-2 border border-muted/40 rounded font-body text-sm">
+            <span className="uppercase text-xs font-semibold tracking-wide text-text-light">Search</span>
+            <svg className="w-3.5 h-3.5 text-muted ml-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
           </div>
         </div>
 
         {/* Navigation links */}
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 px-4 space-y-1">
           <NavLink
-            to="/"
+            to="/admin"
             onClick={onClose}
             className={({ isActive }) =>
-              `block px-4 py-3 rounded-lg font-body transition-colors ${
-                isActive
-                  ? 'bg-accent text-white'
-                  : 'text-text-light hover:bg-secondary'
+              `block px-2 py-2 font-body text-sm transition-colors ${
+                isActive ? 'text-accent font-semibold' : 'text-text-light hover:text-accent'
+              }`
+            }
+          >
+            Admin
+          </NavLink>
+          <NavLink
+            to="/directory"
+            onClick={onClose}
+            className={({ isActive }) =>
+              `block px-2 py-2 font-body text-sm transition-colors ${
+                isActive ? 'text-accent font-semibold' : 'text-text-light hover:text-accent'
+              }`
+            }
+          >
+            Directory
+          </NavLink>
+          <NavLink
+            to="/route-planner"
+            onClick={onClose}
+            className={({ isActive }) =>
+              `block px-2 py-2 font-body text-sm transition-colors ${
+                isActive ? 'text-accent font-semibold' : 'text-text-light hover:text-accent'
+              }`
+            }
+          >
+            Route Planner
+          </NavLink>
+          <NavLink
+            to="/"
+            end
+            onClick={onClose}
+            className={({ isActive }) =>
+              `block px-2 py-2 font-body text-sm transition-colors ${
+                isActive ? 'text-accent font-semibold' : 'text-text-light hover:text-accent'
               }`
             }
           >
             Schedule
           </NavLink>
-          <NavLink
-            to="/team"
-            onClick={onClose}
-            className={({ isActive }) =>
-              `block px-4 py-3 rounded-lg font-body transition-colors ${
-                isActive
-                  ? 'bg-accent text-white'
-                  : 'text-text-light hover:bg-secondary'
-              }`
-            }
-          >
-            Team
-          </NavLink>
-          <NavLink
-            to="/reports"
-            onClick={onClose}
-            className={({ isActive }) =>
-              `block px-4 py-3 rounded-lg font-body transition-colors ${
-                isActive
-                  ? 'bg-accent text-white'
-                  : 'text-text-light hover:bg-secondary'
-              }`
-            }
-          >
-            Reports
-          </NavLink>
+          <div className="flex items-center justify-between px-2 py-2 font-body text-sm text-text-light hover:text-accent cursor-pointer transition-colors">
+            <span>Store</span>
+            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z" />
+            </svg>
+          </div>
         </nav>
 
-        {/* Search bar */}
-        <div className="p-4">
-          <input
-            type="text"
-            placeholder="Search..."
-            className="w-full px-4 py-2 bg-secondary text-text-light rounded-full font-body placeholder-muted focus:outline-none focus:ring-2 focus:ring-accent"
-          />
-        </div>
-
         {/* User avatar/name at bottom */}
-        <div className="p-4 border-t border-secondary">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-10 h-10 rounded-full flex items-center justify-center font-body font-semibold text-sm"
-              style={{ backgroundColor: currentUser.color }}
-            >
-              {currentUser.avatar}
-            </div>
-            <div className="flex-1">
-              <div className="font-body text-sm font-semibold">{currentUser.name}</div>
-              <div className="font-body text-xs text-muted capitalize">{currentUser.role}</div>
+        <div className="mt-auto">
+          <div className="mx-4 border-t border-muted/30" />
+          <div className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-gray-500 flex items-center justify-center">
+                <svg className="w-6 h-6 text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <div className="font-body text-sm font-semibold leading-tight">Austin</div>
+                <div className="font-body text-sm font-semibold leading-tight">Hardcastle</div>
+              </div>
             </div>
           </div>
         </div>

@@ -7,7 +7,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        charcoal: '#1A1A1A',
+        charcoal: '#252525',
         accent: '#F47A20',
         'card-bg': '#FFFFFF',
         secondary: '#2A2A2A',
