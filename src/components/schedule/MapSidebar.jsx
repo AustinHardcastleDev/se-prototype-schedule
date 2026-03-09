@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { format } from 'date-fns'
 import { getAllMembers, getEventTypeByKey } from '../../utils/dataAccess'
@@ -9,6 +9,8 @@ export default function MapSidebar({ event, isOpen, onClose, onAssign, onEventUp
   const [ghostStartTime, setGhostStartTime] = useState(null)
   const [ghostEndTime, setGhostEndTime] = useState(null)
   const [isAssigned, setIsAssigned] = useState(false)
+  const [isTechDropdownOpen, setIsTechDropdownOpen] = useState(false)
+  const dropdownRef = useRef(null)
   const members = getAllMembers().filter(m => m.role === 'tech' || m.role === 'sales')
 
   // Reset selected tech when a new event is clicked
@@ -32,6 +34,17 @@ export default function MapSidebar({ event, isOpen, onClose, onAssign, onEventUp
     // Only re-run when the selected tech changes, not on event object updates
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedTechId])
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsTechDropdownOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [])
 
   if (!event) return null
 
@@ -153,30 +166,68 @@ export default function MapSidebar({ event, isOpen, onClose, onAssign, onEventUp
         {/* Tech selector dropdown */}
         <div className="px-5 py-3 border-b border-gray-100">
           <label className="font-body text-xs font-bold text-gray-400 uppercase tracking-wide block mb-1.5">
-            {isUnassigned ? 'Assign to' : 'Assign to'}
+            Assign to
           </label>
-          <div className="relative">
-            <select
-              value={selectedTechId || ''}
-              onChange={(e) => setSelectedTechId(e.target.value || null)}
-              className="w-full appearance-none bg-white border border-gray-200 rounded-lg px-3 py-2 pr-8 font-body text-sm font-semibold text-gray-800 focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent transition-colors cursor-pointer"
+          <div className="relative" ref={dropdownRef}>
+            <button
+              type="button"
+              onClick={() => setIsTechDropdownOpen(prev => !prev)}
+              className="w-full flex items-center gap-2.5 bg-white border border-gray-200 rounded-lg px-3 py-2 pr-8 font-body text-sm font-semibold text-gray-800 focus:outline-none focus:ring-1 focus:ring-accent focus:border-accent transition-colors cursor-pointer text-left"
             >
-              <option value="">Select a tech...</option>
-              {members.map(member => {
-                const memberJobCount = events.filter(
-                  e => e.assigneeId === member.id && e.date === dateStr
-                ).length
-                const isCurrent = event.assigneeId === member.id
-                return (
-                  <option key={member.id} value={member.id}>
-                    {member.name}{isCurrent ? ' (current)' : ''} — {memberJobCount} jobs
-                  </option>
-                )
-              })}
-            </select>
+              {selectedTechId ? (
+                <>
+                  <svg width="12" height="18" viewBox="0 0 24 36" className="flex-shrink-0">
+                    <path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 24 12 24s12-15 12-24C24 5.4 18.6 0 12 0z" fill={members.find(m => m.id === selectedTechId)?.color || '#6B7280'} stroke="white" strokeWidth="1.5"/>
+                    <circle cx="12" cy="12" r="4.5" fill="white"/>
+                  </svg>
+                  <span className="truncate">
+                    {members.find(m => m.id === selectedTechId)?.name}
+                    {event.assigneeId === selectedTechId ? ' (current)' : ''}
+                  </span>
+                </>
+              ) : (
+                <span className="text-gray-400 font-normal">Select a tech...</span>
+              )}
+            </button>
             <svg className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
+
+            {isTechDropdownOpen && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 py-1 max-h-60 overflow-y-auto">
+                {members.map(member => {
+                  const memberJobCount = events.filter(
+                    e => e.assigneeId === member.id && e.date === dateStr
+                  ).length
+                  const isCurrent = event.assigneeId === member.id
+                  const isSelected = selectedTechId === member.id
+                  return (
+                    <button
+                      key={member.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedTechId(member.id)
+                        setIsTechDropdownOpen(false)
+                      }}
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 text-left font-body text-sm transition-colors ${
+                        isSelected
+                          ? 'bg-accent/10 font-semibold text-gray-900'
+                          : 'hover:bg-gray-50 text-gray-700'
+                      }`}
+                    >
+                      <svg width="12" height="18" viewBox="0 0 24 36" className="flex-shrink-0">
+                        <path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 24 12 24s12-15 12-24C24 5.4 18.6 0 12 0z" fill={member.color} stroke="white" strokeWidth="1.5"/>
+                        <circle cx="12" cy="12" r="4.5" fill="white"/>
+                      </svg>
+                      <span className="truncate flex-1">
+                        {member.name}{isCurrent ? ' (current)' : ''}
+                      </span>
+                      <span className="text-xs text-gray-400 flex-shrink-0">{memberJobCount} jobs</span>
+                    </button>
+                  )
+                })}
+              </div>
+            )}
           </div>
         </div>
 
