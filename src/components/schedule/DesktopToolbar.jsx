@@ -78,12 +78,25 @@ export default function DesktopToolbar({ roleFilter, onRoleFilterChange, selecte
           {/* Spacer */}
           <div className="flex-1" />
 
-          {/* Quick Search */}
-          <div className="flex items-center gap-2 px-3 py-1 rounded bg-secondary">
-            <span className="font-body text-xs text-muted">Quick Search</span>
-            <svg className="w-3.5 h-3.5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-            </svg>
+          {/* Role Filter */}
+          <div className="flex items-center gap-0.5 bg-white/[0.06] rounded-lg p-0.5">
+            {[
+              { value: 'all', label: 'All' },
+              { value: 'tech', label: 'Tech' },
+              { value: 'sales', label: 'Sales' },
+            ].map((filter) => (
+              <button
+                key={filter.value}
+                onClick={() => onRoleFilterChange(filter.value)}
+                className={`px-3.5 py-1.5 rounded-md font-body text-xs font-semibold transition-all duration-200 ${
+                  roleFilter === filter.value
+                    ? 'bg-accent text-white shadow-sm'
+                    : 'text-white/40 hover:text-white/70'
+                }`}
+              >
+                {filter.label}
+              </button>
+            ))}
           </div>
         </div>
 
