@@ -41,10 +41,18 @@ export default function DesktopMapView({ selectedDate, events, onEventUpdate }) 
     setSelectedPinEvent(null)
   }
 
-  const handleAssign = (event, techId) => {
-    onEventUpdate({ ...event, assigneeId: techId })
-    setIsSidebarOpen(false)
-    setSelectedPinEvent(null)
+  const handleAssign = (event, techId, startTime, endTime) => {
+    const updatedEvent = {
+      ...event,
+      assigneeId: techId,
+      ...(startTime ? { startTime } : {}),
+      ...(endTime ? { endTime } : {}),
+      // Earlier openings: move to selected date and clear the flag
+      ...(event.earlierOpening ? { earlierOpening: false, date: dateStr } : {}),
+    }
+    onEventUpdate(updatedEvent)
+    // Update local state so sidebar reflects the new assignee
+    setSelectedPinEvent(updatedEvent)
   }
 
   return (
@@ -120,6 +128,7 @@ export default function DesktopMapView({ selectedDate, events, onEventUpdate }) 
         isOpen={isSidebarOpen}
         onClose={handleCloseSidebar}
         onAssign={handleAssign}
+        onEventUpdate={onEventUpdate}
         events={events}
         selectedDate={selectedDate}
       />
