@@ -14,6 +14,7 @@ const DEFAULT_ZOOM = 12
 export default function DesktopMapView({ selectedDate, events, onEventUpdate }) {
   const [showUnassigned, setShowUnassigned] = useState(true)
   const [showEarlier, setShowEarlier] = useState(true)
+  const [showStopNumbers, setShowStopNumbers] = useState(false)
   const [selectedPinEvent, setSelectedPinEvent] = useState(null)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
@@ -30,6 +31,21 @@ export default function DesktopMapView({ selectedDate, events, onEventUpdate }) 
       earlierGeoEvents: events.filter(e => e.earlierOpening === true && e.lat != null && e.date > dateStr),
     }
   }, [events, dateStr])
+
+  // Compute per-tech stop ordering: group assigned events by tech, sort by startTime
+  const stopNumberMap = useMemo(() => {
+    const map = new Map()
+    const byTech = new Map()
+    for (const event of assignedGeoEvents) {
+      if (!byTech.has(event.assigneeId)) byTech.set(event.assigneeId, [])
+      byTech.get(event.assigneeId).push(event)
+    }
+    for (const techEvents of byTech.values()) {
+      techEvents.sort((a, b) => a.startTime.localeCompare(b.startTime))
+      techEvents.forEach((event, i) => map.set(event.id, i + 1))
+    }
+    return map
+  }, [assignedGeoEvents])
 
   const handlePinClick = (event) => {
     setSelectedPinEvent(event)
@@ -77,6 +93,7 @@ export default function DesktopMapView({ selectedDate, events, onEventUpdate }) 
               key={event.id}
               event={event}
               color={member?.color || '#1A1A1A'}
+              stopNumber={showStopNumbers ? stopNumberMap.get(event.id) : undefined}
               onClick={handlePinClick}
             />
           )
@@ -113,6 +130,8 @@ export default function DesktopMapView({ selectedDate, events, onEventUpdate }) 
         showUnassigned={showUnassigned}
         onToggleUnassigned={() => setShowUnassigned(prev => !prev)}
         unassignedCount={unassignedGeoEvents.length}
+        showStopNumbers={showStopNumbers}
+        onToggleStopNumbers={() => setShowStopNumbers(prev => !prev)}
       />
 
       {/* Tech legend */}
