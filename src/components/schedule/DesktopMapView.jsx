@@ -14,7 +14,7 @@ const DEFAULT_ZOOM = 12
 export default function DesktopMapView({ selectedDate, events, onEventUpdate }) {
   const [showUnassigned, setShowUnassigned] = useState(true)
   const [showEarlier, setShowEarlier] = useState(true)
-  const [showStopNumbers, setShowStopNumbers] = useState(false)
+  const [showStopNumbers, setShowStopNumbers] = useState(true)
   const [selectedPinEvent, setSelectedPinEvent] = useState(null)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
 
