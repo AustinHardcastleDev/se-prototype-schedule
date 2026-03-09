@@ -11,6 +11,7 @@ import CreateEventModal from '../components/schedule/CreateEventModal'
 import EditEventModal from '../components/schedule/EditEventModal'
 import EventDetailsModal from '../components/schedule/EventDetailsModal'
 import DesktopToolbar from '../components/schedule/DesktopToolbar'
+import DesktopMapView from '../components/schedule/DesktopMapView'
 import { getAllMembers, getAllEvents, getEventTypes } from '../utils/dataAccess'
 
 export default function SchedulePage() {
@@ -33,6 +34,9 @@ export default function SchedulePage() {
 
   // Desktop role filter state
   const [roleFilter, setRoleFilter] = useState('all')
+
+  // Desktop view mode state (calendar or map)
+  const [viewMode, setViewMode] = useState('calendar')
 
   // Split view state
   const [splitMember, setSplitMember] = useState(null)
@@ -164,23 +168,32 @@ export default function SchedulePage() {
         onRoleFilterChange={setRoleFilter}
         selectedDate={selectedDate}
         onDateChange={handleDateSelect}
+        viewMode={viewMode}
+        onViewModeChange={setViewMode}
       >
-        {/* Desktop Time Grid - rendered inside the panel */}
-        <DesktopTimeGrid
-          selectedDate={selectedDate}
-          events={events}
-          onDateChange={handleDateSelect}
-          onSlotClick={handleDesktopSlotClick}
-          onEventClick={handleEventClick}
-          onEventUpdate={handleUpdateEvent}
-          roleFilter={roleFilter}
-        >
-          <DesktopFloatingPanel
-            onEventTypeSelect={handleEventTypeSelect}
+        {viewMode === 'calendar' ? (
+          <DesktopTimeGrid
+            selectedDate={selectedDate}
             events={events}
+            onDateChange={handleDateSelect}
+            onSlotClick={handleDesktopSlotClick}
             onEventClick={handleEventClick}
+            onEventUpdate={handleUpdateEvent}
+            roleFilter={roleFilter}
+          >
+            <DesktopFloatingPanel
+              onEventTypeSelect={handleEventTypeSelect}
+              events={events}
+              onEventClick={handleEventClick}
+            />
+          </DesktopTimeGrid>
+        ) : (
+          <DesktopMapView
+            selectedDate={selectedDate}
+            events={events}
+            onEventUpdate={handleUpdateEvent}
           />
-        </DesktopTimeGrid>
+        )}
       </DesktopToolbar>
 
       {/* Time Grid - Mobile Day Agenda View - Mobile Only */}

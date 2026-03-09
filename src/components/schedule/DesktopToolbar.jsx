@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { format } from 'date-fns'
 import CalendarPopup from '../ui/CalendarPopup'
 
-export default function DesktopToolbar({ roleFilter, onRoleFilterChange, selectedDate, onDateChange, children }) {
+export default function DesktopToolbar({ roleFilter, onRoleFilterChange, selectedDate, onDateChange, viewMode, onViewModeChange, children }) {
   const [calendarOpen, setCalendarOpen] = useState(false)
   const calendarRef = useRef(null)
 
@@ -57,7 +57,7 @@ export default function DesktopToolbar({ roleFilter, onRoleFilterChange, selecte
             </button>
 
             {calendarOpen && (
-              <div className="absolute top-full mt-2 left-0 z-50">
+              <div className="absolute top-full mt-2 left-0 z-[1100]">
                 <CalendarPopup
                   selectedDate={selectedDate}
                   onDateSelect={handleDateSelect}
@@ -74,6 +74,38 @@ export default function DesktopToolbar({ roleFilter, onRoleFilterChange, selecte
           >
             Today
           </button>
+
+          {/* View Mode Toggle */}
+          {onViewModeChange && (
+            <div className="flex items-center gap-0.5 bg-white/[0.06] rounded-lg p-0.5 ml-2">
+              <button
+                onClick={() => onViewModeChange('calendar')}
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-md font-body text-xs font-semibold transition-all duration-200 ${
+                  viewMode === 'calendar'
+                    ? 'bg-accent text-white shadow-sm'
+                    : 'text-white/40 hover:text-white/70'
+                }`}
+              >
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Calendar
+              </button>
+              <button
+                onClick={() => onViewModeChange('map')}
+                className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-md font-body text-xs font-semibold transition-all duration-200 ${
+                  viewMode === 'map'
+                    ? 'bg-accent text-white shadow-sm'
+                    : 'text-white/40 hover:text-white/70'
+                }`}
+              >
+                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
+                </svg>
+                Map
+              </button>
+            </div>
+          )}
 
           {/* Spacer */}
           <div className="flex-1" />
@@ -114,5 +146,7 @@ DesktopToolbar.propTypes = {
   onRoleFilterChange: PropTypes.func.isRequired,
   selectedDate: PropTypes.instanceOf(Date).isRequired,
   onDateChange: PropTypes.func.isRequired,
+  viewMode: PropTypes.oneOf(['calendar', 'map']),
+  onViewModeChange: PropTypes.func,
   children: PropTypes.node,
 }
