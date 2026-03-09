@@ -177,8 +177,6 @@ export default function SchedulePage() {
         >
           <DesktopFloatingPanel
             onEventTypeSelect={handleEventTypeSelect}
-            roleFilter={roleFilter}
-            onRoleFilterChange={setRoleFilter}
             events={events}
             onEventClick={handleEventClick}
           />

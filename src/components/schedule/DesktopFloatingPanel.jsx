@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { useDraggable, useDroppable, useDndContext } from '@dnd-kit/core'
 import { getEventTypes, getEventTypeByKey } from '../../utils/dataAccess'
@@ -31,11 +31,89 @@ DraggableHoldingCard.propTypes = {
   children: PropTypes.node.isRequired,
 }
 
-export default function DesktopFloatingPanel({ onEventTypeSelect, roleFilter, onRoleFilterChange, events = [], onEventClick }) {
+// Horizontal carousel with programmatic scroll via arrow buttons
+const CARD_WIDTH = 220
+const CARD_GAP = 10
+
+function HorizontalCarousel({ children, itemCount }) {
+  const scrollRef = useRef(null)
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+  const [canScrollRight, setCanScrollRight] = useState(false)
+
+  const checkScroll = useCallback(() => {
+    const el = scrollRef.current
+    if (!el) return
+    setCanScrollLeft(el.scrollLeft > 1)
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1)
+  }, [])
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(checkScroll)
+    return () => cancelAnimationFrame(frame)
+  }, [checkScroll, itemCount])
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    el.addEventListener('scroll', checkScroll, { passive: true })
+    window.addEventListener('resize', checkScroll)
+    return () => {
+      el.removeEventListener('scroll', checkScroll)
+      window.removeEventListener('resize', checkScroll)
+    }
+  }, [checkScroll])
+
+  const scroll = (direction) => {
+    const el = scrollRef.current
+    if (!el) return
+    el.scrollBy({ left: direction * (CARD_WIDTH + CARD_GAP) * 2, behavior: 'smooth' })
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        onClick={(e) => { e.stopPropagation(); scroll(-1) }}
+        className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
+          canScrollLeft ? 'bg-white/15 hover:bg-white/25 text-white cursor-pointer' : 'text-white/20 pointer-events-none'
+        }`}
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+
+      <div ref={scrollRef} className="flex-1 overflow-x-hidden scrollbar-hide">
+        <div className="flex" style={{ gap: `${CARD_GAP}px` }}>
+          {children}
+        </div>
+      </div>
+
+      <button
+        onClick={(e) => { e.stopPropagation(); scroll(1) }}
+        className={`w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
+          canScrollRight ? 'bg-white/15 hover:bg-white/25 text-white cursor-pointer' : 'text-white/20 pointer-events-none'
+        }`}
+      >
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+  )
+}
+
+HorizontalCarousel.propTypes = {
+  children: PropTypes.node.isRequired,
+  itemCount: PropTypes.number.isRequired,
+}
+
+export default function DesktopFloatingPanel({ onEventTypeSelect, events = [], onEventClick }) {
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [isUnassignedOpen, setIsUnassignedOpen] = useState(false)
   const [isEarlierOpen, setIsEarlierOpen] = useState(false)
   const eventTypes = getEventTypes()
+  const barRef = useRef(null)
+  const carouselRef = useRef(null)
 
   const earlierOpeningEvents = events.filter(e => e.earlierOpening === true)
   const unassignedEvents = events.filter(e => e.assigneeId === null)
@@ -43,12 +121,6 @@ export default function DesktopFloatingPanel({ onEventTypeSelect, roleFilter, on
   const handleEventTypeClick = (eventType) => {
     setIsCreateOpen(false)
     onEventTypeSelect(eventType)
-  }
-
-  const handleBackdropClick = () => {
-    setIsCreateOpen(false)
-    setIsUnassignedOpen(false)
-    setIsEarlierOpen(false)
   }
 
   const handleHoldingCardClick = (event) => {
@@ -81,6 +153,22 @@ export default function DesktopFloatingPanel({ onEventTypeSelect, roleFilter, on
 
   const anyOpen = isCreateOpen || isUnassignedOpen || isEarlierOpen
 
+  // Click-outside handler replaces the full-screen backdrop so the calendar stays scrollable
+  useEffect(() => {
+    if (!anyOpen) return
+    const handleClickOutside = (e) => {
+      const inBar = barRef.current?.contains(e.target)
+      const inCarousel = carouselRef.current?.contains(e.target)
+      if (!inBar && !inCarousel) {
+        setIsCreateOpen(false)
+        setIsUnassignedOpen(false)
+        setIsEarlierOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [anyOpen])
+
   // Format time for display
   const formatTime = (timeStr) => {
     const [hour, minute] = timeStr.split(':').map(Number)
@@ -95,100 +183,100 @@ export default function DesktopFloatingPanel({ onEventTypeSelect, roleFilter, on
     return `${parseInt(month)}/${parseInt(day)}`
   }
 
-  return (
-    <>
-      {/* Backdrop overlay when any menu is open */}
-      {anyOpen && (
-        <div
-          className="fixed inset-0 z-40"
-          onClick={handleBackdropClick}
-        />
-      )}
-
-      {/* Floating Bottom Bar - Desktop Only */}
-      <div className="hidden md:flex fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 items-center gap-3 bg-charcoal/90 backdrop-blur-sm rounded-full px-4 py-2.5 shadow-2xl">
-        {/* Earlier Opening Jobs */}
-        {earlierOpeningEvents.length > 0 && (
-          <div className="relative">
-            {/* Expanded card list */}
-            {isEarlierOpen && earlierOpeningEvents.length > 0 && (
-              <div className="absolute bottom-full mb-3 left-0 flex flex-col gap-2 animate-fadeIn" style={{ width: '280px' }}>
-                {earlierOpeningEvents.map((event) => {
-                  const evtType = getEventTypeByKey(event.type)
-                  return (
-                    <DraggableHoldingCard key={event.id} event={event} source="earlier-pin">
-                      <button
-                        onClick={() => handleEarlierCardClick(event)}
-                        className="bg-white border border-gray-200 rounded-xl px-4 py-3 hover:border-accent hover:shadow-md transition-all text-left shadow-lg w-full"
-                      >
-                        <div className="text-sm font-body text-gray-800 font-semibold truncate">{event.title}</div>
-                        <div className="text-xs font-body text-gray-500 mt-0.5">
-                          {formatDateShort(event.date)} &middot; {formatTime(event.startTime)}
-                        </div>
-                        <div className="text-xs font-body text-amber-600 font-semibold mt-0.5">Earlier Opening</div>
-                        {event.notes && (
-                          <div className="flex items-start gap-1 mt-1.5">
-                            <svg className="w-2.5 h-2.5 text-blue-500 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
-                              <rect x="9" y="3" width="6" height="4" rx="1"/>
-                            </svg>
-                            <span className="text-xs font-body text-blue-500 line-clamp-2">{event.notes}</span>
-                          </div>
-                        )}
-                      </button>
-                    </DraggableHoldingCard>
-                  )
-                })}
-              </div>
-            )}
-
-            {/* Pill button */}
-            <button
-              onClick={() => {
-                setIsEarlierOpen(!isEarlierOpen)
-                setIsUnassignedOpen(false)
-                setIsCreateOpen(false)
-              }}
-              className={`flex items-center gap-2 rounded-full px-3 py-2 transition-all ${
-                isEarlierOpen
-                  ? 'ring-1 ring-amber-400/50'
-                  : 'hover:bg-secondary'
-              }`}
-            >
-              <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-              </svg>
-              <span className="font-body text-xs text-text-light font-semibold whitespace-nowrap">Earlier</span>
-              <span className="font-body text-xs text-white bg-amber-500 rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                {earlierOpeningEvents.length}
-              </span>
-            </button>
+  // Render a full-width carousel tray for a set of events
+  const renderCarouselBar = (carouselEvents, label, dotClass, labelClass, source, onCardClick) => (
+    <div
+      ref={carouselRef}
+      className="hidden md:block fixed z-50 animate-fadeIn"
+      style={{
+        left: 'calc(16rem + 1.5rem)',
+        right: '1.5rem',
+        bottom: '84px',
+      }}
+    >
+      <div className="bg-charcoal/95 backdrop-blur-md rounded-2xl shadow-2xl border border-white/10 px-3 pt-3 pb-3">
+        {/* Header row */}
+        <div className="flex items-center justify-between px-12 mb-2">
+          <div className="flex items-center gap-2">
+            <div className={`w-2 h-2 rounded-full ${dotClass}`} />
+            <span className="text-xs font-body font-semibold text-white/80 tracking-wide uppercase">
+              {label}
+            </span>
           </div>
-        )}
-
-        {/* Role Filter Pills */}
-        <div className="flex items-center gap-1">
-          {[
-            { value: 'all', label: 'All' },
-            { value: 'tech', label: 'Tech' },
-            { value: 'sales', label: 'Sales' },
-          ].map((filter) => (
-            <button
-              key={filter.value}
-              onClick={() => onRoleFilterChange(filter.value)}
-              className={`px-3 py-1.5 rounded-full font-body text-xs font-semibold transition-all ${
-                roleFilter === filter.value
-                  ? 'bg-accent text-white'
-                  : 'text-muted hover:text-text-light'
-              }`}
-            >
-              {filter.label}
-            </button>
-          ))}
+          <span className="text-xs font-body text-white/40">
+            {carouselEvents.length} {carouselEvents.length === 1 ? 'job' : 'jobs'}
+          </span>
         </div>
 
-        {/* Divider */}
-        <div className="w-px h-6 bg-secondary" />
+        {/* Carousel */}
+        <HorizontalCarousel itemCount={carouselEvents.length}>
+          {carouselEvents.map((event) => (
+            <div key={event.id} style={{ width: `${CARD_WIDTH}px`, flexShrink: 0 }}>
+              <DraggableHoldingCard event={event} source={source}>
+                <button
+                  onClick={() => onCardClick(event)}
+                  className="bg-white rounded-xl px-4 py-3 hover:ring-2 hover:ring-accent/50 hover:shadow-md transition-all text-left shadow-lg w-full"
+                >
+                  <div className="text-sm font-body text-gray-800 font-semibold truncate">{event.title}</div>
+                  <div className="text-xs font-body text-gray-500 mt-0.5">
+                    {formatDateShort(event.date)} &middot; {formatTime(event.startTime)}
+                  </div>
+                  <div className={`text-xs font-body ${labelClass} font-semibold mt-0.5`}>{label}</div>
+                  {event.notes && (
+                    <div className="flex items-start gap-1 mt-1.5">
+                      <svg className="w-2.5 h-2.5 text-blue-500 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+                        <rect x="9" y="3" width="6" height="4" rx="1"/>
+                      </svg>
+                      <span className="text-xs font-body text-blue-500 line-clamp-2">{event.notes}</span>
+                    </div>
+                  )}
+                </button>
+              </DraggableHoldingCard>
+            </div>
+          ))}
+        </HorizontalCarousel>
+      </div>
+    </div>
+  )
+
+  return (
+    <>
+      {/* Earlier carousel tray — full calendar width, fixed above the floating bar */}
+      {isEarlierOpen && earlierOpeningEvents.length > 0 &&
+        renderCarouselBar(earlierOpeningEvents, 'Earlier Opening', 'bg-amber-500', 'text-amber-600', 'earlier-pin', handleEarlierCardClick)
+      }
+
+      {/* Unassigned carousel tray */}
+      {isUnassignedOpen && unassignedEvents.length > 0 &&
+        renderCarouselBar(unassignedEvents, 'Unassigned', 'bg-rose-500', 'text-rose-500', 'holding-pin', handleHoldingCardClick)
+      }
+
+      {/* Floating Bottom Bar - Desktop Only */}
+      <div ref={barRef} className="hidden md:flex fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 items-center gap-3 bg-charcoal/90 backdrop-blur-sm rounded-full px-4 py-2.5 shadow-2xl">
+        {/* Earlier Opening Jobs */}
+        {earlierOpeningEvents.length > 0 && (
+          <button
+            onClick={() => {
+              setIsEarlierOpen(!isEarlierOpen)
+              setIsUnassignedOpen(false)
+              setIsCreateOpen(false)
+            }}
+            className={`flex items-center gap-2 rounded-full px-3 py-2 transition-all ${
+              isEarlierOpen
+                ? 'ring-1 ring-amber-400/50'
+                : 'hover:bg-secondary'
+            }`}
+          >
+            <svg className="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span className="font-body text-xs text-text-light font-semibold whitespace-nowrap">Earlier</span>
+            <span className="font-body text-xs text-white bg-amber-500 rounded-full w-5 h-5 flex items-center justify-center font-bold">
+              {earlierOpeningEvents.length}
+            </span>
+          </button>
+        )}
 
         {/* Create Event Button */}
         <div className="relative">
@@ -233,66 +321,31 @@ export default function DesktopFloatingPanel({ onEventTypeSelect, roleFilter, on
 
         {/* Unassigned Jobs */}
         {(unassignedEvents.length > 0 || isAnyDragActive) && (
-          <div className="relative">
-            {/* Expanded card list */}
-            {isUnassignedOpen && unassignedEvents.length > 0 && (
-              <div className="absolute bottom-full mb-3 left-0 flex flex-col gap-2 animate-fadeIn" style={{ width: '280px' }}>
-                {unassignedEvents.map((event) => {
-                  const evtType = getEventTypeByKey(event.type)
-                  return (
-                    <DraggableHoldingCard key={event.id} event={event}>
-                      <button
-                        onClick={() => handleHoldingCardClick(event)}
-                        className="bg-white border border-gray-200 rounded-xl px-4 py-3 hover:border-accent hover:shadow-md transition-all text-left shadow-lg w-full"
-                      >
-                        <div className="text-sm font-body text-gray-800 font-semibold truncate">{event.title}</div>
-                        <div className="text-xs font-body text-gray-500 mt-0.5">
-                          {formatDateShort(event.date)} &middot; {formatTime(event.startTime)}
-                        </div>
-                        <div className="text-xs font-body text-rose-500 font-semibold mt-0.5">Unassigned</div>
-                        {event.notes && (
-                          <div className="flex items-start gap-1 mt-1.5">
-                            <svg className="w-2.5 h-2.5 text-blue-500 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
-                              <rect x="9" y="3" width="6" height="4" rx="1"/>
-                            </svg>
-                            <span className="text-xs font-body text-blue-500 line-clamp-2">{event.notes}</span>
-                          </div>
-                        )}
-                      </button>
-                    </DraggableHoldingCard>
-                  )
-                })}
-              </div>
-            )}
-
-            {/* Pill button - also a drop target */}
-            <button
-              ref={setUnassignedDropRef}
-              onClick={() => {
-                setIsUnassignedOpen(!isUnassignedOpen)
-                setIsCreateOpen(false)
-                setIsEarlierOpen(false)
-              }}
-              className={`flex items-center gap-2 rounded-full transition-all duration-300 ease-out ${
-                isOverUnassigned
-                  ? 'ring-2 ring-rose-400 scale-125 bg-rose-400/20 px-5 py-3'
-                  : isAnyDragActive
-                    ? 'ring-2 ring-rose-400/60 scale-110 bg-rose-400/10 px-4 py-2.5'
-                    : isUnassignedOpen
-                      ? 'ring-1 ring-rose-400/50 px-3 py-2'
-                      : 'hover:bg-secondary px-3 py-2'
-              }`}
-            >
-              <svg className="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-              </svg>
-              <span className="font-body text-xs text-text-light font-semibold whitespace-nowrap">Unassigned</span>
-              <span className="font-body text-xs text-white bg-rose-500 rounded-full w-5 h-5 flex items-center justify-center font-bold">
-                {unassignedEvents.length}
-              </span>
-            </button>
-          </div>
+          <button
+            ref={setUnassignedDropRef}
+            onClick={() => {
+              setIsUnassignedOpen(!isUnassignedOpen)
+              setIsCreateOpen(false)
+              setIsEarlierOpen(false)
+            }}
+            className={`flex items-center gap-2 rounded-full transition-all duration-300 ease-out ${
+              isOverUnassigned
+                ? 'ring-2 ring-rose-400 scale-125 bg-rose-400/20 px-5 py-3'
+                : isAnyDragActive
+                  ? 'ring-2 ring-rose-400/60 scale-110 bg-rose-400/10 px-4 py-2.5'
+                  : isUnassignedOpen
+                    ? 'ring-1 ring-rose-400/50 px-3 py-2'
+                    : 'hover:bg-secondary px-3 py-2'
+            }`}
+          >
+            <svg className="w-4 h-4 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span className="font-body text-xs text-text-light font-semibold whitespace-nowrap">Unassigned</span>
+            <span className="font-body text-xs text-white bg-rose-500 rounded-full w-5 h-5 flex items-center justify-center font-bold">
+              {unassignedEvents.length}
+            </span>
+          </button>
         )}
       </div>
     </>
@@ -301,8 +354,6 @@ export default function DesktopFloatingPanel({ onEventTypeSelect, roleFilter, on
 
 DesktopFloatingPanel.propTypes = {
   onEventTypeSelect: PropTypes.func.isRequired,
-  roleFilter: PropTypes.oneOf(['all', 'tech', 'sales']).isRequired,
-  onRoleFilterChange: PropTypes.func.isRequired,
   events: PropTypes.array,
   onEventClick: PropTypes.func,
 }
