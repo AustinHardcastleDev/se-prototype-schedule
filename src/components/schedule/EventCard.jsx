@@ -104,7 +104,7 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
   const durationMinutes = calculateDurationMinutes(event.startTime, event.endTime)
   const cardHeight = calculateHeight()
   const isTiny = durationMinutes <= 15 // title only, centered
-  const showAddress = compact ? false : durationMinutes >= 45
+  const showAddress = durationMinutes >= 45
   const showTime = compact ? durationMinutes >= 90 : durationMinutes >= 60
   const showType = compact ? false : durationMinutes >= 75
   const isJobType = JOB_TYPES.includes(event.type)
@@ -351,7 +351,7 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
               {event.title}
             </div>
             {showAddress && event.address && (
-              <div className="text-xs font-body text-white/70 truncate">
+              <div className={`font-body text-white/70 truncate ${compact ? 'text-[10px] leading-tight' : 'text-xs'}`}>
                 {event.address}
               </div>
             )}

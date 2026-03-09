@@ -2,11 +2,15 @@ import { Marker, Tooltip } from 'react-leaflet'
 import L from 'leaflet'
 import PropTypes from 'prop-types'
 
-function createTeardropIcon(color, glowType = null) {
+function createTeardropIcon(color, glowType = null, stopNumber = null) {
+  const centerContent = stopNumber != null
+    ? `<circle cx="12" cy="12" r="6.5" fill="white"/><text x="12" y="12.5" text-anchor="middle" dominant-baseline="central" fill="${color}" font-size="9" font-weight="800" font-family="system-ui, sans-serif">${stopNumber}</text>`
+    : '<circle cx="12" cy="12" r="4.5" fill="white"/>'
+
   const svg = `
-    <svg width="24" height="36" viewBox="0 0 24 36" xmlns="http://www.w3.org/2000/svg">
+    <svg width="30" height="45" viewBox="0 0 24 36" xmlns="http://www.w3.org/2000/svg">
       <path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 24 12 24s12-15 12-24C24 5.4 18.6 0 12 0z" fill="${color}" stroke="white" stroke-width="1.5"/>
-      <circle cx="12" cy="12" r="4.5" fill="white"/>
+      ${centerContent}
     </svg>
   `
 
@@ -19,14 +23,14 @@ function createTeardropIcon(color, glowType = null) {
   return L.divIcon({
     html: `<div class="map-pin-wrapper">${glowHtml}<div class="map-pin-teardrop">${svg}</div></div>`,
     className: 'leaflet-map-pin',
-    iconSize: [24, 36],
-    iconAnchor: [12, 36],
-    tooltipAnchor: [0, -36],
+    iconSize: [30, 45],
+    iconAnchor: [15, 45],
+    tooltipAnchor: [0, -45],
   })
 }
 
-export default function MapPin({ event, color = '#1A1A1A', glowType = null, onClick }) {
-  const icon = createTeardropIcon(color, glowType)
+export default function MapPin({ event, color = '#1A1A1A', glowType = null, stopNumber, onClick }) {
+  const icon = createTeardropIcon(color, glowType, stopNumber)
 
   return (
     <Marker
@@ -56,5 +60,6 @@ MapPin.propTypes = {
   }).isRequired,
   color: PropTypes.string,
   glowType: PropTypes.oneOf(['earlier', 'unassigned', null]),
+  stopNumber: PropTypes.number,
   onClick: PropTypes.func,
 }

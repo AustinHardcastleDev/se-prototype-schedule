@@ -7,6 +7,8 @@ export default function MapOverlayControls({
   showUnassigned,
   onToggleUnassigned,
   unassignedCount,
+  showStopNumbers,
+  onToggleStopNumbers,
 }) {
   return (
     <div className="absolute top-4 right-4 z-[1000] flex flex-col gap-2">
@@ -49,6 +51,21 @@ export default function MapOverlayControls({
           {unassignedCount}
         </span>
       </button>
+
+      {/* Stop numbers toggle */}
+      <button
+        onClick={onToggleStopNumbers}
+        className={`flex items-center gap-2 px-3 py-2 rounded-full font-body text-xs font-semibold backdrop-blur-sm transition-all duration-200 ${
+          showStopNumbers
+            ? 'bg-charcoal/90 text-white ring-1 ring-sky-400/50'
+            : 'bg-charcoal/60 text-white/50 hover:bg-charcoal/80 hover:text-white/70'
+        }`}
+      >
+        <svg className="w-3.5 h-3.5 text-sky-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 20 20">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M5 4h2v12H5M10 4h3a2 2 0 010 4h-3m0 0h3a2 2 0 010 4h-3m0-8v8" />
+        </svg>
+        Stop #
+      </button>
     </div>
   )
 }
@@ -60,4 +77,6 @@ MapOverlayControls.propTypes = {
   showUnassigned: PropTypes.bool.isRequired,
   onToggleUnassigned: PropTypes.func.isRequired,
   unassignedCount: PropTypes.number.isRequired,
+  showStopNumbers: PropTypes.bool.isRequired,
+  onToggleStopNumbers: PropTypes.func.isRequired,
 }
