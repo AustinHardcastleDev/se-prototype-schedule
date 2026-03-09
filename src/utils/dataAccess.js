@@ -50,3 +50,11 @@ export const getEventTypes = () => eventTypes
  * @returns {Object|undefined} Event type object or undefined if not found
  */
 export const getEventTypeByKey = (key) => eventTypes.find(t => t.key === key)
+
+/**
+ * Get all events with lat/lng for a specific date (geo-enabled events only)
+ * @param {string} date - Date in YYYY-MM-DD format
+ * @returns {Array} Array of event objects that have coordinates
+ */
+export const getGeoEventsForDate = (date) =>
+  events.filter(e => e.date === date && e.lat != null && e.lng != null)

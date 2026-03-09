@@ -1,3 +1,5 @@
+@import 'leaflet/dist/leaflet.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -32,4 +34,65 @@
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
   }
+}
+
+/* Leaflet map pin styles */
+.leaflet-map-pin {
+  background: transparent !important;
+  border: none !important;
+}
+
+.map-pin-wrapper {
+  position: relative;
+  transition: transform 0.15s ease;
+}
+
+.map-pin-wrapper:hover {
+  transform: scale(1.15);
+  z-index: 10;
+}
+
+/* Solid tech pins — clean drop shadow */
+.map-pin-teardrop {
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.25));
+  position: relative;
+  z-index: 2;
+}
+
+/* Gentle breathing glow — anchored to the pin's bulb center */
+.map-pin-glow {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 32px;
+  height: 32px;
+  margin-top: -16px;
+  margin-left: -16px;
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+  animation: glow-breathe 2s ease-in-out infinite;
+}
+
+.map-pin-glow-amber {
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.7) 0%, rgba(245, 158, 11, 0.3) 45%, rgba(245, 158, 11, 0) 70%);
+}
+
+.map-pin-glow-red {
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.7) 0%, rgba(239, 68, 68, 0.3) 45%, rgba(239, 68, 68, 0) 70%);
+}
+
+@keyframes glow-breathe {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.5); }
+}
+
+/* Override Leaflet default marker styles */
+.leaflet-map-pin .leaflet-marker-icon {
+  background: transparent;
+  border: none;
+}
+
+.leaflet-container {
+  font-family: 'Open Sans', sans-serif;
 }

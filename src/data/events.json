@@ -9,7 +9,9 @@
     "startTime": "06:00",
     "endTime": "06:15",
     "status": "closed-invoiced",
-    "photos": true
+    "photos": true,
+    "lat": 39.7585,
+    "lng": -105.0299
   },
   {
     "id": "evt-test-30min",
@@ -20,7 +22,9 @@
     "date": "2026-02-03",
     "startTime": "06:30",
     "endTime": "07:00",
-    "status": "closed-no-invoice"
+    "status": "closed-no-invoice",
+    "lat": 39.7993,
+    "lng": -105.0233
   },
   {
     "id": "evt-test-45min",
@@ -31,7 +35,9 @@
     "date": "2026-02-03",
     "startTime": "07:15",
     "endTime": "08:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7836,
+    "lng": -105.0117
   },
   {
     "id": "evt-1",
@@ -43,7 +49,9 @@
     "startTime": "08:00",
     "endTime": "09:30",
     "status": "open",
-    "photos": true
+    "photos": true,
+    "lat": 39.7562,
+    "lng": -105.0689
   },
   {
     "id": "evt-2",
@@ -54,7 +62,9 @@
     "date": "2026-02-03",
     "startTime": "10:00",
     "endTime": "11:15",
-    "status": "closed-no-invoice"
+    "status": "closed-no-invoice",
+    "lat": 39.7912,
+    "lng": -105.0214
   },
   {
     "id": "evt-3",
@@ -76,7 +86,9 @@
     "startTime": "07:30",
     "endTime": "09:00",
     "status": "open",
-    "photos": true
+    "photos": true,
+    "lat": 39.7269,
+    "lng": -104.9443
   },
   {
     "id": "evt-5",
@@ -87,7 +99,9 @@
     "date": "2026-02-03",
     "startTime": "09:30",
     "endTime": "11:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7537,
+    "lng": -104.9939
   },
   {
     "id": "evt-6",
@@ -98,7 +112,9 @@
     "date": "2026-02-03",
     "startTime": "13:00",
     "endTime": "14:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7598,
+    "lng": -104.9497
   },
   {
     "id": "evt-7",
@@ -120,7 +136,9 @@
     "startTime": "08:00",
     "endTime": "09:30",
     "status": "closed-invoiced",
-    "photos": true
+    "photos": true,
+    "lat": 39.6957,
+    "lng": -104.9778
   },
   {
     "id": "evt-9",
@@ -132,7 +150,9 @@
     "startTime": "10:00",
     "endTime": "11:45",
     "status": "open",
-    "photos": true
+    "photos": true,
+    "lat": 39.6668,
+    "lng": -104.965
   },
   {
     "id": "evt-10",
@@ -153,7 +173,9 @@
     "date": "2026-02-03",
     "startTime": "09:00",
     "endTime": "10:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.724,
+    "lng": -104.9625
   },
   {
     "id": "evt-12",
@@ -164,7 +186,9 @@
     "date": "2026-02-03",
     "startTime": "11:00",
     "endTime": "12:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7687,
+    "lng": -104.9452
   },
   {
     "id": "evt-13",
@@ -185,7 +209,9 @@
     "date": "2026-02-03",
     "startTime": "10:00",
     "endTime": "11:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7431,
+    "lng": -104.9785
   },
   {
     "id": "evt-15",
@@ -196,7 +222,9 @@
     "date": "2026-02-03",
     "startTime": "13:00",
     "endTime": "13:45",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7298,
+    "lng": -105.0434
   },
   {
     "id": "evt-16",
@@ -238,7 +266,9 @@
     "startTime": "08:00",
     "endTime": "09:45",
     "status": "open",
-    "photos": true
+    "photos": true,
+    "lat": 39.7689,
+    "lng": -105.0475
   },
   {
     "id": "evt-20",
@@ -249,7 +279,9 @@
     "date": "2026-02-04",
     "startTime": "10:30",
     "endTime": "12:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7615,
+    "lng": -105.0007
   },
   {
     "id": "evt-21",
@@ -260,7 +292,9 @@
     "date": "2026-02-04",
     "startTime": "07:30",
     "endTime": "09:15",
-    "status": "closed-no-invoice"
+    "status": "closed-no-invoice",
+    "lat": 39.7396,
+    "lng": -104.9391
   },
   {
     "id": "evt-22",
@@ -271,7 +305,9 @@
     "date": "2026-02-04",
     "startTime": "10:00",
     "endTime": "11:30",
-    "status": "open"
+    "status": "open",
+    "lat": 39.6946,
+    "lng": -104.9396
   },
   {
     "id": "evt-23",
@@ -282,7 +318,9 @@
     "date": "2026-02-04",
     "startTime": "08:00",
     "endTime": "09:30",
-    "status": "open"
+    "status": "open",
+    "lat": 39.6474,
+    "lng": -104.966
   },
   {
     "id": "evt-24",
@@ -293,7 +331,9 @@
     "date": "2026-02-04",
     "startTime": "11:00",
     "endTime": "12:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.709,
+    "lng": -104.9895
   },
   {
     "id": "evt-25",
@@ -304,7 +344,9 @@
     "date": "2026-02-04",
     "startTime": "09:00",
     "endTime": "10:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7749,
+    "lng": -104.9827
   },
   {
     "id": "evt-26",
@@ -315,7 +357,9 @@
     "date": "2026-02-04",
     "startTime": "11:00",
     "endTime": "12:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7314,
+    "lng": -104.9952
   },
   {
     "id": "evt-27",
@@ -326,7 +370,9 @@
     "date": "2026-02-04",
     "startTime": "10:00",
     "endTime": "11:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.728,
+    "lng": -104.9768
   },
   {
     "id": "evt-28",
@@ -337,7 +383,9 @@
     "date": "2026-02-04",
     "startTime": "13:00",
     "endTime": "14:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7461,
+    "lng": -104.9829
   },
   {
     "id": "evt-29",
@@ -349,7 +397,9 @@
     "startTime": "08:30",
     "endTime": "10:00",
     "status": "closed-invoiced",
-    "photos": true
+    "photos": true,
+    "lat": 39.7847,
+    "lng": -105.0335
   },
   {
     "id": "evt-30",
@@ -360,7 +410,9 @@
     "date": "2026-02-05",
     "startTime": "09:00",
     "endTime": "10:15",
-    "status": "closed-no-invoice"
+    "status": "closed-no-invoice",
+    "lat": 39.747,
+    "lng": -104.9337
   },
   {
     "id": "evt-31",
@@ -372,7 +424,9 @@
     "startTime": "08:00",
     "endTime": "09:30",
     "status": "open",
-    "photos": true
+    "photos": true,
+    "lat": 39.7459,
+    "lng": -105.0674
   },
   {
     "id": "evt-32",
@@ -383,7 +437,9 @@
     "date": "2026-02-06",
     "startTime": "10:00",
     "endTime": "11:15",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7594,
+    "lng": -105.0064
   },
   {
     "id": "evt-33",
@@ -394,7 +450,9 @@
     "date": "2026-02-06",
     "startTime": "13:00",
     "endTime": "14:00",
-    "status": "closed-no-invoice"
+    "status": "closed-no-invoice",
+    "lat": 39.7339,
+    "lng": -105.0282
   },
   {
     "id": "evt-34",
@@ -415,7 +473,9 @@
     "date": "2026-02-06",
     "startTime": "07:30",
     "endTime": "09:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7353,
+    "lng": -104.9668
   },
   {
     "id": "evt-36",
@@ -427,7 +487,9 @@
     "startTime": "09:30",
     "endTime": "11:00",
     "status": "closed-invoiced",
-    "photos": true
+    "photos": true,
+    "lat": 39.7863,
+    "lng": -104.9316
   },
   {
     "id": "evt-37",
@@ -438,7 +500,9 @@
     "date": "2026-02-06",
     "startTime": "12:00",
     "endTime": "13:30",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7621,
+    "lng": -104.9801
   },
   {
     "id": "evt-38",
@@ -450,7 +514,9 @@
     "startTime": "08:00",
     "endTime": "09:45",
     "status": "open",
-    "photos": true
+    "photos": true,
+    "lat": 39.6524,
+    "lng": -104.9705
   },
   {
     "id": "evt-39",
@@ -461,7 +527,9 @@
     "date": "2026-02-06",
     "startTime": "10:30",
     "endTime": "12:00",
-    "status": "closed-no-invoice"
+    "status": "closed-no-invoice",
+    "lat": 39.6641,
+    "lng": -104.9636
   },
   {
     "id": "evt-40",
@@ -482,7 +550,9 @@
     "date": "2026-02-06",
     "startTime": "09:00",
     "endTime": "10:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7743,
+    "lng": -104.9454
   },
   {
     "id": "evt-42",
@@ -493,7 +563,9 @@
     "date": "2026-02-06",
     "startTime": "11:00",
     "endTime": "12:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7583,
+    "lng": -104.9725
   },
   {
     "id": "evt-43",
@@ -514,7 +586,9 @@
     "date": "2026-02-06",
     "startTime": "10:00",
     "endTime": "11:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7442,
+    "lng": -105.0259
   },
   {
     "id": "evt-45",
@@ -525,7 +599,9 @@
     "date": "2026-02-06",
     "startTime": "13:00",
     "endTime": "14:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7192,
+    "lng": -105.02
   },
   {
     "id": "evt-46",
@@ -577,7 +653,9 @@
     "startTime": "08:00",
     "endTime": "09:30",
     "status": "open",
-    "photos": true
+    "photos": true,
+    "lat": 39.7787,
+    "lng": -104.9955
   },
   {
     "id": "evt-51",
@@ -588,7 +666,9 @@
     "date": "2026-02-07",
     "startTime": "10:00",
     "endTime": "11:30",
-    "status": "closed-no-invoice"
+    "status": "closed-no-invoice",
+    "lat": 39.8002,
+    "lng": -105.0486
   },
   {
     "id": "evt-52",
@@ -609,7 +689,9 @@
     "date": "2026-02-07",
     "startTime": "07:30",
     "endTime": "09:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7805,
+    "lng": -104.9539
   },
   {
     "id": "evt-54",
@@ -621,7 +703,9 @@
     "startTime": "09:30",
     "endTime": "11:00",
     "status": "closed-invoiced",
-    "photos": true
+    "photos": true,
+    "lat": 39.7214,
+    "lng": -104.9184
   },
   {
     "id": "evt-55",
@@ -632,7 +716,9 @@
     "date": "2026-02-07",
     "startTime": "12:00",
     "endTime": "13:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7504,
+    "lng": -104.9767
   },
   {
     "id": "evt-56",
@@ -654,7 +740,9 @@
     "startTime": "08:00",
     "endTime": "09:30",
     "status": "open",
-    "photos": true
+    "photos": true,
+    "lat": 39.6896,
+    "lng": -105.0159
   },
   {
     "id": "evt-58",
@@ -665,7 +753,9 @@
     "date": "2026-02-07",
     "startTime": "10:00",
     "endTime": "11:30",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7244,
+    "lng": -104.9909
   },
   {
     "id": "evt-59",
@@ -686,7 +776,9 @@
     "date": "2026-02-07",
     "startTime": "09:00",
     "endTime": "10:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7188,
+    "lng": -104.9523
   },
   {
     "id": "evt-61",
@@ -697,7 +789,9 @@
     "date": "2026-02-07",
     "startTime": "11:00",
     "endTime": "12:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.736,
+    "lng": -105.0171
   },
   {
     "id": "evt-62",
@@ -718,7 +812,9 @@
     "date": "2026-02-07",
     "startTime": "10:00",
     "endTime": "11:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7116,
+    "lng": -105.0422
   },
   {
     "id": "evt-64",
@@ -729,7 +825,9 @@
     "date": "2026-02-07",
     "startTime": "13:00",
     "endTime": "14:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7386,
+    "lng": -105.0124
   },
   {
     "id": "evt-65",
@@ -771,7 +869,9 @@
     "startTime": "08:00",
     "endTime": "09:45",
     "status": "open",
-    "photos": true
+    "photos": true,
+    "lat": 39.7674,
+    "lng": -105.0412
   },
   {
     "id": "evt-69",
@@ -782,7 +882,9 @@
     "date": "2026-02-09",
     "startTime": "10:30",
     "endTime": "12:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7333,
+    "lng": -105.0388
   },
   {
     "id": "evt-70",
@@ -803,7 +905,9 @@
     "date": "2026-02-09",
     "startTime": "07:30",
     "endTime": "09:00",
-    "status": "closed-no-invoice"
+    "status": "closed-no-invoice",
+    "lat": 39.7408,
+    "lng": -104.9625
   },
   {
     "id": "evt-72",
@@ -814,7 +918,9 @@
     "date": "2026-02-09",
     "startTime": "09:30",
     "endTime": "11:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7417,
+    "lng": -104.9218
   },
   {
     "id": "evt-73",
@@ -825,7 +931,9 @@
     "date": "2026-02-09",
     "startTime": "12:00",
     "endTime": "13:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7646,
+    "lng": -104.979
   },
   {
     "id": "evt-74",
@@ -847,7 +955,9 @@
     "startTime": "08:00",
     "endTime": "09:30",
     "status": "closed-invoiced",
-    "photos": true
+    "photos": true,
+    "lat": 39.6691,
+    "lng": -104.9443
   },
   {
     "id": "evt-76",
@@ -858,7 +968,9 @@
     "date": "2026-02-09",
     "startTime": "10:00",
     "endTime": "11:45",
-    "status": "open"
+    "status": "open",
+    "lat": 39.6865,
+    "lng": -104.9835
   },
   {
     "id": "evt-77",
@@ -879,7 +991,9 @@
     "date": "2026-02-09",
     "startTime": "09:00",
     "endTime": "10:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7615,
+    "lng": -104.9984
   },
   {
     "id": "evt-79",
@@ -890,7 +1004,9 @@
     "date": "2026-02-09",
     "startTime": "11:00",
     "endTime": "12:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7648,
+    "lng": -104.9931
   },
   {
     "id": "evt-80",
@@ -911,7 +1027,9 @@
     "date": "2026-02-09",
     "startTime": "10:00",
     "endTime": "11:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7049,
+    "lng": -104.9647
   },
   {
     "id": "evt-82",
@@ -922,7 +1040,9 @@
     "date": "2026-02-09",
     "startTime": "13:00",
     "endTime": "14:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7215,
+    "lng": -105.0106
   },
   {
     "id": "evt-83",
@@ -954,7 +1074,9 @@
     "startTime": "08:00",
     "endTime": "09:30",
     "status": "open",
-    "photos": true
+    "photos": true,
+    "lat": 39.7513,
+    "lng": -105.062
   },
   {
     "id": "evt-86",
@@ -965,7 +1087,9 @@
     "date": "2026-02-10",
     "startTime": "10:00",
     "endTime": "11:15",
-    "status": "closed-no-invoice"
+    "status": "closed-no-invoice",
+    "lat": 39.7688,
+    "lng": -105.0322
   },
   {
     "id": "evt-87",
@@ -976,7 +1100,9 @@
     "date": "2026-02-10",
     "startTime": "13:00",
     "endTime": "14:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.746,
+    "lng": -105.0142
   },
   {
     "id": "evt-88",
@@ -987,7 +1113,9 @@
     "date": "2026-02-10",
     "startTime": "07:30",
     "endTime": "09:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7518,
+    "lng": -104.9272
   },
   {
     "id": "evt-89",
@@ -999,7 +1127,9 @@
     "startTime": "09:30",
     "endTime": "11:00",
     "status": "closed-invoiced",
-    "photos": true
+    "photos": true,
+    "lat": 39.769,
+    "lng": -104.9676
   },
   {
     "id": "evt-90",
@@ -1010,7 +1140,9 @@
     "date": "2026-02-10",
     "startTime": "12:00",
     "endTime": "13:30",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7532,
+    "lng": -104.9652
   },
   {
     "id": "evt-91",
@@ -1022,7 +1154,9 @@
     "startTime": "08:00",
     "endTime": "09:45",
     "status": "open",
-    "photos": true
+    "photos": true,
+    "lat": 39.6649,
+    "lng": -104.9868
   },
   {
     "id": "evt-92",
@@ -1033,7 +1167,9 @@
     "date": "2026-02-10",
     "startTime": "10:30",
     "endTime": "12:00",
-    "status": "closed-no-invoice"
+    "status": "closed-no-invoice",
+    "lat": 39.6977,
+    "lng": -104.9739
   },
   {
     "id": "evt-93",
@@ -1054,7 +1190,9 @@
     "date": "2026-02-10",
     "startTime": "09:00",
     "endTime": "10:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7968,
+    "lng": -104.9636
   },
   {
     "id": "evt-95",
@@ -1065,7 +1203,9 @@
     "date": "2026-02-10",
     "startTime": "11:00",
     "endTime": "12:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7468,
+    "lng": -105.0163
   },
   {
     "id": "evt-96",
@@ -1086,7 +1226,9 @@
     "date": "2026-02-10",
     "startTime": "10:00",
     "endTime": "11:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7497,
+    "lng": -104.9711
   },
   {
     "id": "evt-98",
@@ -1097,7 +1239,9 @@
     "date": "2026-02-10",
     "startTime": "13:00",
     "endTime": "14:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.744,
+    "lng": -104.9958
   },
   {
     "id": "evt-99",
@@ -1149,7 +1293,9 @@
     "startTime": "08:00",
     "endTime": "09:30",
     "status": "open",
-    "photos": true
+    "photos": true,
+    "lat": 39.7791,
+    "lng": -105.0092
   },
   {
     "id": "evt-104",
@@ -1160,7 +1306,9 @@
     "date": "2026-02-11",
     "startTime": "10:00",
     "endTime": "11:30",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7123,
+    "lng": -105.0273
   },
   {
     "id": "evt-105",
@@ -1182,7 +1330,9 @@
     "startTime": "07:30",
     "endTime": "09:00",
     "status": "closed-invoiced",
-    "photos": true
+    "photos": true,
+    "lat": 39.7363,
+    "lng": -104.9834
   },
   {
     "id": "evt-107",
@@ -1193,7 +1343,9 @@
     "date": "2026-02-11",
     "startTime": "09:30",
     "endTime": "11:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7621,
+    "lng": -104.9697
   },
   {
     "id": "evt-108",
@@ -1204,7 +1356,9 @@
     "date": "2026-02-11",
     "startTime": "12:00",
     "endTime": "13:00",
-    "status": "closed-no-invoice"
+    "status": "closed-no-invoice",
+    "lat": 39.7539,
+    "lng": -104.9667
   },
   {
     "id": "evt-109",
@@ -1216,7 +1370,9 @@
     "startTime": "08:00",
     "endTime": "09:30",
     "status": "open",
-    "photos": true
+    "photos": true,
+    "lat": 39.6913,
+    "lng": -104.9938
   },
   {
     "id": "evt-110",
@@ -1227,7 +1383,9 @@
     "date": "2026-02-11",
     "startTime": "10:00",
     "endTime": "11:30",
-    "status": "open"
+    "status": "open",
+    "lat": 39.6983,
+    "lng": -104.9838
   },
   {
     "id": "evt-111",
@@ -1238,7 +1396,9 @@
     "date": "2026-02-11",
     "startTime": "09:00",
     "endTime": "10:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7358,
+    "lng": -104.9819
   },
   {
     "id": "evt-112",
@@ -1249,7 +1409,9 @@
     "date": "2026-02-11",
     "startTime": "11:00",
     "endTime": "12:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7517,
+    "lng": -104.9537
   },
   {
     "id": "evt-113",
@@ -1270,7 +1432,9 @@
     "date": "2026-02-11",
     "startTime": "10:00",
     "endTime": "11:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7145,
+    "lng": -105.0234
   },
   {
     "id": "evt-115",
@@ -1281,7 +1445,9 @@
     "date": "2026-02-11",
     "startTime": "13:00",
     "endTime": "14:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7071,
+    "lng": -104.9879
   },
   {
     "id": "evt-116",
@@ -1323,7 +1489,9 @@
     "startTime": "08:00",
     "endTime": "09:45",
     "status": "open",
-    "photos": true
+    "photos": true,
+    "lat": 39.7498,
+    "lng": -104.9746
   },
   {
     "id": "evt-120",
@@ -1334,7 +1502,9 @@
     "date": "2026-02-12",
     "startTime": "10:30",
     "endTime": "12:00",
-    "status": "closed-no-invoice"
+    "status": "closed-no-invoice",
+    "lat": 39.8015,
+    "lng": -105.0156
   },
   {
     "id": "evt-121",
@@ -1355,7 +1525,9 @@
     "date": "2026-02-12",
     "startTime": "07:30",
     "endTime": "09:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7687,
+    "lng": -104.9401
   },
   {
     "id": "evt-123",
@@ -1367,7 +1539,9 @@
     "startTime": "09:30",
     "endTime": "11:00",
     "status": "closed-invoiced",
-    "photos": true
+    "photos": true,
+    "lat": 39.6985,
+    "lng": -104.9329
   },
   {
     "id": "evt-124",
@@ -1378,7 +1552,9 @@
     "date": "2026-02-12",
     "startTime": "12:00",
     "endTime": "13:30",
-    "status": "open"
+    "status": "open",
+    "lat": 39.781,
+    "lng": -104.9776
   },
   {
     "id": "evt-125",
@@ -1390,7 +1566,9 @@
     "startTime": "08:00",
     "endTime": "09:45",
     "status": "open",
-    "photos": true
+    "photos": true,
+    "lat": 39.6487,
+    "lng": -104.986
   },
   {
     "id": "evt-126",
@@ -1401,7 +1579,9 @@
     "date": "2026-02-12",
     "startTime": "10:30",
     "endTime": "11:30",
-    "status": "closed-no-invoice"
+    "status": "closed-no-invoice",
+    "lat": 39.7119,
+    "lng": -104.9373
   },
   {
     "id": "evt-127",
@@ -1412,7 +1592,9 @@
     "date": "2026-02-12",
     "startTime": "13:00",
     "endTime": "14:30",
-    "status": "open"
+    "status": "open",
+    "lat": 39.6792,
+    "lng": -104.9328
   },
   {
     "id": "evt-128",
@@ -1423,7 +1605,9 @@
     "date": "2026-02-12",
     "startTime": "09:00",
     "endTime": "10:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7858,
+    "lng": -104.9465
   },
   {
     "id": "evt-129",
@@ -1434,7 +1618,9 @@
     "date": "2026-02-12",
     "startTime": "11:00",
     "endTime": "12:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7562,
+    "lng": -104.956
   },
   {
     "id": "evt-130",
@@ -1455,7 +1641,9 @@
     "date": "2026-02-12",
     "startTime": "10:00",
     "endTime": "11:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7482,
+    "lng": -104.9856
   },
   {
     "id": "evt-132",
@@ -1466,7 +1654,9 @@
     "date": "2026-02-12",
     "startTime": "13:00",
     "endTime": "14:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7451,
+    "lng": -104.9832
   },
   {
     "id": "evt-133",
@@ -1499,7 +1689,9 @@
     "endTime": "09:30",
     "status": "open",
     "notes": "Check ant traps in kitchen. Customer reports increased activity near dishwasher.",
-    "photos": true
+    "photos": true,
+    "lat": 39.8017,
+    "lng": -105.02
   },
   {
     "id": "evt-136",
@@ -1511,7 +1703,9 @@
     "startTime": "10:00",
     "endTime": "11:15",
     "status": "closed-invoiced",
-    "photos": true
+    "photos": true,
+    "lat": 39.7759,
+    "lng": -105.0298
   },
   {
     "id": "evt-137",
@@ -1522,7 +1716,9 @@
     "date": "2026-02-13",
     "startTime": "13:00",
     "endTime": "14:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7804,
+    "lng": -105.0542
   },
   {
     "id": "evt-138",
@@ -1533,7 +1729,9 @@
     "date": "2026-02-13",
     "startTime": "07:30",
     "endTime": "09:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7181,
+    "lng": -104.993
   },
   {
     "id": "evt-139",
@@ -1544,7 +1742,9 @@
     "date": "2026-02-13",
     "startTime": "09:30",
     "endTime": "11:00",
-    "status": "closed-no-invoice"
+    "status": "closed-no-invoice",
+    "lat": 39.7187,
+    "lng": -104.9683
   },
   {
     "id": "evt-140",
@@ -1565,7 +1765,9 @@
     "date": "2026-02-13",
     "startTime": "08:00",
     "endTime": "09:30",
-    "status": "open"
+    "status": "open",
+    "lat": 39.6822,
+    "lng": -105.0174
   },
   {
     "id": "evt-142",
@@ -1576,7 +1778,9 @@
     "date": "2026-02-13",
     "startTime": "10:00",
     "endTime": "11:45",
-    "status": "open"
+    "status": "open",
+    "lat": 39.6945,
+    "lng": -104.9456
   },
   {
     "id": "evt-143",
@@ -1597,7 +1801,9 @@
     "date": "2026-02-13",
     "startTime": "09:00",
     "endTime": "10:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7827,
+    "lng": -104.9567
   },
   {
     "id": "evt-145",
@@ -1608,7 +1814,9 @@
     "date": "2026-02-13",
     "startTime": "11:00",
     "endTime": "12:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7296,
+    "lng": -105.0058
   },
   {
     "id": "evt-146",
@@ -1629,7 +1837,9 @@
     "date": "2026-02-13",
     "startTime": "10:00",
     "endTime": "11:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7352,
+    "lng": -105.0182
   },
   {
     "id": "evt-148",
@@ -1640,7 +1850,9 @@
     "date": "2026-02-13",
     "startTime": "13:00",
     "endTime": "14:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7027,
+    "lng": -104.9924
   },
   {
     "id": "evt-149",
@@ -1683,7 +1895,9 @@
     "endTime": "09:45",
     "status": "open",
     "notes": "Bring extra bait stations. Previous treatment showed heavy roach activity in units 7A-7F.",
-    "earlierOpening": true
+    "earlierOpening": true,
+    "lat": 39.7364,
+    "lng": -105.0373
   },
   {
     "id": "evt-153",
@@ -1695,7 +1909,9 @@
     "startTime": "10:30",
     "endTime": "12:00",
     "status": "open",
-    "earlierOpening": true
+    "earlierOpening": true,
+    "lat": 39.7706,
+    "lng": -104.9916
   },
   {
     "id": "evt-154",
@@ -1716,7 +1932,9 @@
     "date": "2026-02-16",
     "startTime": "07:30",
     "endTime": "09:00",
-    "status": "closed-no-invoice"
+    "status": "closed-no-invoice",
+    "lat": 39.7087,
+    "lng": -104.9661
   },
   {
     "id": "evt-156",
@@ -1728,7 +1946,9 @@
     "startTime": "09:30",
     "endTime": "11:00",
     "status": "open",
-    "earlierOpening": true
+    "earlierOpening": true,
+    "lat": 39.7248,
+    "lng": -104.9448
   },
   {
     "id": "evt-157",
@@ -1739,7 +1959,9 @@
     "date": "2026-02-16",
     "startTime": "12:00",
     "endTime": "13:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7457,
+    "lng": -104.9324
   },
   {
     "id": "evt-158",
@@ -1760,7 +1982,9 @@
     "date": "2026-02-16",
     "startTime": "08:00",
     "endTime": "09:30",
-    "status": "closed-invoiced"
+    "status": "closed-invoiced",
+    "lat": 39.6517,
+    "lng": -104.9721
   },
   {
     "id": "evt-160",
@@ -1771,7 +1995,9 @@
     "date": "2026-02-16",
     "startTime": "10:00",
     "endTime": "11:30",
-    "status": "open"
+    "status": "open",
+    "lat": 39.6692,
+    "lng": -105.0173
   },
   {
     "id": "evt-161",
@@ -1792,7 +2018,9 @@
     "date": "2026-02-16",
     "startTime": "09:00",
     "endTime": "10:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7407,
+    "lng": -104.9871
   },
   {
     "id": "evt-163",
@@ -1803,7 +2031,9 @@
     "date": "2026-02-16",
     "startTime": "11:00",
     "endTime": "12:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7502,
+    "lng": -105.0053
   },
   {
     "id": "evt-164",
@@ -1824,7 +2054,9 @@
     "date": "2026-02-16",
     "startTime": "10:00",
     "endTime": "11:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7368,
+    "lng": -105.0181
   },
   {
     "id": "evt-166",
@@ -1835,7 +2067,9 @@
     "date": "2026-02-16",
     "startTime": "13:00",
     "endTime": "14:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.6839,
+    "lng": -104.9751
   },
   {
     "id": "evt-167",
@@ -1887,7 +2121,9 @@
     "startTime": "08:00",
     "endTime": "09:30",
     "status": "open",
-    "notes": "Customer requesting exterior-only treatment. Has indoor pets - do not spray inside."
+    "notes": "Customer requesting exterior-only treatment. Has indoor pets - do not spray inside.",
+    "lat": 39.7447,
+    "lng": -105.064
   },
   {
     "id": "evt-172",
@@ -1898,7 +2134,9 @@
     "date": "2026-02-17",
     "startTime": "10:00",
     "endTime": "11:15",
-    "status": "closed-no-invoice"
+    "status": "closed-no-invoice",
+    "lat": 39.748,
+    "lng": -105.0213
   },
   {
     "id": "evt-173",
@@ -1920,7 +2158,9 @@
     "startTime": "07:30",
     "endTime": "09:00",
     "status": "open",
-    "notes": "New account - first service. Get access code from property manager (555-0123)."
+    "notes": "New account - first service. Get access code from property manager (555-0123).",
+    "lat": 39.7264,
+    "lng": -104.9653
   },
   {
     "id": "evt-175",
@@ -1931,7 +2171,9 @@
     "date": "2026-02-17",
     "startTime": "09:30",
     "endTime": "11:00",
-    "status": "closed-invoiced"
+    "status": "closed-invoiced",
+    "lat": 39.7422,
+    "lng": -104.9607
   },
   {
     "id": "evt-176",
@@ -1942,7 +2184,9 @@
     "date": "2026-02-17",
     "startTime": "12:00",
     "endTime": "13:30",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7156,
+    "lng": -104.9243
   },
   {
     "id": "evt-177",
@@ -1954,7 +2198,9 @@
     "startTime": "08:00",
     "endTime": "09:45",
     "status": "open",
-    "notes": "Customer allergic to standard spray. Use hypoallergenic treatment option B."
+    "notes": "Customer allergic to standard spray. Use hypoallergenic treatment option B.",
+    "lat": 39.6643,
+    "lng": -104.9525
   },
   {
     "id": "evt-178",
@@ -1965,7 +2211,9 @@
     "date": "2026-02-17",
     "startTime": "10:30",
     "endTime": "11:30",
-    "status": "open"
+    "status": "open",
+    "lat": 39.6946,
+    "lng": -105.0163
   },
   {
     "id": "evt-179",
@@ -1976,7 +2224,9 @@
     "date": "2026-02-17",
     "startTime": "13:00",
     "endTime": "14:30",
-    "status": "closed-no-invoice"
+    "status": "closed-no-invoice",
+    "lat": 39.6609,
+    "lng": -104.9479
   },
   {
     "id": "evt-180",
@@ -1987,7 +2237,9 @@
     "date": "2026-02-17",
     "startTime": "09:00",
     "endTime": "10:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7525,
+    "lng": -104.9693
   },
   {
     "id": "evt-181",
@@ -1998,7 +2250,9 @@
     "date": "2026-02-17",
     "startTime": "11:00",
     "endTime": "12:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7413,
+    "lng": -105.0079
   },
   {
     "id": "evt-182",
@@ -2019,7 +2273,9 @@
     "date": "2026-02-17",
     "startTime": "10:00",
     "endTime": "11:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7128,
+    "lng": -105.0252
   },
   {
     "id": "evt-184",
@@ -2030,7 +2286,9 @@
     "date": "2026-02-17",
     "startTime": "13:00",
     "endTime": "14:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7017,
+    "lng": -105.0317
   },
   {
     "id": "evt-185",
@@ -2072,7 +2330,9 @@
     "startTime": "08:00",
     "endTime": "09:45",
     "status": "open",
-    "earlierOpening": true
+    "earlierOpening": true,
+    "lat": 39.7853,
+    "lng": -104.9961
   },
   {
     "id": "evt-189",
@@ -2084,7 +2344,9 @@
     "startTime": "10:30",
     "endTime": "12:00",
     "status": "open",
-    "notes": "Full fumigation needed. Check structural damage from termite activity reported last month."
+    "notes": "Full fumigation needed. Check structural damage from termite activity reported last month.",
+    "lat": 39.7215,
+    "lng": -105.0059
   },
   {
     "id": "evt-190",
@@ -2105,7 +2367,9 @@
     "date": "2026-02-18",
     "startTime": "07:30",
     "endTime": "09:00",
-    "status": "closed-invoiced"
+    "status": "closed-invoiced",
+    "lat": 39.76,
+    "lng": -104.9946
   },
   {
     "id": "evt-192",
@@ -2116,7 +2380,9 @@
     "date": "2026-02-18",
     "startTime": "09:30",
     "endTime": "11:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7448,
+    "lng": -104.9626
   },
   {
     "id": "evt-193",
@@ -2127,7 +2393,9 @@
     "date": "2026-02-18",
     "startTime": "12:00",
     "endTime": "13:00",
-    "status": "closed-no-invoice"
+    "status": "closed-no-invoice",
+    "lat": 39.7305,
+    "lng": -104.9017
   },
   {
     "id": "evt-194",
@@ -2148,7 +2416,9 @@
     "date": "2026-02-18",
     "startTime": "08:00",
     "endTime": "09:30",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7029,
+    "lng": -104.9827
   },
   {
     "id": "evt-196",
@@ -2159,7 +2429,9 @@
     "date": "2026-02-18",
     "startTime": "10:00",
     "endTime": "11:45",
-    "status": "open"
+    "status": "open",
+    "lat": 39.6325,
+    "lng": -104.9556
   },
   {
     "id": "evt-197",
@@ -2180,7 +2452,9 @@
     "date": "2026-02-18",
     "startTime": "09:00",
     "endTime": "10:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7734,
+    "lng": -104.9888
   },
   {
     "id": "evt-199",
@@ -2191,7 +2465,9 @@
     "date": "2026-02-18",
     "startTime": "11:00",
     "endTime": "12:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7445,
+    "lng": -104.9684
   },
   {
     "id": "evt-200",
@@ -2212,7 +2488,9 @@
     "date": "2026-02-18",
     "startTime": "10:00",
     "endTime": "11:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7035,
+    "lng": -104.969
   },
   {
     "id": "evt-202",
@@ -2223,7 +2501,9 @@
     "date": "2026-02-18",
     "startTime": "13:00",
     "endTime": "14:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.6879,
+    "lng": -104.9765
   },
   {
     "id": "evt-203",
@@ -2255,7 +2535,9 @@
     "startTime": "08:00",
     "endTime": "09:30",
     "status": "open",
-    "notes": "Follow up on bed bug treatment from 2/5. Second application required per protocol."
+    "notes": "Follow up on bed bug treatment from 2/5. Second application required per protocol.",
+    "lat": 39.7625,
+    "lng": -105.0357
   },
   {
     "id": "evt-206",
@@ -2266,7 +2548,9 @@
     "date": "2026-02-19",
     "startTime": "10:00",
     "endTime": "11:15",
-    "status": "closed-invoiced"
+    "status": "closed-invoiced",
+    "lat": 39.7718,
+    "lng": -105.0235
   },
   {
     "id": "evt-207",
@@ -2277,7 +2561,9 @@
     "date": "2026-02-19",
     "startTime": "13:00",
     "endTime": "14:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7687,
+    "lng": -105.038
   },
   {
     "id": "evt-208",
@@ -2289,7 +2575,9 @@
     "startTime": "07:30",
     "endTime": "09:00",
     "status": "open",
-    "earlierOpening": true
+    "earlierOpening": true,
+    "lat": 39.7014,
+    "lng": -104.9569
   },
   {
     "id": "evt-209",
@@ -2300,7 +2588,9 @@
     "date": "2026-02-19",
     "startTime": "09:30",
     "endTime": "11:00",
-    "status": "closed-no-invoice"
+    "status": "closed-no-invoice",
+    "lat": 39.7485,
+    "lng": -104.9678
   },
   {
     "id": "evt-210",
@@ -2311,7 +2601,9 @@
     "date": "2026-02-19",
     "startTime": "12:00",
     "endTime": "13:30",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7106,
+    "lng": -104.9795
   },
   {
     "id": "evt-211",
@@ -2323,7 +2615,9 @@
     "startTime": "08:00",
     "endTime": "09:45",
     "status": "open",
-    "earlierOpening": true
+    "earlierOpening": true,
+    "lat": 39.6518,
+    "lng": -104.9606
   },
   {
     "id": "evt-212",
@@ -2334,7 +2628,9 @@
     "date": "2026-02-19",
     "startTime": "10:30",
     "endTime": "12:00",
-    "status": "closed-no-invoice"
+    "status": "closed-no-invoice",
+    "lat": 39.7222,
+    "lng": -104.975
   },
   {
     "id": "evt-213",
@@ -2355,7 +2651,9 @@
     "date": "2026-02-19",
     "startTime": "09:00",
     "endTime": "10:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7344,
+    "lng": -104.9902
   },
   {
     "id": "evt-215",
@@ -2366,7 +2664,9 @@
     "date": "2026-02-19",
     "startTime": "11:00",
     "endTime": "12:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7632,
+    "lng": -104.9941
   },
   {
     "id": "evt-216",
@@ -2387,7 +2687,9 @@
     "date": "2026-02-19",
     "startTime": "10:00",
     "endTime": "11:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7062,
+    "lng": -105.0141
   },
   {
     "id": "evt-218",
@@ -2398,7 +2700,9 @@
     "date": "2026-02-19",
     "startTime": "13:00",
     "endTime": "14:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.711,
+    "lng": -105.0117
   },
   {
     "id": "evt-219",
@@ -2439,7 +2743,9 @@
     "date": "2026-02-20",
     "startTime": "08:00",
     "endTime": "09:45",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7776,
+    "lng": -105.0025
   },
   {
     "id": "evt-223",
@@ -2450,7 +2756,9 @@
     "date": "2026-02-20",
     "startTime": "10:30",
     "endTime": "12:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7802,
+    "lng": -105.044
   },
   {
     "id": "evt-224",
@@ -2471,7 +2779,9 @@
     "date": "2026-02-20",
     "startTime": "07:30",
     "endTime": "09:00",
-    "status": "closed-invoiced"
+    "status": "closed-invoiced",
+    "lat": 39.7294,
+    "lng": -104.9266
   },
   {
     "id": "evt-226",
@@ -2482,7 +2792,9 @@
     "date": "2026-02-20",
     "startTime": "09:30",
     "endTime": "11:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7464,
+    "lng": -104.9409
   },
   {
     "id": "evt-227",
@@ -2493,7 +2805,9 @@
     "date": "2026-02-20",
     "startTime": "12:00",
     "endTime": "13:00",
-    "status": "closed-no-invoice"
+    "status": "closed-no-invoice",
+    "lat": 39.7206,
+    "lng": -104.9569
   },
   {
     "id": "evt-228",
@@ -2514,7 +2828,9 @@
     "date": "2026-02-20",
     "startTime": "08:00",
     "endTime": "09:30",
-    "status": "open"
+    "status": "open",
+    "lat": 39.673,
+    "lng": -105.0133
   },
   {
     "id": "evt-230",
@@ -2525,7 +2841,9 @@
     "date": "2026-02-20",
     "startTime": "10:00",
     "endTime": "11:30",
-    "status": "open"
+    "status": "open",
+    "lat": 39.67,
+    "lng": -104.9674
   },
   {
     "id": "evt-231",
@@ -2546,7 +2864,9 @@
     "date": "2026-02-20",
     "startTime": "09:00",
     "endTime": "10:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7684,
+    "lng": -104.9626
   },
   {
     "id": "evt-233",
@@ -2557,7 +2877,9 @@
     "date": "2026-02-20",
     "startTime": "11:00",
     "endTime": "12:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7606,
+    "lng": -104.9924
   },
   {
     "id": "evt-234",
@@ -2578,7 +2900,9 @@
     "date": "2026-02-20",
     "startTime": "10:00",
     "endTime": "11:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7314,
+    "lng": -105.0016
   },
   {
     "id": "evt-236",
@@ -2589,7 +2913,9 @@
     "date": "2026-02-20",
     "startTime": "13:00",
     "endTime": "14:00",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7555,
+    "lng": -104.9882
   },
   {
     "id": "evt-237",
@@ -2630,7 +2956,9 @@
     "date": "2026-02-13",
     "startTime": "09:00",
     "endTime": "10:30",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7285,
+    "lng": -104.9936
   },
   {
     "id": "evt-unassigned-2",
@@ -2641,7 +2969,9 @@
     "date": "2026-02-16",
     "startTime": "10:00",
     "endTime": "11:15",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7628,
+    "lng": -104.9567
   },
   {
     "id": "evt-unassigned-3",
@@ -2653,7 +2983,9 @@
     "startTime": "08:00",
     "endTime": "09:00",
     "status": "open",
-    "notes": "Third callback for same issue. Check crawl space ventilation."
+    "notes": "Third callback for same issue. Check crawl space ventilation.",
+    "lat": 39.7263,
+    "lng": -105.0327
   },
   {
     "id": "evt-unassigned-4",
@@ -2664,7 +2996,9 @@
     "date": "2026-02-18",
     "startTime": "11:00",
     "endTime": "12:30",
-    "status": "open"
+    "status": "open",
+    "lat": 39.7099,
+    "lng": -104.9865
   },
   {
     "id": "evt-earlier-1",
@@ -2677,7 +3011,9 @@
     "endTime": "11:30",
     "status": "open",
     "earlierOpening": true,
-    "notes": "Customer wants morning slot. Elderly occupant prefers before 9 AM."
+    "notes": "Customer wants morning slot. Elderly occupant prefers before 9 AM.",
+    "lat": 39.808,
+    "lng": -105.032
   },
   {
     "id": "evt-earlier-2",
@@ -2690,7 +3026,9 @@
     "endTime": "14:30",
     "status": "open",
     "earlierOpening": true,
-    "notes": "Requested AM slot. Customer works from home afternoons."
+    "notes": "Requested AM slot. Customer works from home afternoons.",
+    "lat": 39.7782,
+    "lng": -104.959
   },
   {
     "id": "evt-earlier-3",
@@ -2702,6 +3040,8 @@
     "startTime": "14:00",
     "endTime": "15:15",
     "status": "open",
-    "earlierOpening": true
+    "earlierOpening": true,
+    "lat": 39.6532,
+    "lng": -104.9859
   }
 ]
