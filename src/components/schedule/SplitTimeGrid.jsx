@@ -212,6 +212,7 @@ function SplitColumn({
   // Calculate drag preview height based on active event duration
   const getDragPreviewHeight = () => {
     if (!activeEvent) return SLOT_HEIGHT
+    if (!activeEvent.startTime || !activeEvent.endTime) return 2 * SLOT_HEIGHT // default 30 min
     const [startH, startM] = activeEvent.startTime.split(':').map(Number)
     const [endH, endM] = activeEvent.endTime.split(':').map(Number)
     const durationMinutes = (endH * 60 + endM) - (startH * 60 + startM)
@@ -443,12 +444,12 @@ export default function SplitTimeGrid({
       if (member.virtualType === 'unassigned') {
         return allEvents
           .filter((e) => e.assigneeId === null)
-          .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime))
+          .sort((a, b) => a.date.localeCompare(b.date) || (a.startTime || '').localeCompare(b.startTime || ''))
       }
       if (member.virtualType === 'earlier') {
         return allEvents
           .filter((e) => e.earlierOpening === true)
-          .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime))
+          .sort((a, b) => a.date.localeCompare(b.date) || (a.startTime || '').localeCompare(b.startTime || ''))
       }
       return []
     }
@@ -688,9 +689,13 @@ export default function SplitTimeGrid({
     let newStartTime = `${newHours.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}`
     newStartTime = roundToNearestSlot(newStartTime)
 
-    const [oldStartHour, oldStartMin] = draggedEvent.startTime.split(':').map(Number)
-    const [oldEndHour, oldEndMin] = draggedEvent.endTime.split(':').map(Number)
-    const durationMinutes = (oldEndHour * 60 + oldEndMin) - (oldStartHour * 60 + oldStartMin)
+    // Default to 30-min duration for events without times (unassigned)
+    let durationMinutes = 30
+    if (draggedEvent.startTime && draggedEvent.endTime) {
+      const [oldStartHour, oldStartMin] = draggedEvent.startTime.split(':').map(Number)
+      const [oldEndHour, oldEndMin] = draggedEvent.endTime.split(':').map(Number)
+      durationMinutes = (oldEndHour * 60 + oldEndMin) - (oldStartHour * 60 + oldStartMin)
+    }
 
     const [newStartHour, newStartMin] = newStartTime.split(':').map(Number)
     const endTotalMinutes = (newStartHour * 60 + newStartMin) + durationMinutes
@@ -827,6 +832,7 @@ export default function SplitTimeGrid({
   // Calculate drag overlay height for card-to-grid transformation
   const getDragOverlayHeight = () => {
     if (!activeEvent) return undefined
+    if (!activeEvent.startTime || !activeEvent.endTime) return 2 * SLOT_HEIGHT // default 30 min
     const [startH, startM] = activeEvent.startTime.split(':').map(Number)
     const [endH, endM] = activeEvent.endTime.split(':').map(Number)
     const durationMinutes = (endH * 60 + endM) - (startH * 60 + startM)

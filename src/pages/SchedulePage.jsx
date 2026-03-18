@@ -200,12 +200,12 @@ export default function SchedulePage() {
     if (selectedMember.virtualType === 'unassigned') {
       return events
         .filter((e) => e.assigneeId === null)
-        .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime))
+        .sort((a, b) => a.date.localeCompare(b.date) || (a.startTime || '').localeCompare(b.startTime || ''))
     }
     if (selectedMember.virtualType === 'earlier') {
       return events
         .filter((e) => e.earlierOpening === true)
-        .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime))
+        .sort((a, b) => a.date.localeCompare(b.date) || (a.startTime || '').localeCompare(b.startTime || ''))
     }
     return []
   }

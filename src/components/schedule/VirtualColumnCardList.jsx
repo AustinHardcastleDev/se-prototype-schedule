@@ -19,6 +19,7 @@ function DraggablePoolCard({ event, onEventClick, isDragging }) {
   const eventType = getEventTypeByKey(event.type)
 
   const formatTime = (timeStr) => {
+    if (!timeStr) return null
     const [hour, minute] = timeStr.split(':').map(Number)
     const period = hour >= 12 ? 'PM' : 'AM'
     const displayHour = hour % 12 || 12
@@ -76,9 +77,11 @@ function DraggablePoolCard({ event, onEventClick, isDragging }) {
         </div>
 
         {/* Time range */}
-        <div className="text-[10px] font-body text-white/70">
-          {formatTime(event.startTime)} – {formatTime(event.endTime)}
-        </div>
+        {event.startTime && event.endTime && (
+          <div className="text-[10px] font-body text-white/70">
+            {formatTime(event.startTime)} – {formatTime(event.endTime)}
+          </div>
+        )}
 
         {/* Address */}
         {event.address && (
