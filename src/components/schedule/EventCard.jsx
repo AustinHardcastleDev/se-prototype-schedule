@@ -79,6 +79,7 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
 
   // Calculate event duration in minutes
   const calculateDurationMinutes = (startTime, endTime) => {
+    if (!startTime || !endTime) return 30 // Default 30 min (2 slots) for unassigned events
     const [startHour, startMin] = startTime.split(':').map(Number)
     const [endHour, endMin] = endTime.split(':').map(Number)
     const startTotalMin = startHour * 60 + startMin
@@ -95,6 +96,7 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
 
   // Format time for display (HH:MM to h:MM AM/PM)
   const formatTime = (timeStr) => {
+    if (!timeStr) return null
     const [hour, minute] = timeStr.split(':').map(Number)
     const period = hour >= 12 ? 'PM' : 'AM'
     const displayHour = hour % 12 || 12
@@ -253,9 +255,11 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
         <div className="text-sm font-body text-gray-900 font-semibold mb-2">{event.title}</div>
 
         {/* Time */}
-        <div className="text-xs font-body text-gray-600 mb-1">
-          {formatTime(event.startTime)} – {formatTime(event.endTime)}
-        </div>
+        {event.startTime && event.endTime && (
+          <div className="text-xs font-body text-gray-600 mb-1">
+            {formatTime(event.startTime)} – {formatTime(event.endTime)}
+          </div>
+        )}
 
         {/* Address */}
         {event.address && (
@@ -290,6 +294,8 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
         isLongPressing ? 'brightness-90' : ''
       } ${
         missingPhotos && !isEarlier ? 'ring-1 ring-amber-400/60 ring-inset' : ''
+      } ${
+        event.assigneeId === null ? 'border border-dashed border-white/40' : ''
       }`}
       style={{
         height: `${cardHeight}px`,
@@ -298,8 +304,8 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
         minHeight: `${SLOT_HEIGHT}px`, // Minimum 15 minutes
         // Earlier opening: amber outline indicator
         ...(isEarlier ? {
-          outline: '2px solid #F59E0B',
-          outlineOffset: '-2px',
+          outline: '3px solid #F59E0B',
+          outlineOffset: '-3px',
         } : {}),
       }}
       onMouseEnter={handleMouseEnter}
@@ -307,23 +313,26 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
       {...pointerHandlers}
     >
       <div className={`relative h-full ${isTiny ? 'px-1.5 flex items-center' : 'p-1.5'}`}>
-        {/* Missing photos indicator (top-right) */}
+        {/* Missing photos indicator (bottom-right) */}
         {missingPhotos && !isTiny && (
           <div
-            className="absolute top-0.5 right-0.5"
+            className="absolute bottom-1 right-1 flex items-center gap-1 bg-red-500 rounded-full px-1.5 py-0.5"
             title="Missing photos"
           >
-            <svg className="w-4 h-4 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg className="w-3 h-3 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="6" width="18" height="14" rx="2"/>
               <circle cx="12" cy="13" r="3"/>
             </svg>
+            {durationMinutes >= 45 && (
+              <span className="text-[9px] font-bold text-white leading-none">Photos</span>
+            )}
           </div>
         )}
 
-        {/* Has-notes indicator (top-right, below photos indicator) */}
+        {/* Has-notes indicator (bottom-right, above photos indicator) */}
         {hasNotes && !isTiny && (
           <div
-            className={`absolute ${missingPhotos ? 'top-5' : 'top-0.5'} right-0.5`}
+            className={`absolute ${missingPhotos ? 'bottom-7' : 'bottom-1'} right-1`}
             title="Has prep notes"
           >
             <svg className="w-4 h-4 text-blue-200" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -355,7 +364,7 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
                 {event.address}
               </div>
             )}
-            {showTime && (
+            {showTime && event.startTime && event.endTime && (
               <div className="text-xs font-body text-white/70 truncate">
                 {formatTime(event.startTime)} – {formatTime(event.endTime)}
               </div>
@@ -378,7 +387,7 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
       {!disableResize && onResizeStart && (
         <div
           data-resize-handle
-          className="absolute bottom-0 left-0 right-0 h-3 cursor-ns-resize flex items-center justify-center z-30"
+          className="absolute bottom-0 left-0 right-0 h-3 cursor-ns-resize flex items-center justify-center z-10"
           onPointerDown={handleResizeStart}
           style={{ touchAction: 'none' }}
         >
@@ -397,8 +406,8 @@ EventCard.propTypes = {
     type: PropTypes.string.isRequired,
     assigneeId: PropTypes.string,
     date: PropTypes.string.isRequired,
-    startTime: PropTypes.string.isRequired,
-    endTime: PropTypes.string.isRequired,
+    startTime: PropTypes.string,
+    endTime: PropTypes.string,
     status: PropTypes.string,
     notes: PropTypes.string,
     earlierOpening: PropTypes.bool,

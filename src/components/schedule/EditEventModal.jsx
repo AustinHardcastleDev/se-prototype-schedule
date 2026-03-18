@@ -135,14 +135,14 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
 
       {/* Date Picker */}
       <div className="mb-4 relative">
-        <label htmlFor={`date${idPrefix}`} className="block text-sm font-body text-text-dark font-semibold mb-2">
+        <label htmlFor={`date${idPrefix}`} className="block text-sm font-body text-text-light font-semibold mb-2">
           Date
         </label>
         <button
           type="button"
           id={`date${idPrefix}`}
           onClick={() => setShowCalendar(!showCalendar)}
-          className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg font-body text-sm text-left flex items-center justify-between"
+          className="w-full px-4 py-3 bg-white/10 text-white rounded-lg font-body text-sm text-left flex items-center justify-between"
         >
           <span>{format(parseISO(date), 'EEEE, MMMM d, yyyy')}</span>
           <svg className="w-5 h-5 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -191,7 +191,7 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
 
       {/* Title Input */}
       <div className="mb-4">
-        <label htmlFor={`title${idPrefix}`} className="block text-sm font-body text-text-dark font-semibold mb-2">
+        <label htmlFor={`title${idPrefix}`} className="block text-sm font-body text-text-light font-semibold mb-2">
           Title
         </label>
         <input
@@ -200,14 +200,14 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Enter event title"
-          className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg font-body text-sm placeholder-muted"
+          className="w-full px-4 py-3 bg-white/10 text-white rounded-lg font-body text-sm placeholder-muted"
           required
         />
       </div>
 
       {/* Notes Input */}
       <div className="mb-6">
-        <label htmlFor={`notes${idPrefix}`} className="block text-sm font-body text-text-dark font-semibold mb-2 flex items-center gap-1.5">
+        <label htmlFor={`notes${idPrefix}`} className="block text-sm font-body text-text-light font-semibold mb-2 flex items-center gap-1.5">
           <svg className="w-3.5 h-3.5 text-blue-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
             <rect x="9" y="3" width="6" height="4" rx="1"/>
@@ -221,7 +221,7 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Add prep notes, special instructions, or details for the tech..."
           rows={3}
-          className="w-full px-4 py-3 bg-secondary text-text-light rounded-lg font-body text-sm placeholder-muted resize-none"
+          className="w-full px-4 py-3 bg-white/10 text-white rounded-lg font-body text-sm placeholder-muted resize-none"
         />
       </div>
 
@@ -234,7 +234,7 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
           onChange={(e) => setEarlierOpening(e.target.checked)}
           className="w-4 h-4 rounded border-gray-300 text-accent focus:ring-accent cursor-pointer"
         />
-        <label htmlFor={`earlierOpening${idPrefix}`} className="text-sm font-body text-text-dark cursor-pointer">
+        <label htmlFor={`earlierOpening${idPrefix}`} className="text-sm font-body text-text-light cursor-pointer">
           Do earlier if possible
         </label>
       </div>
@@ -270,7 +270,7 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
   // Delete confirmation view as render function
   const renderDeleteConfirmation = () => (
     <div className="px-6 py-8">
-      <p className="text-center font-body text-text-dark mb-6">
+      <p className="text-center font-body text-text-light mb-6">
         Are you sure you want to delete this event?
       </p>
       <div className="flex gap-3">
@@ -302,18 +302,18 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
 
       {/* Bottom Sheet Modal - Mobile */}
       <div
-        className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-50 md:hidden transform transition-transform duration-300 ${
+        className={`fixed bottom-0 left-0 right-0 bg-charcoal rounded-t-2xl z-50 md:hidden transform transition-transform duration-300 ${
           isOpen ? 'translate-y-0' : 'translate-y-full'
         }`}
       >
         {/* Drag Handle */}
         <div className="flex justify-center py-3">
-          <div className="w-12 h-1 bg-muted rounded-full" />
+          <div className="w-12 h-1 bg-white/20 rounded-full" />
         </div>
 
         {/* Modal Header */}
-        <div className="px-6 pb-4 border-b border-secondary">
-          <h2 className="font-body text-2xl text-text-dark uppercase font-bold">Edit Event</h2>
+        <div className="px-6 pb-4 border-b border-white/10">
+          <h2 className="font-body text-2xl text-text-light uppercase font-bold">Edit Event</h2>
         </div>
 
         {/* Delete Confirmation or Form */}
@@ -328,13 +328,13 @@ export default function EditEventModal({ isOpen, onClose, onSave, onDelete, even
 
       {/* Centered Modal - Desktop */}
       <div
-        className={`hidden md:block fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-2xl z-50 w-[480px] max-h-[80vh] overflow-hidden ${
+        className={`hidden md:block fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-charcoal rounded-2xl z-50 w-[480px] max-h-[80vh] overflow-hidden ${
           isOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'
         } transition-all duration-200`}
       >
         {/* Modal Header */}
-        <div className="px-6 py-4 border-b border-secondary">
-          <h2 className="font-body text-2xl text-text-dark uppercase font-bold">Edit Event</h2>
+        <div className="px-6 py-4 border-b border-white/10">
+          <h2 className="font-body text-2xl text-text-light uppercase font-bold">Edit Event</h2>
         </div>
 
         {/* Delete Confirmation or Form */}

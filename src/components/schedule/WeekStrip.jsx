@@ -24,7 +24,13 @@ export default function WeekStrip({ selectedDate, onDateSelect }) {
   }
 
   return (
-    <div className="md:hidden bg-charcoal border-b border-secondary py-3 px-4">
+    <div className="md:hidden bg-charcoal border-b border-secondary pt-1.5 pb-3 px-4">
+      {/* Month / Year label */}
+      <div className="text-center mb-1.5">
+        <span className="font-body text-[10px] font-semibold tracking-widest uppercase text-white/35">
+          {format(currentWeekStart, 'MMMM yyyy')}
+        </span>
+      </div>
       <div className="flex items-center justify-between gap-2">
         {/* Left Arrow */}
         <button

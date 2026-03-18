@@ -29,7 +29,7 @@ export default function DesktopToolbar({ roleFilter, onRoleFilterChange, selecte
   }
 
   return (
-    <div className="hidden md:flex md:flex-col flex-1 min-h-0 bg-stone-200">
+    <div className="hidden md:flex md:flex-col flex-1 min-h-0 bg-stone-200" {...(calendarOpen ? { 'data-calendar-open': '' } : {})}>
       {/* Page Title - white bar */}
       <div className="px-8 py-7 bg-white flex-shrink-0">
         <h1 className="font-body text-3xl font-bold uppercase tracking-wide text-gray-800">
@@ -50,8 +50,8 @@ export default function DesktopToolbar({ roleFilter, onRoleFilterChange, selecte
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              <span className="font-semibold">{format(selectedDate, 'MMM d, yyyy')}</span>
-              <svg className="w-3 h-3 text-muted" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <span className="font-semibold hidden lg:inline">{format(selectedDate, 'MMM d, yyyy')}</span>
+              <svg className="w-3 h-3 text-muted hidden lg:inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
             </button>

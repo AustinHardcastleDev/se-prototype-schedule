@@ -1,12 +1,11 @@
 import { useState, useEffect, useLayoutEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
-import { format, addDays, isSameDay } from 'date-fns'
+import { format, addDays } from 'date-fns'
 import { DndContext, DragOverlay, pointerWithin, useDroppable, MouseSensor, TouchSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { toast } from 'react-hot-toast'
 import { getAllMembers } from '../../utils/dataAccess'
 import EventCard from './EventCard'
 import DraggableEvent from './DraggableEvent'
-import CalendarPopup from '../ui/CalendarPopup'
 
 const SLOT_HEIGHT = 16 // pixels per 15-minute slot
 const SLOTS_PER_HOUR = 4
@@ -149,8 +148,6 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
   const [dragOverSlot, setDragOverSlot] = useState(null) // Track which slot is being dragged over
   const [dragOverColumn, setDragOverColumn] = useState(null) // Track which column (memberId) is being dragged over
   const [dragOverDate, setDragOverDate] = useState(null) // Track which date section is being dragged over
-  const [calendarOpenForDate, setCalendarOpenForDate] = useState(null) // Track which date's calendar is open
-  const calendarButtonRef = useRef(null) // Ref for calendar button positioning
   const scrollChangeSource = useRef(null) // 'scroll' | 'picker' | null - tracks source of date change
   const ignoreObserverUntil = useRef(0) // Timestamp until which to ignore observer updates
 
@@ -163,6 +160,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
   const holdingPinEventRef = useRef(null) // Persist panel-drag event id across draggable unmount
   const panelDragSourceRef = useRef(null) // Track source type ('holding-pin' or 'earlier-pin')
   const grabOffsetRef = useRef({ x: 0, y: 0 }) // Offset from pointer to top-left of dragged card
+  const justClosedPopupRef = useRef(false) // Track when a popup was just closed to prevent click-through
 
   // Configure sensors for both mouse and touch - require movement before drag starts
   const mouseSensor = useSensor(MouseSensor, {
@@ -287,42 +285,21 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     return () => clearInterval(interval)
   }, [])
 
-  // Handle outside click to close calendar
+  // Track when clicking on floating panel backdrop to prevent click-through
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (calendarButtonRef.current && !calendarButtonRef.current.contains(event.target)) {
-        setCalendarOpenForDate(null)
+    const handleMouseDown = (e) => {
+      // If clicking on a floating panel, carousel, or popup backdrop, mark it
+      if (e.target.closest('[data-floating-panel]') ||
+          e.target.closest('.fixed.z-50') ||
+          e.target.closest('[data-calendar-popup]') ||
+          document.querySelector('[data-calendar-open]')) {
+        justClosedPopupRef.current = true
+        setTimeout(() => { justClosedPopupRef.current = false }, 100)
       }
     }
-
-    if (calendarOpenForDate) {
-      document.addEventListener('mousedown', handleClickOutside)
-    }
-
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside)
-    }
-  }, [calendarOpenForDate])
-
-  const handleCalendarClick = (dateKey) => {
-    setCalendarOpenForDate(calendarOpenForDate === dateKey ? null : dateKey)
-  }
-
-  const handleCalendarDateSelect = (date) => {
-    if (onDateChange) {
-      onDateChange(date)
-    }
-    setCalendarOpenForDate(null)
-  }
-
-  const handleTodayClick = () => {
-    if (onDateChange) {
-      const today = new Date()
-      console.log('[handleTodayClick] Calling onDateChange with:', format(today, 'yyyy-MM-dd'))
-      onDateChange(today)
-    }
-  }
-
+    document.addEventListener('mousedown', handleMouseDown, true)
+    return () => document.removeEventListener('mousedown', handleMouseDown, true)
+  }, [])
 
   // Generate time labels for each hour
   const timeLabels = []
@@ -415,6 +392,12 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     // Don't trigger if we just finished resizing
     if (justFinishedResizingRef.current) {
       justFinishedResizingRef.current = false
+      return
+    }
+
+    // Don't trigger if a popup was just closed
+    if (justClosedPopupRef.current) {
+      justClosedPopupRef.current = false
       return
     }
 
@@ -566,6 +549,8 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
       const updatedEvent = {
         ...draggedEvent,
         assigneeId: null,
+        startTime: null,
+        endTime: null,
         ...(isFromEarlierPin ? { earlierOpening: false } : {}),
       }
       if (onEventUpdate) onEventUpdate(updatedEvent)
@@ -770,7 +755,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
       <div
         ref={scrollContainerRef}
         tabIndex={-1}
-        className="flex flex-col flex-1 min-h-0 overflow-auto bg-white relative focus:outline-none"
+        className={`flex flex-col flex-1 min-h-0 bg-white relative focus:outline-none ${activeId ? 'overflow-hidden' : 'overflow-auto'}`}
       >
       {/* Content wrapper with min-width to enable horizontal scrolling */}
       <div style={{ minWidth: `${64 + filteredMembers.length * 220}px` }}>
@@ -822,59 +807,15 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
               className="sticky top-14 z-30 bg-white border-b border-gray-300 px-4 py-2"
             >
               <div className="flex items-center gap-3">
-                {/* Calendar Icon Button */}
-                <div className="relative" ref={calendarOpenForDate === dateKey ? calendarButtonRef : null}>
-                  <button
-                    onClick={() => handleCalendarClick(dateKey)}
-                    className="flex items-center justify-center w-8 h-8 rounded hover:bg-gray-100 transition-colors"
-                    aria-label="Open calendar"
-                  >
-                    <svg
-                      className="w-5 h-5 text-gray-700"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                      />
-                    </svg>
-                  </button>
-
-                  {/* Calendar Popup */}
-                  {calendarOpenForDate === dateKey && (
-                    <CalendarPopup
-                      selectedDate={selectedDate}
-                      onDateSelect={handleCalendarDateSelect}
-                      onClose={() => setCalendarOpenForDate(null)}
-                    />
-                  )}
-                </div>
-
                 {/* Date Text */}
                 <h2 className="font-body text-lg uppercase text-gray-700 font-bold">
                   {format(dayDate, 'EEEE, MMMM d, yyyy')}
                 </h2>
-
-                {/* Today Badge or Button */}
-                {isToday ? (
-                  <span className="text-accent text-sm font-body font-semibold">Today</span>
-                ) : (
-                  <button
-                    onClick={handleTodayClick}
-                    className="px-3 py-1 bg-white text-gray-600 border border-gray-300 rounded-full font-body text-xs font-semibold hover:border-accent hover:text-accent transition-all"
-                  >
-                    Today
-                  </button>
-                )}
               </div>
             </div>
 
             {/* Grid Body for this day */}
-            <div className="flex relative" style={{ height: `${TOTAL_SLOTS * SLOT_HEIGHT}px` }}>
+            <div className="flex relative overflow-hidden" style={{ height: `${TOTAL_SLOTS * SLOT_HEIGHT}px` }}>
               {/* Time labels column - Sticky on left */}
               <div className="w-16 flex-shrink-0 bg-gray-50 relative sticky left-0 z-10">
                 {timeLabels.map((time, index) => {

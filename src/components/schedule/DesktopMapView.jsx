@@ -11,7 +11,7 @@ import MapSidebar from './MapSidebar'
 const DENVER_CENTER = [39.74, -104.99]
 const DEFAULT_ZOOM = 12
 
-export default function DesktopMapView({ selectedDate, events, onEventUpdate }) {
+export default function DesktopMapView({ selectedDate, events, onEventUpdate, roleFilter = 'all' }) {
   const [showUnassigned, setShowUnassigned] = useState(true)
   const [showEarlier, setShowEarlier] = useState(true)
   const [showStopNumbers, setShowStopNumbers] = useState(true)
@@ -26,17 +26,25 @@ export default function DesktopMapView({ selectedDate, events, onEventUpdate }) 
     const geoDateEvents = events.filter(e => e.date === dateStr && e.lat != null)
     return {
       assignedGeoEvents: geoDateEvents.filter(e => e.assigneeId != null),
-      unassignedGeoEvents: geoDateEvents.filter(e => e.assigneeId === null),
-      // Earlier openings: any future event with earlierOpening flag (could be moved to today)
+      unassignedGeoEvents: events.filter(e => e.assigneeId === null && e.lat != null),
       earlierGeoEvents: events.filter(e => e.earlierOpening === true && e.lat != null && e.date > dateStr),
     }
   }, [events, dateStr])
+
+  // Filter assigned events by role
+  const filteredAssignedGeoEvents = useMemo(() => {
+    if (roleFilter === 'all') return assignedGeoEvents
+    return assignedGeoEvents.filter(e => {
+      const member = getMemberById(e.assigneeId)
+      return member?.role === roleFilter
+    })
+  }, [assignedGeoEvents, roleFilter])
 
   // Compute per-tech stop ordering: group assigned events by tech, sort by startTime
   const stopNumberMap = useMemo(() => {
     const map = new Map()
     const byTech = new Map()
-    for (const event of assignedGeoEvents) {
+    for (const event of filteredAssignedGeoEvents) {
       if (!byTech.has(event.assigneeId)) byTech.set(event.assigneeId, [])
       byTech.get(event.assigneeId).push(event)
     }
@@ -45,7 +53,7 @@ export default function DesktopMapView({ selectedDate, events, onEventUpdate }) 
       techEvents.forEach((event, i) => map.set(event.id, i + 1))
     }
     return map
-  }, [assignedGeoEvents])
+  }, [filteredAssignedGeoEvents])
 
   const handlePinClick = (event) => {
     setSelectedPinEvent(event)
@@ -86,7 +94,7 @@ export default function DesktopMapView({ selectedDate, events, onEventUpdate }) 
         />
 
         {/* Assigned job pins - colored by tech */}
-        {assignedGeoEvents.map(event => {
+        {filteredAssignedGeoEvents.map(event => {
           const member = getMemberById(event.assigneeId)
           return (
             <MapPin
@@ -159,4 +167,5 @@ DesktopMapView.propTypes = {
   selectedDate: PropTypes.instanceOf(Date).isRequired,
   events: PropTypes.array.isRequired,
   onEventUpdate: PropTypes.func.isRequired,
+  roleFilter: PropTypes.oneOf(['all', 'tech', 'sales']),
 }

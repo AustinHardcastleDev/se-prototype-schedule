@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types'
 import { getAllMembers } from '../../utils/dataAccess'
+import { VIRTUAL_UNASSIGNED, VIRTUAL_EARLIER } from '../../utils/virtualMembers'
 
 export default function TeamMemberSwitcher({
   selectedMember,
@@ -16,6 +17,8 @@ export default function TeamMemberSwitcher({
   }
   const allMembers = getAllMembers()
   const isSplitView = splitMember !== null
+
+  const virtualMembers = [VIRTUAL_UNASSIGNED, VIRTUAL_EARLIER]
 
   const handleToggle = () => {
     setOpenState(!isOpen)
@@ -64,6 +67,68 @@ export default function TeamMemberSwitcher({
     </svg>
   )
 
+  // Render a virtual member entry (inline helper — uses vm.* directly)
+  const renderVirtualEntry = (vm, isSelected, showSplitIcon = true) => (
+    <div
+      key={vm.id}
+      className={`flex items-center bg-white rounded-full shadow-lg hover:brightness-95 transition-all ${
+        isSelected ? 'ring-2 ring-accent' : ''
+      }`}
+      style={{ minWidth: '200px' }}
+    >
+      <button
+        onClick={() => handleMemberClick(vm)}
+        className="flex items-center gap-3 px-4 py-3 flex-1 min-w-0"
+      >
+        <div
+          className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-body font-semibold flex-shrink-0"
+          style={{ backgroundColor: vm.color }}
+        >
+          {vm.avatar}
+        </div>
+        <span className="text-sm font-body text-text-dark font-semibold text-left flex-1 truncate">
+          {vm.name === 'Unassigned' ? 'Unassigned Jobs' : 'Earlier Openings'}
+        </span>
+        {isSelected && (
+          <div className="w-2 h-2 rounded-full bg-accent flex-shrink-0" />
+        )}
+      </button>
+      {showSplitIcon && !isSelected && (
+        <button
+          onClick={(e) => handleSplitIconClick(e, vm)}
+          className="pr-3 pl-2.5 py-3 text-gray-400 hover:text-accent transition-colors border-l border-gray-300 flex-shrink-0"
+          aria-label={`Compare with ${vm.name}`}
+        >
+          <SplitIcon />
+        </button>
+      )}
+    </div>
+  )
+
+  // Render a compact virtual entry for split mode columns (inline helper)
+  const renderCompactVirtualEntry = (vm, isSelected, side) => (
+    <button
+      key={`${side}-${vm.id}`}
+      onClick={() => handleSwapMember(side, vm)}
+      className={`flex items-center gap-2 bg-white rounded-full px-3 py-2 shadow-lg hover:brightness-95 transition-all ${
+        isSelected ? 'ring-2 ring-accent' : ''
+      }`}
+    >
+      <div
+        className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-body font-semibold flex-shrink-0"
+        style={{ backgroundColor: vm.color }}
+      >
+        {vm.avatar}
+      </div>
+      <span className="text-xs font-body text-text-dark font-semibold text-left flex-1 truncate">
+        {vm.name === 'Unassigned' ? 'Unassigned Jobs' : 'Earlier Openings'}
+      </span>
+      {isSelected && (
+        <div className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />
+      )}
+    </button>
+  )
+
   return (
     <>
       {/* Backdrop overlay */}
@@ -79,6 +144,15 @@ export default function TeamMemberSwitcher({
         {/* Member list - shown when open */}
         {isOpen && !isSplitView && (
           <div className="absolute bottom-16 left-0 flex flex-col gap-2 mb-2 animate-fadeIn">
+            {/* Virtual members at top with separator */}
+            {virtualMembers.map((vm) =>
+              renderVirtualEntry(vm, selectedMember.id === vm.id)
+            )}
+
+            {/* Separator */}
+            <div className="mx-4 border-t border-gray-300/50" />
+
+            {/* Real team members */}
             {sortedMembers.map((member) => {
               const isSelected = member.id === selectedMember.id
               return (
@@ -134,9 +208,16 @@ export default function TeamMemberSwitcher({
                 <div className="px-2 pb-0.5 border-b border-gray-300 mb-0.5">
                   <span className="text-xs font-body text-white font-bold uppercase tracking-wider">Left</span>
                 </div>
-                {sortedMembers
-                  .filter((m) => m.id !== splitMember.id)
-                  .map((member) => {
+
+                {/* Virtual members for left column */}
+                {virtualMembers.map((vm) =>
+                  renderCompactVirtualEntry(vm, selectedMember.id === vm.id, 'left')
+                )}
+
+                {/* Separator */}
+                <div className="mx-2 border-t border-gray-300/30" />
+
+                {sortedMembers.map((member) => {
                     const isLeftSelected = member.id === selectedMember.id
                     return (
                       <button
@@ -168,10 +249,17 @@ export default function TeamMemberSwitcher({
                 <div className="px-2 pb-0.5 border-b border-gray-300 mb-0.5">
                   <span className="text-xs font-body text-white font-bold uppercase tracking-wider">Right</span>
                 </div>
-                {sortedMembers
-                  .filter((m) => m.id !== selectedMember.id)
-                  .map((member) => {
-                    const isRightSelected = member.id === splitMember.id
+
+                {/* Virtual members for right column */}
+                {virtualMembers.map((vm) =>
+                  renderCompactVirtualEntry(vm, splitMember?.id === vm.id, 'right')
+                )}
+
+                {/* Separator */}
+                <div className="mx-2 border-t border-gray-300/30" />
+
+                {sortedMembers.map((member) => {
+                    const isRightSelected = member.id === splitMember?.id
                     return (
                       <button
                         key={`right-${member.id}`}
@@ -259,7 +347,6 @@ TeamMemberSwitcher.propTypes = {
   selectedMember: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
-    role: PropTypes.string.isRequired,
     avatar: PropTypes.string.isRequired,
     color: PropTypes.string.isRequired,
   }).isRequired,
@@ -267,7 +354,6 @@ TeamMemberSwitcher.propTypes = {
   splitMember: PropTypes.shape({
     id: PropTypes.string.isRequired,
     name: PropTypes.string.isRequired,
-    role: PropTypes.string.isRequired,
     avatar: PropTypes.string.isRequired,
     color: PropTypes.string.isRequired,
   }),

@@ -105,7 +105,7 @@ DraggableEvent.propTypes = {
     id: PropTypes.string.isRequired,
     title: PropTypes.string.isRequired,
     type: PropTypes.string.isRequired,
-    assigneeId: PropTypes.string.isRequired,
+    assigneeId: PropTypes.string,
     date: PropTypes.string.isRequired,
     startTime: PropTypes.string.isRequired,
     endTime: PropTypes.string.isRequired,

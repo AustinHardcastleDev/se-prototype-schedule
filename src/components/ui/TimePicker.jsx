@@ -94,7 +94,7 @@ export default function TimePicker({
     <div className="mb-4">
       {/* Label */}
       {label && (
-        <label htmlFor={id} className="block text-sm font-body text-text-dark font-semibold mb-2">
+        <label htmlFor={id} className="block text-sm font-body text-text-light font-semibold mb-2">
           {label}
         </label>
       )}

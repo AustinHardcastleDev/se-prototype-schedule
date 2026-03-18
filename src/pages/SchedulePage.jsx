@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { format } from 'date-fns'
+import { Toaster } from 'react-hot-toast'
 import WeekStrip from '../components/schedule/WeekStrip'
 import TimeGrid from '../components/schedule/TimeGrid'
 import SplitTimeGrid from '../components/schedule/SplitTimeGrid'
@@ -12,7 +13,10 @@ import EditEventModal from '../components/schedule/EditEventModal'
 import EventDetailsModal from '../components/schedule/EventDetailsModal'
 import DesktopToolbar from '../components/schedule/DesktopToolbar'
 import DesktopMapView from '../components/schedule/DesktopMapView'
+import MobileMapView from '../components/schedule/MobileMapView'
+import VirtualColumnCardList from '../components/schedule/VirtualColumnCardList'
 import { getAllMembers, getAllEvents, getEventTypes } from '../utils/dataAccess'
+import { useMobileViewMode } from '../contexts/ViewModeContext'
 
 export default function SchedulePage() {
   const [selectedDate, setSelectedDate] = useState(new Date())
@@ -42,10 +46,30 @@ export default function SchedulePage() {
   const [splitMember, setSplitMember] = useState(null)
   const isSplitView = splitMember !== null
 
+  // Per-column date state for split view
+  const [leftDate, setLeftDate] = useState(new Date())
+  const [rightDate, setRightDate] = useState(new Date())
+
   // Track whether the team member switcher is open (to hide FAB)
   const [switcherOpen, setSwitcherOpen] = useState(false)
 
   const eventTypes = getEventTypes()
+
+  // Check if selected member is a virtual member
+  const isVirtualMember = selectedMember?.isVirtual === true
+
+  // Mobile view mode
+  const { mobileViewMode, setMobileViewMode } = useMobileViewMode()
+
+  // Force back to calendar when entering split view or virtual member view
+  useEffect(() => {
+    if (isSplitView || isVirtualMember) setMobileViewMode('calendar')
+  }, [isSplitView, isVirtualMember, setMobileViewMode])
+
+  const showMobileMap = mobileViewMode === 'map' && !isSplitView && !isVirtualMember
+
+  // Hide WeekStrip when in split view or when a virtual member is selected
+  const hideWeekStrip = isSplitView || isVirtualMember
 
   const handleDateSelect = (date) => {
     setSelectedDate(date)
@@ -65,7 +89,7 @@ export default function SchedulePage() {
     // Open create event modal with pre-selected event type
     setCreateModalDefaults({
       eventType: eventType.key,
-      assigneeId: selectedMember.id,
+      assigneeId: isVirtualMember ? allMembers[0].id : selectedMember.id,
       date: format(selectedDate, 'yyyy-MM-dd'),
       startTime,
       endTime,
@@ -78,10 +102,15 @@ export default function SchedulePage() {
   }
 
   const handleEnterSplitView = (member) => {
+    // Set both dates to current selectedDate when entering split mode
+    setLeftDate(selectedDate)
+    setRightDate(selectedDate)
     setSplitMember(member)
   }
 
   const handleExitSplitView = () => {
+    // Restore selectedDate from leftDate when exiting
+    setSelectedDate(leftDate)
     setSplitMember(null)
   }
 
@@ -119,11 +148,11 @@ export default function SchedulePage() {
     setSelectedEvent(null)
   }
 
-  const handleLongPressSlot = ({ startTime, endTime, memberId }) => {
+  const handleLongPressSlot = ({ startTime, endTime, memberId, date }) => {
     // Open create modal with pre-filled time from long-pressed slot
     setCreateModalDefaults({
       assigneeId: memberId || selectedMember.id,
-      date: format(selectedDate, 'yyyy-MM-dd'),
+      date: date || format(selectedDate, 'yyyy-MM-dd'),
       startTime,
       endTime,
     })
@@ -156,11 +185,39 @@ export default function SchedulePage() {
     setSelectedEvent(null)
   }
 
+  // Per-column date change handlers
+  const handleLeftDateChange = (date) => {
+    setLeftDate(date)
+  }
+
+  const handleRightDateChange = (date) => {
+    setRightDate(date)
+  }
+
+  // Get events for virtual member single-column view
+  const getVirtualColumnEvents = () => {
+    if (!isVirtualMember) return []
+    if (selectedMember.virtualType === 'unassigned') {
+      return events
+        .filter((e) => e.assigneeId === null)
+        .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime))
+    }
+    if (selectedMember.virtualType === 'earlier') {
+      return events
+        .filter((e) => e.earlierOpening === true)
+        .sort((a, b) => a.date.localeCompare(b.date) || a.startTime.localeCompare(b.startTime))
+    }
+    return []
+  }
+
   return (
     <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
+      <Toaster position="top-center" toastOptions={{ style: { background: '#1A1A1A', color: '#fff', fontFamily: 'Inter, system-ui, sans-serif', fontSize: '14px' } }} />
 
-      {/* Week Strip - Mobile Only */}
-      <WeekStrip selectedDate={selectedDate} onDateSelect={handleDateSelect} />
+      {/* Week Strip - Mobile Only - Hidden in split view and virtual member view */}
+      {!hideWeekStrip && (
+        <WeekStrip selectedDate={selectedDate} onDateSelect={handleDateSelect} />
+      )}
 
       {/* Desktop Page Title + Panel with Toolbar + Grid */}
       <DesktopToolbar
@@ -185,6 +242,7 @@ export default function SchedulePage() {
               onEventTypeSelect={handleEventTypeSelect}
               events={events}
               onEventClick={handleEventClick}
+              hidden={isCreateModalOpen || isDetailsModalOpen || isEditModalOpen}
             />
           </DesktopTimeGrid>
         ) : (
@@ -192,23 +250,66 @@ export default function SchedulePage() {
             selectedDate={selectedDate}
             events={events}
             onEventUpdate={handleUpdateEvent}
+            roleFilter={roleFilter}
           />
         )}
       </DesktopToolbar>
 
       {/* Time Grid - Mobile Day Agenda View - Mobile Only */}
-      <div className="md:hidden flex flex-col flex-1">
+      <div className="md:hidden flex flex-col flex-1 min-h-0">
         {isSplitView ? (
           <SplitTimeGrid
-            selectedDate={selectedDate}
             leftMember={selectedMember}
             rightMember={splitMember}
+            leftDate={leftDate}
+            rightDate={rightDate}
+            onLeftDateChange={handleLeftDateChange}
+            onRightDateChange={handleRightDateChange}
             events={events}
             onEventClick={handleEventClick}
             onLongPressSlot={handleLongPressSlot}
             onEventUpdate={handleUpdateEvent}
             onHeaderTap={() => setSwitcherOpen(true)}
           />
+        ) : showMobileMap ? (
+          <MobileMapView
+            selectedDate={selectedDate}
+            events={events}
+            onEventUpdate={handleUpdateEvent}
+          />
+        ) : isVirtualMember ? (
+          // Virtual member single-column view: card list instead of time grid
+          <div className="flex flex-col flex-1 min-h-0">
+            {/* Virtual member header */}
+            <div
+              className="bg-charcoal px-3 py-2 flex items-center gap-2 border-b border-secondary"
+              onClick={() => setSwitcherOpen(true)}
+            >
+              <div
+                className="w-7 h-7 rounded-full flex items-center justify-center text-white text-xs font-body font-semibold flex-shrink-0"
+                style={{ backgroundColor: selectedMember.color }}
+              >
+                {selectedMember.avatar}
+              </div>
+              <span className="text-sm font-body text-text-light font-semibold">
+                {selectedMember.name}
+              </span>
+              <span className="text-xs font-body text-gray-400 ml-auto">
+                {getVirtualColumnEvents().length} jobs
+              </span>
+            </div>
+            <div className="flex-1 overflow-y-auto min-h-0">
+              <VirtualColumnCardList
+                events={getVirtualColumnEvents()}
+                onEventClick={handleEventClick}
+                emptyMessage={
+                  selectedMember.virtualType === 'unassigned'
+                    ? 'No unassigned jobs'
+                    : 'No earlier openings available'
+                }
+              />
+            </div>
+          </div>
         ) : (
           <TimeGrid
             selectedDate={selectedDate}
@@ -234,7 +335,7 @@ export default function SchedulePage() {
       />
 
       {/* Floating Action Button - Mobile Only - Bottom Right */}
-      <FloatingActionButton onEventTypeSelect={handleEventTypeSelect} hidden={switcherOpen} />
+      <FloatingActionButton onEventTypeSelect={handleEventTypeSelect} hidden={switcherOpen || showMobileMap} />
 
       {/* Create Event Modal - Mobile Only */}
       <CreateEventModal

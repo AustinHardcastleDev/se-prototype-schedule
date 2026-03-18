@@ -50,6 +50,7 @@ export default function SidebarTimeline({
   isAssigned,
   selectedDate,
   techId,
+  maxHeight = '420px',
 }) {
   const scrollRef = useRef(null)
   const ghostRef = useRef(null)
@@ -93,6 +94,32 @@ export default function SidebarTimeline({
     ev.id !== ghostEvent?.id && timesOverlap(ghostStartTime, ghostEndTime, ev.startTime, ev.endTime)
   )
 
+  // Auto-scroll container when dragging near top/bottom edges
+  // When maxHeight is null, the component itself doesn't scroll — find the nearest scrollable ancestor
+  const autoScrollEdge = useCallback((clientY) => {
+    let container = scrollRef.current
+    if (!container) return
+    // If this element isn't scrollable, walk up to find the scrollable ancestor
+    if (container.scrollHeight <= container.clientHeight) {
+      let el = container.parentElement
+      while (el) {
+        if (el.scrollHeight > el.clientHeight && getComputedStyle(el).overflowY !== 'visible') {
+          container = el
+          break
+        }
+        el = el.parentElement
+      }
+    }
+    const rect = container.getBoundingClientRect()
+    const edgeZone = 40
+    const scrollSpeed = 6
+    if (clientY < rect.top + edgeZone) {
+      container.scrollTop -= scrollSpeed
+    } else if (clientY > rect.bottom - edgeZone) {
+      container.scrollTop += scrollSpeed
+    }
+  }, [])
+
   // --- Ghost card drag (vertical reposition) ---
   const handleGhostDragStart = useCallback((e) => {
     if (isAssigned || isResizingGhost) return
@@ -106,6 +133,7 @@ export default function SidebarTimeline({
     setIsDraggingGhost(true)
 
     const handleMove = (ev) => {
+      autoScrollEdge(ev.clientY)
       const deltaY = ev.clientY - ghostDragRef.current.startY
       const newTop = ghostDragRef.current.origTop + deltaY
       // Snap to slot
@@ -131,7 +159,7 @@ export default function SidebarTimeline({
 
     document.addEventListener('pointermove', handleMove)
     document.addEventListener('pointerup', handleUp)
-  }, [ghostStartTime, ghostEndTime, isAssigned, isResizingGhost, onGhostTimeChange])
+  }, [ghostStartTime, ghostEndTime, isAssigned, isResizingGhost, onGhostTimeChange, autoScrollEdge])
 
   // --- Ghost card resize (bottom edge) ---
   const handleGhostResizeStart = useCallback((e) => {
@@ -144,6 +172,7 @@ export default function SidebarTimeline({
     setIsResizingGhost(true)
 
     const handleMove = (ev) => {
+      autoScrollEdge(ev.clientY)
       const deltaY = ev.clientY - ghostResizeRef.current.startY
       const newEndPx = ghostResizeRef.current.origEnd + deltaY
       const newEnd = offsetToTime(newEndPx)
@@ -163,7 +192,7 @@ export default function SidebarTimeline({
 
     document.addEventListener('pointermove', handleMove)
     document.addEventListener('pointerup', handleUp)
-  }, [ghostStartTime, ghostEndTime, isAssigned, onGhostTimeChange])
+  }, [ghostStartTime, ghostEndTime, isAssigned, onGhostTimeChange, autoScrollEdge])
 
   // --- Existing event drag ---
   const handleEventDragStart = useCallback((ev, pointerEvent) => {
@@ -179,6 +208,7 @@ export default function SidebarTimeline({
     setDraggingEventId(ev.id)
 
     const handleMove = (e) => {
+      autoScrollEdge(e.clientY)
       const deltaY = e.clientY - eventDragRef.current.startY
       const newTop = eventDragRef.current.origTop + deltaY
       const newStart = offsetToTime(newTop)
@@ -198,7 +228,7 @@ export default function SidebarTimeline({
 
     document.addEventListener('pointermove', handleMove)
     document.addEventListener('pointerup', handleUp)
-  }, [onEventUpdate])
+  }, [onEventUpdate, autoScrollEdge])
 
   // --- Existing event resize ---
   const handleEventResizeStart = useCallback((ev, pointerEvent) => {
@@ -210,6 +240,7 @@ export default function SidebarTimeline({
     setResizingEventId(ev.id)
 
     const handleMove = (e) => {
+      autoScrollEdge(e.clientY)
       const deltaY = e.clientY - eventResizeRef.current.startY
       const newEndPx = eventResizeRef.current.origEnd + deltaY
       const newEnd = offsetToTime(newEndPx)
@@ -228,7 +259,7 @@ export default function SidebarTimeline({
 
     document.addEventListener('pointermove', handleMove)
     document.addEventListener('pointerup', handleUp)
-  }, [onEventUpdate])
+  }, [onEventUpdate, autoScrollEdge])
 
   // Ghost card pixel values
   const ghostTop = ghostStartTime ? timeToOffset(ghostStartTime) : 0
@@ -243,8 +274,8 @@ export default function SidebarTimeline({
   return (
     <div
       ref={scrollRef}
-      className="overflow-y-auto overflow-x-hidden"
-      style={{ maxHeight: '420px' }}
+      className={maxHeight ? 'overflow-y-auto overflow-x-hidden' : ''}
+      style={maxHeight ? { maxHeight } : undefined}
     >
       <div className="relative" style={{ height: `${GRID_HEIGHT}px`, minWidth: '100%' }}>
 
@@ -436,4 +467,5 @@ SidebarTimeline.propTypes = {
   isAssigned: PropTypes.bool,
   selectedDate: PropTypes.string,
   techId: PropTypes.string,
+  maxHeight: PropTypes.string,
 }

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { format } from 'date-fns'
 import { DndContext, DragOverlay, pointerWithin, TouchSensor, MouseSensor, useSensor, useSensors } from '@dnd-kit/core'
-import { Toaster, toast } from 'react-hot-toast'
+import { toast } from 'react-hot-toast'
 import DraggableEvent from './DraggableEvent'
 import EventCard from './EventCard'
 
@@ -358,19 +358,6 @@ export default function TimeGrid({ selectedDate, selectedMember, events: allEven
 
   return (
     <>
-      {/* Toast notifications */}
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          duration: 3000,
-          style: {
-            background: '#2A2A2A',
-            color: '#FFFFFF',
-            border: '1px solid #F47A20',
-          },
-        }}
-      />
-
       <DndContext
         sensors={sensors}
         onDragStart={handleDragStart}

@@ -107,7 +107,7 @@ HorizontalCarousel.propTypes = {
   itemCount: PropTypes.number.isRequired,
 }
 
-export default function DesktopFloatingPanel({ onEventTypeSelect, events = [], onEventClick }) {
+export default function DesktopFloatingPanel({ onEventTypeSelect, events = [], onEventClick, hidden = false }) {
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [isUnassignedOpen, setIsUnassignedOpen] = useState(false)
   const [isEarlierOpen, setIsEarlierOpen] = useState(false)
@@ -144,6 +144,15 @@ export default function DesktopFloatingPanel({ onEventTypeSelect, events = [], o
       setIsEarlierOpen(false)
     }
   }, [isDraggingFromPanel])
+
+  // Close trays and hide panel when a modal opens
+  useEffect(() => {
+    if (hidden) {
+      setIsCreateOpen(false)
+      setIsUnassignedOpen(false)
+      setIsEarlierOpen(false)
+    }
+  }, [hidden])
 
   // Make Unassigned pill a droppable target for calendar events
   const { setNodeRef: setUnassignedDropRef, isOver: isOverUnassigned } = useDroppable({
@@ -191,7 +200,7 @@ export default function DesktopFloatingPanel({ onEventTypeSelect, events = [], o
       style={{
         left: 'calc(16rem + 1.5rem)',
         right: '1.5rem',
-        bottom: '84px',
+        bottom: '100px',
       }}
     >
       <div className="bg-charcoal/95 backdrop-blur-md rounded-2xl shadow-2xl border border-white/10 px-3 pt-3 pb-3">
@@ -210,35 +219,41 @@ export default function DesktopFloatingPanel({ onEventTypeSelect, events = [], o
 
         {/* Carousel */}
         <HorizontalCarousel itemCount={carouselEvents.length}>
-          {carouselEvents.map((event) => (
-            <div key={event.id} style={{ width: `${CARD_WIDTH}px`, flexShrink: 0 }}>
-              <DraggableHoldingCard event={event} source={source}>
-                <button
-                  onClick={() => onCardClick(event)}
-                  className="bg-white rounded-xl px-4 py-3 hover:ring-2 hover:ring-accent/50 hover:shadow-md transition-all text-left shadow-lg w-full"
-                >
-                  <div className="text-sm font-body text-gray-800 font-semibold truncate">{event.title}</div>
-                  <div className="text-xs font-body text-gray-500 mt-0.5">
-                    {formatDateShort(event.date)} &middot; {formatTime(event.startTime)}
-                  </div>
-                  <div className={`text-xs font-body ${labelClass} font-semibold mt-0.5`}>{label}</div>
-                  {event.notes && (
-                    <div className="flex items-start gap-1 mt-1.5">
-                      <svg className="w-2.5 h-2.5 text-blue-500 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
-                        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
-                        <rect x="9" y="3" width="6" height="4" rx="1"/>
-                      </svg>
-                      <span className="text-xs font-body text-blue-500 line-clamp-2">{event.notes}</span>
+          {carouselEvents.map((event) => {
+            const cardEventType = getEventTypeByKey(event.type)
+            return (
+              <div key={event.id} style={{ width: `${CARD_WIDTH}px`, flexShrink: 0 }}>
+                <DraggableHoldingCard event={event} source={source}>
+                  <button
+                    onClick={() => onCardClick(event)}
+                    className="rounded-xl px-4 py-3 hover:ring-2 hover:ring-accent/50 hover:shadow-md transition-all text-left w-full"
+                    style={{ backgroundColor: cardEventType?.color || '#6B7280' }}
+                  >
+                    <div className="text-sm font-body text-white font-semibold truncate">{event.title}</div>
+                    <div className="text-xs font-body text-white/70 mt-0.5">
+                      {formatDateShort(event.date)}{event.startTime ? ` \u00b7 ${formatTime(event.startTime)}` : ''}
                     </div>
-                  )}
-                </button>
-              </DraggableHoldingCard>
-            </div>
-          ))}
+                    <div className="text-xs font-body text-white/80 font-semibold mt-0.5">{label}</div>
+                    {event.notes && (
+                      <div className="flex items-start gap-1 mt-1.5">
+                        <svg className="w-2.5 h-2.5 text-white/60 mt-0.5 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                          <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+                          <rect x="9" y="3" width="6" height="4" rx="1"/>
+                        </svg>
+                        <span className="text-xs font-body text-white/60 line-clamp-2">{event.notes}</span>
+                      </div>
+                    )}
+                  </button>
+                </DraggableHoldingCard>
+              </div>
+            )
+          })}
         </HorizontalCarousel>
       </div>
     </div>
   )
+
+  if (hidden) return null
 
   return (
     <>
@@ -253,7 +268,7 @@ export default function DesktopFloatingPanel({ onEventTypeSelect, events = [], o
       }
 
       {/* Floating Bottom Bar - Desktop Only */}
-      <div ref={barRef} className="hidden md:flex fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 items-center gap-3 bg-charcoal/90 backdrop-blur-sm rounded-full px-4 py-2.5 shadow-2xl">
+      <div ref={barRef} className="hidden md:flex fixed bottom-10 left-1/2 transform -translate-x-1/2 z-50 items-center gap-3 bg-charcoal/90 backdrop-blur-sm rounded-full px-4 py-2.5 shadow-2xl">
         {/* Earlier Opening Jobs */}
         {earlierOpeningEvents.length > 0 && (
           <button
@@ -308,14 +323,15 @@ export default function DesktopFloatingPanel({ onEventTypeSelect, events = [], o
               setIsUnassignedOpen(false)
               setIsEarlierOpen(false)
             }}
-            className={`w-10 h-10 bg-accent rounded-full flex items-center justify-center text-white shadow-lg hover:shadow-xl transition-all ${
-              isCreateOpen ? 'rotate-45 scale-110' : 'rotate-0 scale-100'
+            className={`flex items-center gap-2 bg-accent rounded-full px-5 py-2.5 text-white shadow-lg hover:shadow-xl transition-all ${
+              isCreateOpen ? 'scale-105' : 'scale-100'
             }`}
             aria-label={isCreateOpen ? 'Close menu' : 'Create event'}
           >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className={`w-4 h-4 transition-transform ${isCreateOpen ? 'rotate-45' : 'rotate-0'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
             </svg>
+            <span className="font-body text-sm font-semibold whitespace-nowrap">Add Event</span>
           </button>
         </div>
 
@@ -356,4 +372,5 @@ DesktopFloatingPanel.propTypes = {
   onEventTypeSelect: PropTypes.func.isRequired,
   events: PropTypes.array,
   onEventClick: PropTypes.func,
+  hidden: PropTypes.bool,
 }
