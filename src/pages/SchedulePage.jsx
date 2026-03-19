@@ -61,12 +61,12 @@ export default function SchedulePage() {
   // Mobile view mode
   const { mobileViewMode, setMobileViewMode } = useMobileViewMode()
 
-  // Force back to calendar when entering split view or virtual member view
+  // Force back to calendar when entering virtual member view
   useEffect(() => {
-    if (isSplitView || isVirtualMember) setMobileViewMode('calendar')
-  }, [isSplitView, isVirtualMember, setMobileViewMode])
+    if (isVirtualMember) setMobileViewMode('calendar')
+  }, [isVirtualMember, setMobileViewMode])
 
-  const showMobileMap = mobileViewMode === 'map' && !isSplitView && !isVirtualMember
+  const showMobileMap = mobileViewMode === 'map' && !isVirtualMember
 
   // Hide WeekStrip when in split view or when a virtual member is selected
   const hideWeekStrip = isSplitView || isVirtualMember
@@ -257,7 +257,13 @@ export default function SchedulePage() {
 
       {/* Time Grid - Mobile Day Agenda View - Mobile Only */}
       <div className="md:hidden flex flex-col flex-1 min-h-0">
-        {isSplitView ? (
+        {showMobileMap ? (
+          <MobileMapView
+            selectedDate={selectedDate}
+            events={events}
+            onEventUpdate={handleUpdateEvent}
+          />
+        ) : isSplitView ? (
           <SplitTimeGrid
             leftMember={selectedMember}
             rightMember={splitMember}
@@ -270,12 +276,6 @@ export default function SchedulePage() {
             onLongPressSlot={handleLongPressSlot}
             onEventUpdate={handleUpdateEvent}
             onHeaderTap={() => setSwitcherOpen(true)}
-          />
-        ) : showMobileMap ? (
-          <MobileMapView
-            selectedDate={selectedDate}
-            events={events}
-            onEventUpdate={handleUpdateEvent}
           />
         ) : isVirtualMember ? (
           // Virtual member single-column view: card list instead of time grid

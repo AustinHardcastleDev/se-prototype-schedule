@@ -108,7 +108,7 @@ function DroppableEventColumn({
           className="absolute left-2 right-2 pointer-events-none z-20 border-2 border-dashed border-accent bg-accent/10"
           style={{
             top: `${dragOverSlot * SLOT_HEIGHT}px`,
-            height: `${calculateEventOffset(activeEvent.endTime) - calculateEventOffset(activeEvent.startTime)}px`,
+            height: `${activeEvent.startTime && activeEvent.endTime ? calculateEventOffset(activeEvent.endTime) - calculateEventOffset(activeEvent.startTime) : SLOT_HEIGHT * 2}px`,
           }}
         >
           <div className="p-1.5 text-xs text-accent font-semibold truncate">
@@ -588,10 +588,14 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
         clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
       } else {
         // Last resort: same day, same column, delta-based calculation
-        const originalOffset = calculateEventOffset(draggedEvent.startTime)
-        const newOffset = originalOffset + delta.y
-        const newSlot = Math.floor(newOffset / SLOT_HEIGHT)
-        clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
+        if (draggedEvent.startTime) {
+          const originalOffset = calculateEventOffset(draggedEvent.startTime)
+          const newOffset = originalOffset + delta.y
+          const newSlot = Math.floor(newOffset / SLOT_HEIGHT)
+          clampedSlot = Math.max(0, Math.min(TOTAL_SLOTS - 1, newSlot))
+        } else {
+          clampedSlot = 0
+        }
       }
     }
 
@@ -605,9 +609,12 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     newStartTime = roundToNearestSlot(newStartTime)
 
     // Calculate new end time (preserve duration)
-    const [oldStartHour, oldStartMin] = draggedEvent.startTime.split(':').map(Number)
-    const [oldEndHour, oldEndMin] = draggedEvent.endTime.split(':').map(Number)
-    const durationMinutes = (oldEndHour * 60 + oldEndMin) - (oldStartHour * 60 + oldStartMin)
+    let durationMinutes = 30
+    if (draggedEvent.startTime && draggedEvent.endTime) {
+      const [oldStartHour, oldStartMin] = draggedEvent.startTime.split(':').map(Number)
+      const [oldEndHour, oldEndMin] = draggedEvent.endTime.split(':').map(Number)
+      durationMinutes = (oldEndHour * 60 + oldEndMin) - (oldStartHour * 60 + oldStartMin)
+    }
 
     const [newStartHour, newStartMin] = newStartTime.split(':').map(Number)
     const endTotalMinutes = (newStartHour * 60 + newStartMin) + durationMinutes
