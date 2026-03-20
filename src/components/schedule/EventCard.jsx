@@ -66,7 +66,7 @@ const STATUS_LABELS = {
   'closed-invoiced': 'Closed - Invoiced',
 }
 
-export default function EventCard({ event, onClick, onLongPress, onResizeStart, disableInteraction = false, disableResize = false, compact = false }) {
+export default function EventCard({ event, onClick, onLongPress, onResizeStart, disableInteraction = false, disableResize = false, compact = false, flash = false }) {
   const eventType = getEventTypeByKey(event.type)
   const [longPressTimer, setLongPressTimer] = useState(null)
   const [isLongPressing, setIsLongPressing] = useState(false)
@@ -296,6 +296,8 @@ export default function EventCard({ event, onClick, onLongPress, onResizeStart, 
         missingPhotos && !isEarlier ? 'ring-1 ring-amber-400/60 ring-inset' : ''
       } ${
         event.assigneeId === null ? 'border border-dashed border-white/40' : ''
+      } ${
+        flash && !isEarlier ? 'animate-eventFlash' : ''
       }`}
       style={{
         height: `${cardHeight}px`,
@@ -418,4 +420,5 @@ EventCard.propTypes = {
   disableInteraction: PropTypes.bool,
   disableResize: PropTypes.bool,
   compact: PropTypes.bool,
+  flash: PropTypes.bool,
 }

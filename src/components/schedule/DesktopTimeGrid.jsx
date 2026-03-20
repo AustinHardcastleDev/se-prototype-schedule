@@ -66,7 +66,7 @@ function DroppableEventColumn({
             key={event.id}
             data-event-card
             data-event-id={event.id}
-            className={`absolute left-2 right-2${event.id === flashEventId ? ' animate-eventFlash rounded-md' : ''}`}
+            className="absolute left-2 right-2"
             style={{
               top: `${topOffset}px`,
               opacity: isResizing ? 0 : 1,
@@ -77,6 +77,7 @@ function DroppableEventColumn({
               onEventClick={onEventClick}
               onResizeStart={onResizeStart}
               isDragging={isDragging}
+              flash={event.id === flashEventId}
             />
           </div>
         )
