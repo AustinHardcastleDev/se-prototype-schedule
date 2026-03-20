@@ -316,9 +316,20 @@ function SplitColumn({
                 height: `${calculateEventOffset(resizePreviewEndTime) - calculateEventOffset(resizingEvent.startTime)}px`,
               }}
             >
-              <div className="p-1">
+              <div className="p-1 overflow-hidden">
                 <div className="text-[10px] font-body text-accent font-semibold truncate">
                   {resizingEvent.title}
+                </div>
+                <div className="text-[9px] font-body text-accent/80 truncate">
+                  {(() => {
+                    const [sh, sm] = resizingEvent.startTime.split(':').map(Number)
+                    const [eh, em] = resizePreviewEndTime.split(':').map(Number)
+                    const fmtTime = (h, m) => `${h > 12 ? h - 12 : h || 12}:${String(m).padStart(2,'0')} ${h >= 12 ? 'PM' : 'AM'}`
+                    const dur = (eh * 60 + em) - (sh * 60 + sm)
+                    const dh = Math.floor(dur / 60)
+                    const dm = dur % 60
+                    return `${fmtTime(sh, sm)} – ${fmtTime(eh, em)} (${dh ? dh + 'h ' : ''}${dm ? dm + 'm' : ''})`
+                  })()}
                 </div>
               </div>
             </div>

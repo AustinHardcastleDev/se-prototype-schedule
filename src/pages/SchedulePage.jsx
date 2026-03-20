@@ -12,6 +12,7 @@ import CreateEventModal from '../components/schedule/CreateEventModal'
 import EditEventModal from '../components/schedule/EditEventModal'
 import EventDetailsModal from '../components/schedule/EventDetailsModal'
 import DesktopToolbar from '../components/schedule/DesktopToolbar'
+import DesktopWeekView from '../components/schedule/DesktopWeekView'
 import DesktopMapView from '../components/schedule/DesktopMapView'
 import MobileMapView from '../components/schedule/MobileMapView'
 import VirtualColumnCardList from '../components/schedule/VirtualColumnCardList'
@@ -38,9 +39,28 @@ export default function SchedulePage() {
 
   // Desktop role filter state
   const [roleFilter, setRoleFilter] = useState('all')
+  const handleRoleFilterChange = (newFilter) => {
+    setRoleFilter(newFilter)
+    setHiddenMembers(new Set())
+  }
 
-  // Desktop view mode state (calendar or map)
+  // Desktop view mode state (calendar, map, or week)
   const [viewMode, setViewMode] = useState('calendar')
+
+  // Hidden members for tech toggle filter
+  const [hiddenMembers, setHiddenMembers] = useState(new Set())
+
+  // Flash event ID for week view → calendar navigation
+  const [flashEventId, setFlashEventId] = useState(null)
+
+  const handleToggleMember = (memberId) => {
+    setHiddenMembers(prev => {
+      const next = new Set(prev)
+      if (next.has(memberId)) next.delete(memberId)
+      else next.add(memberId)
+      return next
+    })
+  }
 
   // Split view state
   const [splitMember, setSplitMember] = useState(null)
@@ -137,6 +157,14 @@ export default function SchedulePage() {
     setIsDetailsModalOpen(true)
   }
 
+  const handleWeekEventClick = (event) => {
+    // Navigate to calendar view on the event's date and flash the event
+    setViewMode('calendar')
+    setSelectedDate(new Date(event.date + 'T00:00:00'))
+    setFlashEventId(event.id)
+    setTimeout(() => setFlashEventId(null), 2000)
+  }
+
   const handleEditFromDetails = () => {
     // Transition from details modal to edit modal
     setIsDetailsModalOpen(false)
@@ -222,11 +250,13 @@ export default function SchedulePage() {
       {/* Desktop Page Title + Panel with Toolbar + Grid */}
       <DesktopToolbar
         roleFilter={roleFilter}
-        onRoleFilterChange={setRoleFilter}
+        onRoleFilterChange={handleRoleFilterChange}
         selectedDate={selectedDate}
         onDateChange={handleDateSelect}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        hiddenMembers={hiddenMembers}
+        onToggleMember={handleToggleMember}
       >
         {viewMode === 'calendar' ? (
           <DesktopTimeGrid
@@ -237,6 +267,8 @@ export default function SchedulePage() {
             onEventClick={handleEventClick}
             onEventUpdate={handleUpdateEvent}
             roleFilter={roleFilter}
+            hiddenMembers={hiddenMembers}
+            flashEventId={flashEventId}
           >
             <DesktopFloatingPanel
               onEventTypeSelect={handleEventTypeSelect}
@@ -245,6 +277,15 @@ export default function SchedulePage() {
               hidden={isCreateModalOpen || isDetailsModalOpen || isEditModalOpen}
             />
           </DesktopTimeGrid>
+        ) : viewMode === 'week' ? (
+          <DesktopWeekView
+            selectedDate={selectedDate}
+            events={events}
+            onDateChange={handleDateSelect}
+            onEventClick={handleWeekEventClick}
+            roleFilter={roleFilter}
+            hiddenMembers={hiddenMembers}
+          />
         ) : (
           <DesktopMapView
             selectedDate={selectedDate}

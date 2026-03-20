@@ -31,6 +31,7 @@ function DroppableEventColumn({
   resizingEvent,
   resizePreviewEndTime,
   calculateEventOffset,
+  flashEventId,
 }) {
   const { setNodeRef } = useDroppable({
     id: `${memberId}-${date}`,
@@ -64,7 +65,8 @@ function DroppableEventColumn({
           <div
             key={event.id}
             data-event-card
-            className="absolute left-2 right-2"
+            data-event-id={event.id}
+            className={`absolute left-2 right-2${event.id === flashEventId ? ' animate-eventFlash rounded-md' : ''}`}
             style={{
               top: `${topOffset}px`,
               opacity: isResizing ? 0 : 1,
@@ -93,9 +95,20 @@ function DroppableEventColumn({
               height: `${calculateEventOffset(resizePreviewEndTime) - calculateEventOffset(resizingEvent.startTime)}px`,
             }}
           >
-            <div className="p-1.5">
+            <div className="p-1.5 overflow-hidden">
               <div className="text-xs font-body text-accent font-semibold truncate">
                 {resizingEvent.title}
+              </div>
+              <div className="text-[10px] font-body text-accent/80 truncate">
+                {(() => {
+                  const [sh, sm] = resizingEvent.startTime.split(':').map(Number)
+                  const [eh, em] = resizePreviewEndTime.split(':').map(Number)
+                  const fmtTime = (h, m) => `${h > 12 ? h - 12 : h || 12}:${String(m).padStart(2,'0')} ${h >= 12 ? 'PM' : 'AM'}`
+                  const dur = (eh * 60 + em) - (sh * 60 + sm)
+                  const dh = Math.floor(dur / 60)
+                  const dm = dur % 60
+                  return `${fmtTime(sh, sm)} – ${fmtTime(eh, em)} (${dh ? dh + 'h ' : ''}${dm ? dm + 'm' : ''})`
+                })()}
               </div>
             </div>
           </div>
@@ -136,9 +149,10 @@ DroppableEventColumn.propTypes = {
   resizingEvent: PropTypes.object,
   resizePreviewEndTime: PropTypes.string,
   calculateEventOffset: PropTypes.func.isRequired,
+  flashEventId: PropTypes.string,
 }
 
-export default function DesktopTimeGrid({ selectedDate, events, onDateChange, onSlotClick, onEventClick, onEventUpdate, roleFilter = 'all', children }) {
+export default function DesktopTimeGrid({ selectedDate, events, onDateChange, onSlotClick, onEventClick, onEventUpdate, roleFilter = 'all', hiddenMembers, flashEventId, children }) {
   const [currentTime, setCurrentTime] = useState(new Date())
   const dayRefs = useRef({}) // Store refs to each day section
   const scrollContainerRef = useRef(null) // Ref to the scrollable container
@@ -162,6 +176,14 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
   const grabOffsetRef = useRef({ x: 0, y: 0 }) // Offset from pointer to top-left of dragged card
   const justClosedPopupRef = useRef(false) // Track when a popup was just closed to prevent click-through
 
+  // Click-drag horizontal scrolling state
+  const isDragScrollingRef = useRef(false)
+  const dragScrollStartXRef = useRef(0)
+  const dragScrollStartYRef = useRef(0)
+  const dragScrollStartScrollLeftRef = useRef(0)
+  const dragScrollStartScrollTopRef = useRef(0)
+  const justDragScrolledRef = useRef(false)
+
   // Configure sensors for both mouse and touch - require movement before drag starts
   const mouseSensor = useSensor(MouseSensor, {
     activationConstraint: {
@@ -178,9 +200,10 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
 
   // Get all team members for columns
   const teamMembers = getAllMembers()
-  const filteredMembers = roleFilter === 'all'
+  const filteredMembers = (roleFilter === 'all'
     ? teamMembers
     : teamMembers.filter(m => m.role === roleFilter)
+  ).filter(m => !hiddenMembers?.has(m.id))
 
   // Generate array of dates to render (10 days before + selected date + 10 days after = 21 days total)
   const daysToRender = []
@@ -275,6 +298,19 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
 
     scrollChangeSource.current = null
   }, [selectedDate])
+
+  // Scroll to flashed event when navigating from week view
+  useEffect(() => {
+    if (!flashEventId) return
+    // Small delay to let the DOM render the target day section
+    const timer = setTimeout(() => {
+      const el = document.querySelector(`[data-event-id="${flashEventId}"]`)
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [flashEventId])
 
   // Update current time every minute
   useEffect(() => {
@@ -388,6 +424,9 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
   const handleColumnClick = (e, memberId, dayDate) => {
     // Don't trigger if clicking on an event card
     if (e.target.closest('[data-event-card]')) return
+
+    // Don't trigger if we just finished drag-scrolling
+    if (justDragScrolledRef.current) return
 
     // Don't trigger if we just finished resizing
     if (justFinishedResizingRef.current) {
@@ -747,6 +786,68 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
     document.addEventListener('pointerup', handlePointerUp)
   }
 
+  // Click-drag horizontal scrolling handlers
+  const handleDragScrollMouseDown = (e) => {
+    // Only left-click
+    if (e.button !== 0) return
+    // Don't activate during dnd-kit drag or resize
+    if (activeId || resizingEvent) return
+    // Don't activate on interactive elements
+    if (e.target.closest('[data-event-card], [data-resize-handle], .sticky, [data-floating-panel], [data-calendar-popup], button')) return
+
+    isDragScrollingRef.current = true
+    dragScrollStartXRef.current = e.clientX
+    dragScrollStartYRef.current = e.clientY
+    dragScrollStartScrollLeftRef.current = scrollContainerRef.current.scrollLeft
+    dragScrollStartScrollTopRef.current = scrollContainerRef.current.scrollTop
+
+    document.addEventListener('mousemove', handleDragScrollMouseMove)
+    document.addEventListener('mouseup', handleDragScrollMouseUp)
+  }
+
+  const handleDragScrollMouseMove = (e) => {
+    if (!isDragScrollingRef.current) return
+    const dx = e.clientX - dragScrollStartXRef.current
+    const dy = e.clientY - dragScrollStartYRef.current
+
+    // Only switch to grab cursor after 5px movement
+    if (Math.abs(dx) > 5 || Math.abs(dy) > 5) {
+      scrollContainerRef.current.style.cursor = 'grabbing'
+      scrollContainerRef.current.style.userSelect = 'none'
+      justDragScrolledRef.current = true
+    }
+
+    scrollContainerRef.current.scrollLeft = dragScrollStartScrollLeftRef.current - dx
+    scrollContainerRef.current.scrollTop = dragScrollStartScrollTopRef.current - dy
+  }
+
+  const handleDragScrollMouseUp = () => {
+    isDragScrollingRef.current = false
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.style.cursor = ''
+      scrollContainerRef.current.style.userSelect = ''
+    }
+    document.removeEventListener('mousemove', handleDragScrollMouseMove)
+    document.removeEventListener('mouseup', handleDragScrollMouseUp)
+
+    if (justDragScrolledRef.current) {
+      // Prevent handleColumnClick from firing after drag-scroll
+      setTimeout(() => { justDragScrolledRef.current = false }, 100)
+    }
+  }
+
+  const handleDragScrollMouseLeave = () => {
+    if (isDragScrollingRef.current) {
+      isDragScrollingRef.current = false
+      if (scrollContainerRef.current) {
+        scrollContainerRef.current.style.cursor = ''
+        scrollContainerRef.current.style.userSelect = ''
+      }
+      document.removeEventListener('mousemove', handleDragScrollMouseMove)
+      document.removeEventListener('mouseup', handleDragScrollMouseUp)
+    }
+  }
+
   // Get the active event being dragged for the overlay
   const activeEvent = activeId ? events.find((e) => e.id === activeId) : null
 
@@ -763,6 +864,8 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
         ref={scrollContainerRef}
         tabIndex={-1}
         className={`flex flex-col flex-1 min-h-0 bg-white relative focus:outline-none ${activeId ? 'overflow-hidden' : 'overflow-auto'}`}
+        onMouseDown={handleDragScrollMouseDown}
+        onMouseLeave={handleDragScrollMouseLeave}
       >
       {/* Content wrapper with min-width to enable horizontal scrolling */}
       <div style={{ minWidth: `${64 + filteredMembers.length * 220}px` }}>
@@ -923,6 +1026,7 @@ export default function DesktopTimeGrid({ selectedDate, events, onDateChange, on
                         resizingEvent={resizingEvent}
                         resizePreviewEndTime={resizePreviewEndTime}
                         calculateEventOffset={calculateEventOffset}
+                        flashEventId={flashEventId}
                       />
                     )
                   })}
@@ -966,5 +1070,7 @@ DesktopTimeGrid.propTypes = {
   onEventClick: PropTypes.func,
   onEventUpdate: PropTypes.func,
   roleFilter: PropTypes.oneOf(['all', 'tech', 'sales']),
+  hiddenMembers: PropTypes.instanceOf(Set),
+  flashEventId: PropTypes.string,
   children: PropTypes.node,
 }

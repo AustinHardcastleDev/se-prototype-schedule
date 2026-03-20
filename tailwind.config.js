@@ -39,9 +39,17 @@ export default {
           '0%': { opacity: '0', transform: 'translateY(10px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
+        eventFlash: {
+          '0%': { outline: '2.5px solid rgba(244,122,32,0.55)', outlineOffset: '1.5px' },
+          '35%': { outline: '2.5px solid rgba(244,122,32,0.12)', outlineOffset: '1.5px' },
+          '55%': { outline: '2.5px solid rgba(244,122,32,0.4)', outlineOffset: '1.5px' },
+          '75%': { outline: '2.5px solid rgba(244,122,32,0.08)', outlineOffset: '1.5px' },
+          '100%': { outline: '2.5px solid transparent', outlineOffset: '0px' },
+        },
       },
       animation: {
         fadeIn: 'fadeIn 0.2s ease-out',
+        eventFlash: 'eventFlash 2s ease-out 0.35s both',
       },
     },
   },

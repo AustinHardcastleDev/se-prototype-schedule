@@ -40,5 +40,68 @@
     "role": "ops",
     "avatar": "JP",
     "color": "#64748B"
+  },
+  {
+    "id": "tm-7",
+    "name": "Carlos Vega",
+    "role": "tech",
+    "avatar": "CV",
+    "color": "#F59E0B"
+  },
+  {
+    "id": "tm-8",
+    "name": "Lisa Nguyen",
+    "role": "tech",
+    "avatar": "LN",
+    "color": "#EF4444"
+  },
+  {
+    "id": "tm-9",
+    "name": "Brandon Scott",
+    "role": "tech",
+    "avatar": "BS",
+    "color": "#06B6D4"
+  },
+  {
+    "id": "tm-10",
+    "name": "Amanda Foster",
+    "role": "tech",
+    "avatar": "AF",
+    "color": "#D946EF"
+  },
+  {
+    "id": "tm-11",
+    "name": "Ryan Cooper",
+    "role": "tech",
+    "avatar": "RC",
+    "color": "#84CC16"
+  },
+  {
+    "id": "tm-12",
+    "name": "Natalie Brooks",
+    "role": "tech",
+    "avatar": "NB",
+    "color": "#F97316"
+  },
+  {
+    "id": "tm-13",
+    "name": "Tyler Mason",
+    "role": "tech",
+    "avatar": "TM",
+    "color": "#0EA5E9"
+  },
+  {
+    "id": "tm-14",
+    "name": "Heather Wells",
+    "role": "sales",
+    "avatar": "HW",
+    "color": "#A855F7"
+  },
+  {
+    "id": "tm-15",
+    "name": "Derek Chang",
+    "role": "tech",
+    "avatar": "DC",
+    "color": "#10B981"
   }
 ]
