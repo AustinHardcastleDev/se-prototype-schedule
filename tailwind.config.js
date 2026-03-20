@@ -40,11 +40,11 @@ export default {
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
         eventFlash: {
-          '0%': { outline: '2.5px solid rgba(244,122,32,0.55)', outlineOffset: '1.5px' },
-          '35%': { outline: '2.5px solid rgba(244,122,32,0.12)', outlineOffset: '1.5px' },
-          '55%': { outline: '2.5px solid rgba(244,122,32,0.4)', outlineOffset: '1.5px' },
-          '75%': { outline: '2.5px solid rgba(244,122,32,0.08)', outlineOffset: '1.5px' },
-          '100%': { outline: '2.5px solid transparent', outlineOffset: '0px' },
+          '0%': { outline: '3px solid rgba(244,122,32,0.55)', outlineOffset: '-3px' },
+          '35%': { outline: '3px solid rgba(244,122,32,0.12)', outlineOffset: '-3px' },
+          '55%': { outline: '3px solid rgba(244,122,32,0.4)', outlineOffset: '-3px' },
+          '75%': { outline: '3px solid rgba(244,122,32,0.08)', outlineOffset: '-3px' },
+          '100%': { outline: '3px solid transparent', outlineOffset: '-3px' },
         },
       },
       animation: {
